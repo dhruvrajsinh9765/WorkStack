@@ -92,7 +92,8 @@ namespace WorkStack.Controllers
                     UserId = member.UserId,
                     Email = member.User.Email,
                     Role = member.Role,
-                    JoinedAt = member.JoinedAt
+                    JoinedAt = member.JoinedAt,
+                    CanBeRemovedByCurrentUser = CanRemoveMember(currentRole.Value, member.Role, userId, member.UserId)
                 })
                 .AsNoTracking()
                 .ToListAsync();
@@ -100,6 +101,45 @@ namespace WorkStack.Controllers
             ViewData["WorkspaceId"] = id;
             ViewData["CanManageMembers"] = currentRole is WorkspaceRole.Owner or WorkspaceRole.Manager;
             return View(members);
+        }
+
+        [HttpPost("/Workspace/RemoveMember/{workspaceId:int}/{userId}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveMember(int workspaceId, string userId)
+        {
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserId is null)
+            {
+                return Forbid();
+            }
+
+            var currentRole = await context.WorkspaceMembers
+                .Where(member => member.WorkspaceId == workspaceId && member.UserId == currentUserId)
+                .Select(member => (WorkspaceRole?)member.Role)
+                .FirstOrDefaultAsync();
+
+            if (currentRole is null)
+            {
+                return NotFound();
+            }
+
+            var targetMember = await context.WorkspaceMembers
+                .FirstOrDefaultAsync(member => member.WorkspaceId == workspaceId && member.UserId == userId);
+
+            if (targetMember is null)
+            {
+                return NotFound();
+            }
+
+            if (!CanRemoveMember(currentRole.Value, targetMember.Role, currentUserId, targetMember.UserId))
+            {
+                return Forbid();
+            }
+
+            context.WorkspaceMembers.Remove(targetMember);
+            await context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Members), new { id = workspaceId });
         }
 
         [HttpGet("/Workspace/AddMember/{id:int}")]
@@ -190,6 +230,21 @@ namespace WorkStack.Controllers
             }
 
             return null;
+        }
+
+        private static bool CanRemoveMember(WorkspaceRole currentRole, WorkspaceRole targetRole, string currentUserId, string targetUserId)
+        {
+            if (currentUserId == targetUserId || targetRole == WorkspaceRole.Owner)
+            {
+                return false;
+            }
+
+            return currentRole switch
+            {
+                WorkspaceRole.Owner => targetRole is WorkspaceRole.Member or WorkspaceRole.Manager,
+                WorkspaceRole.Manager => targetRole == WorkspaceRole.Member,
+                _ => false
+            };
         }
 
         [HttpGet]

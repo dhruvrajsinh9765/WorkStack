@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Workspace members";
     var workspaceId = (int)ViewData["WorkspaceId"]!;
+    var showRemoveColumn = Model.Any(member => member.CanBeRemovedByCurrentUser);
 }
 
 <h1>Workspace members</h1>
@@ -24,6 +25,10 @@ else
                 <th scope="col">Email</th>
                 <th scope="col">Role</th>
                 <th scope="col">Joined date</th>
+                @if (showRemoveColumn)
+                {
+                    <th scope="col">Actions</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -33,6 +38,18 @@ else
                     <td>@(member.Email ?? "Email unavailable")</td>
                     <td>@member.Role</td>
                     <td>@member.JoinedAt.ToString("d")</td>
+                    @if (showRemoveColumn)
+                    {
+                        <td>
+                            @if (member.CanBeRemovedByCurrentUser)
+                            {
+                                <form asp-action="RemoveMember" asp-route-workspaceId="@workspaceId" asp-route-userId="@member.UserId" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to remove this member?');">Remove</button>
+                                </form>
+                            }
+                        </td>
+                    }
                 </tr>
             }
         </tbody>

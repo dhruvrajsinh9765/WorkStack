@@ -11,5 +11,7 @@ namespace WorkStack.Models.ViewModels
         public WorkspaceRole Role { get; set; }
 
         public DateTime JoinedAt { get; set; }
+
+        public bool CanBeRemovedByCurrentUser { get; set; }
     }
 }
