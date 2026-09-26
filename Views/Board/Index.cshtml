@@ -1,0 +1,51 @@
+@model WorkStack.Models.ViewModels.WorkspaceBoardsViewModel
+
+@{
+    ViewData["Title"] = "Boards";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1>Boards</h1>
+        <p class="text-muted mb-0">@Model.WorkspaceName</p>
+    </div>
+    @if (Model.CanManageBoards)
+    {
+        <a asp-action="Create" asp-route-workspaceId="@Model.WorkspaceId" class="btn btn-primary">Create board</a>
+    }
+</div>
+
+@if (Model.Boards.Count == 0)
+{
+    <p>This workspace has no boards yet.</p>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var board in Model.Boards)
+        {
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="h5 mb-1">@board.Name</h2>
+                    @if (!string.IsNullOrWhiteSpace(board.Description))
+                    {
+                        <p class="mb-0">@board.Description</p>
+                    }
+                </div>
+                <div class="d-flex gap-2">
+                    <a asp-action="Details" asp-route-workspaceId="@Model.WorkspaceId" asp-route-boardId="@board.Id" class="btn btn-outline-primary">Open</a>
+                    @if (Model.CanManageBoards)
+                    {
+                        <a asp-action="Edit" asp-route-workspaceId="@Model.WorkspaceId" asp-route-boardId="@board.Id" class="btn btn-outline-secondary">Edit</a>
+                        <form asp-action="Delete" asp-route-workspaceId="@Model.WorkspaceId" asp-route-boardId="@board.Id" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this board?');">Delete</button>
+                        </form>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}
+
+<a asp-controller="Workspace" asp-action="Details" asp-route-id="@Model.WorkspaceId" class="btn btn-secondary mt-3">Back to workspace</a>

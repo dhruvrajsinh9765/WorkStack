@@ -1,0 +1,30 @@
+@model WorkStack.Models.ViewModels.BoardDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+@if (TempData["BoardDeleteError"] is string errorMessage)
+{
+    <div class="alert alert-warning" role="alert">@errorMessage</div>
+}
+
+<div class="mb-3">
+    <p class="text-muted">@Model.WorkspaceName</p>
+    <h1>@Model.Name</h1>
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <p>@Model.Description</p>
+    }
+    <p class="text-muted">Created @Model.CreatedAt.ToString("g") · Updated @Model.UpdatedAt.ToString("g")</p>
+</div>
+
+@if (Model.CanManageBoards)
+{
+    <a asp-action="Edit" asp-route-workspaceId="@Model.WorkspaceId" asp-route-boardId="@Model.Id" class="btn btn-primary">Edit</a>
+    <form asp-action="Delete" asp-route-workspaceId="@Model.WorkspaceId" asp-route-boardId="@Model.Id" method="post" class="d-inline">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this board?');">Delete</button>
+    </form>
+}
+<a asp-action="Index" asp-route-workspaceId="@Model.WorkspaceId" class="btn btn-secondary">Back to boards</a>
