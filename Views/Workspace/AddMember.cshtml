@@ -1,0 +1,31 @@
+@model WorkStack.Models.ViewModels.AddWorkspaceMemberViewModel
+
+@{
+    ViewData["Title"] = "Add workspace member";
+    var workspaceId = (int)ViewData["WorkspaceId"]!;
+}
+
+<h1>Add workspace member</h1>
+
+<form asp-action="AddMember" asp-route-id="@workspaceId" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" type="email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Role" class="form-label"></label>
+        <select asp-for="Role" class="form-select">
+            <option value="3">Member</option>
+            <option value="2">Manager</option>
+        </select>
+        <span asp-validation-for="Role" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Add member</button>
+    <a asp-action="Members" asp-route-id="@workspaceId" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

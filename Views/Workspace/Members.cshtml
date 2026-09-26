@@ -7,6 +7,11 @@
 
 <h1>Workspace members</h1>
 
+@if (ViewData["CanManageMembers"] is true)
+{
+    <a asp-action="AddMember" asp-route-id="@workspaceId" class="btn btn-primary mb-3">Add member</a>
+}
+
 @if (!Model.Any())
 {
     <p>This workspace has no members yet.</p>

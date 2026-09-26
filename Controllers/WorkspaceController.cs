@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkStack.Data;
@@ -10,7 +11,7 @@ using WorkStack.Models.ViewModels;
 namespace WorkStack.Controllers
 {
     [Authorize]
-    public class WorkspaceController(ApplicationDbContext context) : Controller
+    public class WorkspaceController(ApplicationDbContext context, UserManager<IdentityUser> userManager) : Controller
     {
         public async Task<IActionResult> Index()
         {
@@ -73,10 +74,13 @@ namespace WorkStack.Controllers
                 return Forbid();
             }
 
-            var isMember = await context.WorkspaceMembers
-                .AnyAsync(member => member.WorkspaceId == id && member.UserId == userId);
+            var currentRole = await context.WorkspaceMembers
+                .Where(member => member.WorkspaceId == id && member.UserId == userId)
+                .AsNoTracking()
+                .Select(member => (WorkspaceRole?)member.Role)
+                .FirstOrDefaultAsync();
 
-            if (!isMember)
+            if (currentRole is null)
             {
                 return NotFound();
             }
@@ -94,7 +98,98 @@ namespace WorkStack.Controllers
                 .ToListAsync();
 
             ViewData["WorkspaceId"] = id;
+            ViewData["CanManageMembers"] = currentRole is WorkspaceRole.Owner or WorkspaceRole.Manager;
             return View(members);
+        }
+
+        [HttpGet("/Workspace/AddMember/{id:int}")]
+        public async Task<IActionResult> AddMember(int id)
+        {
+            var authorizationResult = await CheckWorkspaceManagerAccessAsync(id);
+            if (authorizationResult is not null)
+            {
+                return authorizationResult;
+            }
+
+            ViewData["WorkspaceId"] = id;
+            return View(new AddWorkspaceMemberViewModel { Role = WorkspaceRole.Member });
+        }
+
+        [HttpPost("/Workspace/AddMember/{id:int}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddMember(int id, AddWorkspaceMemberViewModel model)
+        {
+            var authorizationResult = await CheckWorkspaceManagerAccessAsync(id);
+            if (authorizationResult is not null)
+            {
+                return authorizationResult;
+            }
+
+            ViewData["WorkspaceId"] = id;
+
+            if (model.Role is not (WorkspaceRole.Member or WorkspaceRole.Manager))
+            {
+                ModelState.AddModelError(nameof(model.Role), "Select Member or Manager. The Owner role cannot be assigned here.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var targetUser = await userManager.FindByEmailAsync(model.Email);
+            if (targetUser is null)
+            {
+                ModelState.AddModelError(nameof(model.Email), "No registered user was found with that email address.");
+                return View(model);
+            }
+
+            var alreadyMember = await context.WorkspaceMembers
+                .AnyAsync(member => member.WorkspaceId == id && member.UserId == targetUser.Id);
+            if (alreadyMember)
+            {
+                ModelState.AddModelError(nameof(model.Email), "That user is already a member of this workspace.");
+                return View(model);
+            }
+
+            context.WorkspaceMembers.Add(new WorkspaceMember
+            {
+                WorkspaceId = id,
+                UserId = targetUser.Id,
+                Role = model.Role,
+                JoinedAt = DateTime.UtcNow
+            });
+
+            await context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Members), new { id });
+        }
+
+        private async Task<IActionResult?> CheckWorkspaceManagerAccessAsync(int workspaceId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+            {
+                return Forbid();
+            }
+
+            var role = await context.WorkspaceMembers
+                .Where(member => member.WorkspaceId == workspaceId && member.UserId == userId)
+                .AsNoTracking()
+                .Select(member => (WorkspaceRole?)member.Role)
+                .FirstOrDefaultAsync();
+
+            if (role is null)
+            {
+                return NotFound();
+            }
+
+            if (role is not (WorkspaceRole.Owner or WorkspaceRole.Manager))
+            {
+                return Forbid();
+            }
+
+            return null;
         }
 
         [HttpGet]
