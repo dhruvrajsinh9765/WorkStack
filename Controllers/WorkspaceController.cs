@@ -64,6 +64,39 @@ namespace WorkStack.Controllers
             return View(model);
         }
 
+        [HttpGet("/Workspace/Members/{id:int}")]
+        public async Task<IActionResult> Members(int id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+            {
+                return Forbid();
+            }
+
+            var isMember = await context.WorkspaceMembers
+                .AnyAsync(member => member.WorkspaceId == id && member.UserId == userId);
+
+            if (!isMember)
+            {
+                return NotFound();
+            }
+
+            var members = await context.WorkspaceMembers
+                .Where(member => member.WorkspaceId == id)
+                .Select(member => new WorkspaceMemberViewModel
+                {
+                    UserId = member.UserId,
+                    Email = member.User.Email,
+                    Role = member.Role,
+                    JoinedAt = member.JoinedAt
+                })
+                .AsNoTracking()
+                .ToListAsync();
+
+            ViewData["WorkspaceId"] = id;
+            return View(members);
+        }
+
         [HttpGet]
         public IActionResult Create()
         {

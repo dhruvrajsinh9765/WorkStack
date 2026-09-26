@@ -1,0 +1,37 @@
+@model IEnumerable<WorkStack.Models.ViewModels.WorkspaceMemberViewModel>
+
+@{
+    ViewData["Title"] = "Workspace members";
+    var workspaceId = (int)ViewData["WorkspaceId"]!;
+}
+
+<h1>Workspace members</h1>
+
+@if (!Model.Any())
+{
+    <p>This workspace has no members yet.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Joined date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var member in Model)
+            {
+                <tr>
+                    <td>@(member.Email ?? "Email unavailable")</td>
+                    <td>@member.Role</td>
+                    <td>@member.JoinedAt.ToString("d")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<a asp-action="Details" asp-route-id="@workspaceId" class="btn btn-secondary">Back to workspace</a>
