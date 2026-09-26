@@ -1,0 +1,30 @@
+@model IEnumerable<WorkStack.Models.Workspace>
+
+@{
+    ViewData["Title"] = "Workspaces";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Workspaces</h1>
+    <a asp-action="Create" class="btn btn-primary">Create workspace</a>
+</div>
+
+@if (!Model.Any())
+{
+    <p>You are not a member of any workspaces yet.</p>
+}
+else
+{
+    <div class="list-group">
+        @foreach (var workspace in Model)
+        {
+            <div class="list-group-item">
+                <h2 class="h5 mb-1">@workspace.Name</h2>
+                @if (!string.IsNullOrWhiteSpace(workspace.Description))
+                {
+                    <p class="mb-0">@workspace.Description</p>
+                }
+            </div>
+        }
+    </div>
+}
