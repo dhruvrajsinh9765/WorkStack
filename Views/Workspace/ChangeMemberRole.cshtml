@@ -1,0 +1,35 @@
+@model WorkStack.Models.ViewModels.ChangeWorkspaceMemberRoleViewModel
+
+@{
+    ViewData["Title"] = "Change member role";
+    var workspaceId = (int)ViewData["WorkspaceId"]!;
+    var userId = (string)ViewContext.RouteData.Values["userId"]!;
+}
+
+<h1>Change member role</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@(Model.Email ?? "Email unavailable")</dd>
+    <dt class="col-sm-3">Current role</dt>
+    <dd class="col-sm-9">@Model.CurrentRole</dd>
+</dl>
+
+<form asp-action="ChangeMemberRole" asp-route-workspaceId="@workspaceId" asp-route-userId="@userId" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="mb-3">
+        <label asp-for="NewRole" class="form-label">New role</label>
+        <select asp-for="NewRole" class="form-select">
+            <option value="3">Member</option>
+            <option value="2">Manager</option>
+        </select>
+        <span asp-validation-for="NewRole" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Save role</button>
+    <a asp-action="Members" asp-route-id="@workspaceId" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

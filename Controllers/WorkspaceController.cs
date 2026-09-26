@@ -93,7 +93,8 @@ namespace WorkStack.Controllers
                     Email = member.User.Email,
                     Role = member.Role,
                     JoinedAt = member.JoinedAt,
-                    CanBeRemovedByCurrentUser = CanRemoveMember(currentRole.Value, member.Role, userId, member.UserId)
+                    CanBeRemovedByCurrentUser = CanRemoveMember(currentRole.Value, member.Role, userId, member.UserId),
+                    CanChangeRole = currentRole == WorkspaceRole.Owner && member.Role != WorkspaceRole.Owner && member.UserId != userId
                 })
                 .AsNoTracking()
                 .ToListAsync();
@@ -101,6 +102,86 @@ namespace WorkStack.Controllers
             ViewData["WorkspaceId"] = id;
             ViewData["CanManageMembers"] = currentRole is WorkspaceRole.Owner or WorkspaceRole.Manager;
             return View(members);
+        }
+
+        [HttpGet("/Workspace/ChangeMemberRole/{workspaceId:int}/{userId}")]
+        public async Task<IActionResult> ChangeMemberRole(int workspaceId, string userId)
+        {
+            var authorizationResult = await CheckWorkspaceOwnerAccessAsync(workspaceId);
+            if (authorizationResult is not null)
+            {
+                return authorizationResult;
+            }
+
+            var targetMember = await context.WorkspaceMembers
+                .Where(member => member.WorkspaceId == workspaceId && member.UserId == userId)
+                .Include(member => member.User)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (targetMember is null)
+            {
+                return NotFound();
+            }
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserId == targetMember.UserId || targetMember.Role == WorkspaceRole.Owner)
+            {
+                return Forbid();
+            }
+
+            ViewData["WorkspaceId"] = workspaceId;
+            return View(new ChangeWorkspaceMemberRoleViewModel
+            {
+                Email = targetMember.User.Email,
+                CurrentRole = targetMember.Role,
+                NewRole = targetMember.Role
+            });
+        }
+
+        [HttpPost("/Workspace/ChangeMemberRole/{workspaceId:int}/{userId}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeMemberRole(int workspaceId, string userId, ChangeWorkspaceMemberRoleViewModel model)
+        {
+            var authorizationResult = await CheckWorkspaceOwnerAccessAsync(workspaceId);
+            if (authorizationResult is not null)
+            {
+                return authorizationResult;
+            }
+
+            var targetMember = await context.WorkspaceMembers
+                .Where(member => member.WorkspaceId == workspaceId && member.UserId == userId)
+                .Include(member => member.User)
+                .FirstOrDefaultAsync();
+
+            if (targetMember is null)
+            {
+                return NotFound();
+            }
+
+            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (currentUserId == targetMember.UserId || targetMember.Role == WorkspaceRole.Owner)
+            {
+                return Forbid();
+            }
+
+            if (model.NewRole is not (WorkspaceRole.Member or WorkspaceRole.Manager))
+            {
+                ModelState.AddModelError(nameof(model.NewRole), "Select Member or Manager. The Owner role cannot be assigned here.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                model.Email = targetMember.User.Email;
+                model.CurrentRole = targetMember.Role;
+                ViewData["WorkspaceId"] = workspaceId;
+                return View(model);
+            }
+
+            targetMember.Role = model.NewRole;
+            await context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Members), new { id = workspaceId });
         }
 
         [HttpPost("/Workspace/RemoveMember/{workspaceId:int}/{userId}")]
@@ -225,6 +306,33 @@ namespace WorkStack.Controllers
             }
 
             if (role is not (WorkspaceRole.Owner or WorkspaceRole.Manager))
+            {
+                return Forbid();
+            }
+
+            return null;
+        }
+
+        private async Task<IActionResult?> CheckWorkspaceOwnerAccessAsync(int workspaceId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId is null)
+            {
+                return Forbid();
+            }
+
+            var role = await context.WorkspaceMembers
+                .Where(member => member.WorkspaceId == workspaceId && member.UserId == userId)
+                .AsNoTracking()
+                .Select(member => (WorkspaceRole?)member.Role)
+                .FirstOrDefaultAsync();
+
+            if (role is null)
+            {
+                return NotFound();
+            }
+
+            if (role != WorkspaceRole.Owner)
             {
                 return Forbid();
             }

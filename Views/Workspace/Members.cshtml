@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Workspace members";
     var workspaceId = (int)ViewData["WorkspaceId"]!;
-    var showRemoveColumn = Model.Any(member => member.CanBeRemovedByCurrentUser);
+    var showActionsColumn = Model.Any(member => member.CanBeRemovedByCurrentUser || member.CanChangeRole);
 }
 
 <h1>Workspace members</h1>
@@ -25,7 +25,7 @@ else
                 <th scope="col">Email</th>
                 <th scope="col">Role</th>
                 <th scope="col">Joined date</th>
-                @if (showRemoveColumn)
+                @if (showActionsColumn)
                 {
                     <th scope="col">Actions</th>
                 }
@@ -38,9 +38,13 @@ else
                     <td>@(member.Email ?? "Email unavailable")</td>
                     <td>@member.Role</td>
                     <td>@member.JoinedAt.ToString("d")</td>
-                    @if (showRemoveColumn)
+                    @if (showActionsColumn)
                     {
                         <td>
+                            @if (member.CanChangeRole)
+                            {
+                                <a asp-action="ChangeMemberRole" asp-route-workspaceId="@workspaceId" asp-route-userId="@member.UserId" class="btn btn-outline-primary btn-sm">Change role</a>
+                            }
                             @if (member.CanBeRemovedByCurrentUser)
                             {
                                 <form asp-action="RemoveMember" asp-route-workspaceId="@workspaceId" asp-route-userId="@member.UserId" method="post" class="d-inline">

@@ -13,5 +13,7 @@ namespace WorkStack.Models.ViewModels
         public DateTime JoinedAt { get; set; }
 
         public bool CanBeRemovedByCurrentUser { get; set; }
+
+        public bool CanChangeRole { get; set; }
     }
 }
