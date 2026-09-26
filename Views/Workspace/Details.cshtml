@@ -1,0 +1,16 @@
+@model WorkStack.Models.ViewModels.WorkspaceDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="mb-3">
+    <h1>@Model.Name</h1>
+    @if (!string.IsNullOrWhiteSpace(Model.Description))
+    {
+        <p>@Model.Description</p>
+    }
+    <p><strong>Your role:</strong> @Model.Role</p>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary">Back to workspaces</a>
