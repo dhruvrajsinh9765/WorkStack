@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -9,40 +9,81 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WorkStack.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">WorkStack</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
+<body class="ws-body @(ViewContext.RouteData.Values["area"]?.ToString() == "Identity" ? "ws-identity-body" : null)">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+        var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+        var isDashboard = currentController == "Dashboard";
+        var isWorkspaceIndex = currentController == "Workspace" && currentAction == "Index";
+
+        <div class="ws-app-shell" data-ws-app-shell>
+            <header class="ws-topbar">
+                <button class="ws-mobile-menu-toggle" type="button" data-ws-nav-toggle aria-controls="ws-sidebar" aria-expanded="false" aria-label="Open navigation">
+                    <svg class="ws-menu-open-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    <svg class="ws-menu-close-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <partial name="_LoginPartial" />
+                <div class="ws-topbar-context">
+                    <span class="ws-topbar-kicker">WORKSTACK</span>
+                    <span class="ws-topbar-label">@(ViewData["Title"] ?? "WorkStack")</span>
                 </div>
+                <div class="ws-topbar-account"><partial name="_LoginPartial" /></div>
+            </header>
+
+            <button class="ws-sidebar-backdrop" type="button" data-ws-nav-close aria-label="Close navigation"></button>
+            <aside class="ws-sidebar" id="ws-sidebar" aria-label="WorkStack navigation">
+                <a class="ws-sidebar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="ws-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h7v6H4zM13 5.5h7v3h-7zM13 10.5h7v8h-7zM4 13.5h7v5H4z" /></svg></span>
+                    <span>WorkStack</span>
+                </a>
+                <nav class="ws-sidebar-nav" aria-label="Main navigation">
+                    <div class="ws-nav-section">
+                        <p class="ws-nav-heading">Main</p>
+                        <a class="ws-sidebar-link @(isDashboard ? "is-active" : null)" asp-area="" asp-controller="Dashboard" asp-action="Index" aria-current="@(isDashboard ? "page" : null)">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="4" rx="1"/><rect x="13" y="10" width="7" height="10" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/></svg>
+                            <span>Dashboard</span>
+                        </a>
+                        <a class="ws-sidebar-link @(isWorkspaceIndex ? "is-active" : null)" asp-area="" asp-controller="Workspace" asp-action="Index" aria-current="@(isWorkspaceIndex ? "page" : null)">
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7.5h6l2 2h8v9H4z"/><path d="M4 7.5v-2h6l2 2"/></svg>
+                            <span>Workspaces</span>
+                        </a>
+                    </div>
+                    <div class="ws-nav-section ws-workspace-nav-section">
+                        <p class="ws-nav-heading">Your workspaces</p>
+                        @await Component.InvokeAsync("WorkspaceNavigation")
+                    </div>
+                </nav>
+            </aside>
+
+            <div class="ws-shell-main">
+                <main role="main" class="ws-main ws-content">
+                    @RenderBody()
+                </main>
+                <footer class="ws-footer">
+                    <div class="ws-content ws-footer-content">&copy; @DateTime.UtcNow.Year - WorkStack <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></div>
+                </footer>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+        </div>
+    }
+    else
+    {
+        <header class="ws-public-header">
+            <nav class="ws-public-nav" aria-label="Public navigation">
+                <a class="ws-public-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <span class="ws-brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5.5h7v6H4zM13 5.5h7v3h-7zM13 10.5h7v8h-7zM4 13.5h7v5H4z" /></svg></span>
+                    <span>WorkStack</span>
+                </a>
+                <div class="ws-public-account"><partial name="_LoginPartial" /></div>
+            </nav>
+        </header>
+        <main role="main" class="ws-public-main ws-content">
             @RenderBody()
         </main>
-    </div>
+        <footer class="ws-footer">
+            <div class="ws-content ws-footer-content">&copy; @DateTime.UtcNow.Year - WorkStack <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></div>
+        </footer>
+    }
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - WorkStack - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

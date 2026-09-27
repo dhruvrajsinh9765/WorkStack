@@ -1,8 +1,59 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Welcome to WorkStack";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <section class="ws-home-hero ws-home-authenticated">
+        <div class="ws-home-copy">
+            <p class="ws-eyebrow"><span class="ws-eyebrow-mark" aria-hidden="true"></span>Teamwork, organized</p>
+            <h1>Welcome back.</h1>
+            <p class="ws-home-lead">Bring your workspaces, projects, and boards together, and keep collaborative work moving forward.</p>
+            <a asp-controller="Workspace" asp-action="Index" class="btn btn-primary">View workspaces <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="ws-home-art" aria-hidden="true">
+            <div class="ws-art-window">
+                <div class="ws-art-window-top"><span></span><span></span><span></span><i></i></div>
+                <div class="ws-art-window-content">
+                    <div class="ws-art-workspace-mark"></div>
+                    <div class="ws-art-lines"><i></i><i></i><i></i></div>
+                    <div class="ws-art-divider"></div>
+                    <div class="ws-art-panels"><i></i><i></i><i></i></div>
+                </div>
+            </div>
+            <span class="ws-art-spark ws-art-spark-one"></span>
+            <span class="ws-art-spark ws-art-spark-two"></span>
+        </div>
+    </section>
+}
+else
+{
+    <section class="ws-home-hero">
+        <div class="ws-home-copy">
+            <p class="ws-eyebrow"><span class="ws-eyebrow-mark" aria-hidden="true"></span>Work together, clearly</p>
+            <h1>Bring your team’s work together.</h1>
+            <p class="ws-home-lead">WorkStack helps teams organize workspaces, projects, and boards so everyone can plan, track, and collaborate in one place.</p>
+            <div class="ws-home-actions">
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary">Get started <span aria-hidden="true">→</span></a>
+                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-secondary">Log in</a>
+            </div>
+            <p class="ws-home-note">A shared place for your team to plan and make progress.</p>
+        </div>
+        <div class="ws-home-art" aria-hidden="true">
+            <div class="ws-art-orbit ws-art-orbit-outer"></div>
+            <div class="ws-art-orbit ws-art-orbit-inner"></div>
+            <div class="ws-art-window">
+                <div class="ws-art-window-top"><span></span><span></span><span></span><i></i></div>
+                <div class="ws-art-window-content">
+                    <div class="ws-art-workspace-mark"></div>
+                    <div class="ws-art-lines"><i></i><i></i><i></i></div>
+                    <div class="ws-art-divider"></div>
+                    <div class="ws-art-panels"><i></i><i></i><i></i></div>
+                    <div class="ws-art-footer-lines"><i></i><i></i></div>
+                </div>
+            </div>
+            <span class="ws-art-spark ws-art-spark-one"></span>
+            <span class="ws-art-spark ws-art-spark-two"></span>
+        </div>
+    </section>
+}

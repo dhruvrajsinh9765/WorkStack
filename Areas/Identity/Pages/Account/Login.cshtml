@@ -1,0 +1,58 @@
+@page
+@model WorkStack.Areas.Identity.Pages.Account.LoginModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = "Log in";
+}
+
+<div class="row justify-content-center py-4">
+    <div class="col-12 col-md-8 col-lg-5">
+        <div class="ws-card p-4 p-md-5">
+            <h1 class="h2 mb-2">Log in</h1>
+            <p class="text-secondary mb-4">Welcome back to WorkStack.</p>
+
+            <form id="account" method="post" asp-route-returnUrl="@Model.ReturnUrl">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+                <div class="mb-3">
+                    <label asp-for="Input.Email" class="form-label">Email</label>
+                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Input.Password" class="form-label"></label>
+                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" asp-for="Input.RememberMe" />
+                    <label asp-for="Input.RememberMe" class="form-check-label"></label>
+                </div>
+                <button id="login-submit" type="submit" class="btn btn-primary w-100">Log in</button>
+            </form>
+
+            <div class="d-flex flex-column gap-2 mt-4">
+                <a asp-page="./ForgotPassword">Forgot your password?</a>
+                <p class="mb-0">New to WorkStack? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register</a></p>
+            </div>
+
+            @if (Model.ExternalLogins.Count > 0)
+            {
+                <hr class="my-4" />
+                <h2 class="h5 mb-3">Log in with another service</h2>
+                <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    @foreach (var provider in Model.ExternalLogins)
+                    {
+                        <button type="submit" class="btn btn-outline-secondary w-100 mb-2" name="provider" value="@provider.Name">
+                            Continue with @provider.DisplayName
+                        </button>
+                    }
+                </form>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

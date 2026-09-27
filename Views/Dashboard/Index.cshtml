@@ -1,0 +1,78 @@
+@model WorkStack.Models.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<section class="ws-page-header d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
+    <div>
+        <p class="text-primary fw-semibold text-uppercase mb-2">Dashboard</p>
+        <h1 class="mb-2">Welcome back@(string.IsNullOrWhiteSpace(Model.DisplayName) ? "" : $", {Model.DisplayName}")</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.Email))
+        {
+            <p>@Model.Email</p>
+        }
+        <p>Your workspaces and teams at a glance.</p>
+    </div>
+    <a asp-controller="Workspace" asp-action="Index" class="btn btn-outline-primary">View workspaces</a>
+</section>
+
+<section class="row g-3 mb-5" aria-label="Workspace summary">
+    <div class="col-12 col-sm-4">
+        <div class="ws-card h-100 p-3 p-lg-4">
+            <p class="text-muted mb-1">Workspaces</p>
+            <p class="h2 mb-0">@Model.WorkspaceCount</p>
+        </div>
+    </div>
+    <div class="col-12 col-sm-4">
+        <div class="ws-card h-100 p-3 p-lg-4">
+            <p class="text-muted mb-1">Boards</p>
+            <p class="h2 mb-0">@Model.BoardCount</p>
+        </div>
+    </div>
+    <div class="col-12 col-sm-4">
+        <div class="ws-card h-100 p-3 p-lg-4">
+            <p class="text-muted mb-1">Memberships across your workspaces</p>
+            <p class="h2 mb-0">@Model.WorkspaceMembershipCount</p>
+            <small class="text-muted">Counts memberships, not unique people.</small>
+        </div>
+    </div>
+</section>
+
+<section aria-labelledby="workspaces-heading">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 id="workspaces-heading" class="h3 mb-0">Your Workspaces</h2>
+    </div>
+
+    @if (Model.Workspaces.Count == 0)
+    {
+        <div class="ws-empty-state">
+            <h3 class="h4">No workspaces yet</h3>
+            <p class="mb-3">Create your first workspace to start organizing your team's work.</p>
+            <a asp-controller="Workspace" asp-action="Create" class="btn btn-primary">Create workspace</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var workspace in Model.Workspaces)
+            {
+                <div class="col-12 col-md-6 col-xl-4">
+                    <article class="ws-card h-100 d-flex flex-column p-4">
+                        <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                            <h3 class="h5 mb-0">@workspace.WorkspaceName</h3>
+                            <span class="badge rounded-pill text-bg-light border">@workspace.Role</span>
+                        </div>
+                        <p class="text-secondary flex-grow-1 mb-4">
+                            @(string.IsNullOrWhiteSpace(workspace.Description) ? "No description provided." : workspace.Description)
+                        </p>
+                        <p class="small text-muted mb-3">@workspace.MemberCount members · @workspace.BoardCount boards</p>
+                        <a asp-controller="Workspace" asp-action="Details" asp-route-id="@workspace.WorkspaceId" class="btn btn-outline-primary align-self-start">
+                            Open workspace <span aria-hidden="true">→</span>
+                        </a>
+                    </article>
+                </div>
+            }
+        </div>
+    }
+</section>

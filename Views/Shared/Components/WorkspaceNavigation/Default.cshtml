@@ -1,0 +1,27 @@
+@model IReadOnlyList<WorkStack.Models.ViewModels.WorkspaceNavigationItemViewModel>
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentWorkspaceId = ViewContext.RouteData.Values["workspaceId"]?.ToString()
+        ?? ViewContext.RouteData.Values["id"]?.ToString();
+}
+
+@if (Model.Count == 0)
+{
+    <p class="ws-nav-empty">No workspaces yet</p>
+}
+else
+{
+    <ul class="ws-workspace-links">
+        @foreach (var workspace in Model)
+        {
+            var isActive = currentWorkspaceId == workspace.Id.ToString()
+                && (currentController == "Workspace" || currentController == "Board");
+            <li>
+                <a class="ws-sidebar-link ws-workspace-link @(isActive ? "is-active" : null)" asp-area="" asp-controller="Workspace" asp-action="Details" asp-route-id="@workspace.Id" title="@workspace.Name" aria-current="@(isActive ? "page" : null)">
+                    <span class="ws-workspace-dot" aria-hidden="true"></span>
+                    <span class="ws-workspace-name">@workspace.Name</span>
+                </a>
+            </li>
+        }
+    </ul>
+}
