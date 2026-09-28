@@ -7,72 +7,402 @@
 <section class="ws-page-header d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
     <div>
         <p class="text-primary fw-semibold text-uppercase mb-2">Dashboard</p>
-        <h1 class="mb-2">Welcome back@(string.IsNullOrWhiteSpace(Model.DisplayName) ? "" : $", {Model.DisplayName}")</h1>
+
+        <h1 class="mb-2">
+            Welcome back@(string.IsNullOrWhiteSpace(Model.DisplayName) ? "" : $", {Model.DisplayName}")
+        </h1>
+
         @if (!string.IsNullOrWhiteSpace(Model.Email))
         {
-            <p>@Model.Email</p>
+            <p class="text-secondary mb-1">@Model.Email</p>
         }
-        <p>Your workspaces and teams at a glance.</p>
+
+        <p class="mb-0">
+            Your workspaces, tasks, and deadlines at a glance.
+        </p>
     </div>
-    <a asp-controller="Workspace" asp-action="Index" class="btn btn-outline-primary">View workspaces</a>
+
+    <a asp-controller="Workspace"
+       asp-action="Index"
+       class="btn btn-outline-primary">
+        View workspaces
+    </a>
 </section>
 
-<section class="row g-3 mb-5" aria-label="Workspace summary">
-    <div class="col-12 col-sm-4">
+
+<!-- =========================================================
+     DASHBOARD SUMMARY
+     ========================================================= -->
+
+<section class="row g-3 mb-5" aria-label="Dashboard summary">
+
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="ws-card h-100 p-3 p-lg-4">
             <p class="text-muted mb-1">Workspaces</p>
             <p class="h2 mb-0">@Model.WorkspaceCount</p>
+            <small class="text-muted">Workspaces you belong to</small>
         </div>
     </div>
-    <div class="col-12 col-sm-4">
+
+
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="ws-card h-100 p-3 p-lg-4">
             <p class="text-muted mb-1">Boards</p>
             <p class="h2 mb-0">@Model.BoardCount</p>
+            <small class="text-muted">Across your workspaces</small>
         </div>
     </div>
-    <div class="col-12 col-sm-4">
+
+
+    <div class="col-12 col-sm-6 col-xl-3">
         <div class="ws-card h-100 p-3 p-lg-4">
-            <p class="text-muted mb-1">Memberships across your workspaces</p>
-            <p class="h2 mb-0">@Model.WorkspaceMembershipCount</p>
-            <small class="text-muted">Counts memberships, not unique people.</small>
+            <p class="text-muted mb-1">My Tasks</p>
+            <p class="h2 mb-0">@Model.MyTaskCount</p>
+            <small class="text-muted">Tasks assigned to you</small>
         </div>
     </div>
+
+
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="ws-card h-100 p-3 p-lg-4">
+            <p class="text-muted mb-1">Due Soon</p>
+            <p class="h2 mb-0">@Model.DueSoonTaskCount</p>
+            <small class="text-muted">Due within 7 days</small>
+        </div>
+    </div>
+
 </section>
 
-<section aria-labelledby="workspaces-heading">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2 id="workspaces-heading" class="h3 mb-0">Your Workspaces</h2>
+
+
+<!-- =========================================================
+     MY TASKS
+     ========================================================= -->
+
+<section class="mb-5" aria-labelledby="my-tasks-heading">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
+
+        <div>
+            <h2 id="my-tasks-heading" class="h3 mb-1">
+                My Tasks
+            </h2>
+
+            <p class="text-muted mb-0">
+                Tasks currently assigned to you.
+            </p>
+        </div>
+
+
+        @if (Model.UrgentTaskCount > 0)
+        {
+            <span class="badge rounded-pill bg-danger px-3 py-2">
+                @Model.UrgentTaskCount urgent
+                @(Model.UrgentTaskCount == 1 ? "task" : "tasks")
+            </span>
+        }
+
     </div>
+
+
+    @if (Model.MyTasks.Count == 0)
+    {
+        <div class="ws-empty-state">
+
+            <h3 class="h4">
+                No tasks assigned to you
+            </h3>
+
+            <p class="mb-0">
+                When someone assigns you a task, it will appear here.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="ws-card overflow-hidden">
+
+            <div class="table-responsive">
+
+                <table class="table table-dark table-hover align-middle mb-0">
+
+                    <thead>
+                        <tr>
+
+                            <th class="px-4 py-3">
+                                Task
+                            </th>
+
+                            <th class="py-3">
+                                Workspace
+                            </th>
+
+                            <th class="py-3">
+                                Board
+                            </th>
+
+                            <th class="py-3">
+                                List
+                            </th>
+
+                            <th class="py-3">
+                                Priority
+                            </th>
+
+                            <th class="py-3">
+                                Due
+                            </th>
+
+                            <th class="px-4 py-3 text-end">
+                                Action
+                            </th>
+
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var task in Model.MyTasks)
+                        {
+                            <tr>
+
+                                <td class="px-4 py-3">
+
+                                    <div class="fw-semibold">
+                                        @task.Title
+                                    </div>
+
+                                </td>
+
+
+                                <td class="py-3">
+                                    <span class="text-secondary">
+                                        @task.WorkspaceName
+                                    </span>
+                                </td>
+
+
+                                <td class="py-3">
+                                    <span class="text-secondary">
+                                        @task.BoardName
+                                    </span>
+                                </td>
+
+
+                                <td class="py-3">
+                                    <span class="text-secondary">
+                                        @task.ListName
+                                    </span>
+                                </td>
+
+
+                                <td class="py-3">
+
+                                    <span class="badge
+                                        @(task.Priority switch
+                                          {
+                                              WorkStack.Models.Enums.TaskPriority.Urgent => "bg-danger",
+                                              WorkStack.Models.Enums.TaskPriority.High => "bg-warning text-dark",
+                                              WorkStack.Models.Enums.TaskPriority.Medium => "bg-primary",
+                                              _ => "bg-secondary"
+                                          })">
+
+                                        @task.Priority
+
+                                    </span>
+
+                                </td>
+
+
+                                <td class="py-3">
+
+                                    @if (!task.DueDate.HasValue)
+                                    {
+                                        <span class="text-muted">
+                                            No due date
+                                        </span>
+                                    }
+                                    else if (task.IsOverdue)
+                                    {
+                                        <span class="text-danger fw-semibold">
+
+                                            Overdue
+
+                                            <br />
+
+                                            <small>
+                                                @task.DueDate.Value.ToLocalTime().ToString("dd MMM yyyy")
+                                            </small>
+
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span>
+                                            @task.DueDate.Value.ToLocalTime().ToString("dd MMM yyyy")
+                                        </span>
+                                    }
+
+                                </td>
+
+
+                                <td class="px-4 py-3 text-end">
+
+                                    <a asp-controller="Task"
+                                       asp-action="Details"
+                                       asp-route-workspaceId="@task.WorkspaceId"
+                                       asp-route-boardId="@task.BoardId"
+                                       asp-route-listId="@task.ListId"
+                                       asp-route-taskId="@task.TaskId"
+                                       class="btn btn-sm btn-outline-primary">
+
+                                        Open
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        @if (Model.MyTaskCount > Model.MyTasks.Count)
+        {
+            <p class="text-muted small mt-2 mb-0">
+
+                Showing the 10 most relevant tasks out of
+                @Model.MyTaskCount assigned tasks.
+
+            </p>
+        }
+
+    }
+
+</section>
+
+
+
+<!-- =========================================================
+     YOUR WORKSPACES
+     ========================================================= -->
+
+<section aria-labelledby="workspaces-heading">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+
+            <h2 id="workspaces-heading" class="h3 mb-1">
+                Your Workspaces
+            </h2>
+
+            <p class="text-muted mb-0">
+                Workspaces and teams you belong to.
+            </p>
+
+        </div>
+
+    </div>
+
 
     @if (Model.Workspaces.Count == 0)
     {
         <div class="ws-empty-state">
-            <h3 class="h4">No workspaces yet</h3>
-            <p class="mb-3">Create your first workspace to start organizing your team's work.</p>
-            <a asp-controller="Workspace" asp-action="Create" class="btn btn-primary">Create workspace</a>
+
+            <h3 class="h4">
+                No workspaces yet
+            </h3>
+
+            <p class="mb-3">
+                Create your first workspace to start organizing your team's work.
+            </p>
+
+            <a asp-controller="Workspace"
+               asp-action="Create"
+               class="btn btn-primary">
+
+                Create workspace
+
+            </a>
+
         </div>
     }
     else
     {
         <div class="row g-3">
+
             @foreach (var workspace in Model.Workspaces)
             {
                 <div class="col-12 col-md-6 col-xl-4">
+
                     <article class="ws-card h-100 d-flex flex-column p-4">
+
                         <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
-                            <h3 class="h5 mb-0">@workspace.WorkspaceName</h3>
-                            <span class="badge rounded-pill text-bg-light border">@workspace.Role</span>
+
+                            <h3 class="h5 mb-0">
+                                @workspace.WorkspaceName
+                            </h3>
+
+                            <span class="badge rounded-pill text-bg-light border">
+                                @workspace.Role
+                            </span>
+
                         </div>
+
+
                         <p class="text-secondary flex-grow-1 mb-4">
-                            @(string.IsNullOrWhiteSpace(workspace.Description) ? "No description provided." : workspace.Description)
+
+                            @(string.IsNullOrWhiteSpace(workspace.Description)
+                                ? "No description provided."
+                                : workspace.Description)
+
                         </p>
-                        <p class="small text-muted mb-3">@workspace.MemberCount members · @workspace.BoardCount boards</p>
-                        <a asp-controller="Workspace" asp-action="Details" asp-route-id="@workspace.WorkspaceId" class="btn btn-outline-primary align-self-start">
-                            Open workspace <span aria-hidden="true">→</span>
+
+
+                        <div class="d-flex gap-3 small text-muted mb-3">
+
+                            <span>
+                                @workspace.MemberCount
+                                @(workspace.MemberCount == 1 ? "member" : "members")
+                            </span>
+
+                            <span>
+                                @workspace.BoardCount
+                                @(workspace.BoardCount == 1 ? "board" : "boards")
+                            </span>
+
+                        </div>
+
+
+                        <a asp-controller="Workspace"
+                           asp-action="Details"
+                           asp-route-id="@workspace.WorkspaceId"
+                           class="btn btn-outline-primary align-self-start">
+
+                            Open workspace
+
+                            <span aria-hidden="true">
+                                →
+                            </span>
+
                         </a>
+
                     </article>
+
                 </div>
             }
+
         </div>
     }
+
 </section>
