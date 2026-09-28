@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkStack.Data;
@@ -9,7 +10,9 @@ using WorkStack.Models.ViewModels;
 namespace WorkStack.Controllers
 {
     [Authorize]
-    public class DashboardController(ApplicationDbContext context) : Controller
+    public class DashboardController(
+        ApplicationDbContext context,
+        UserManager<IdentityUser> userManager) : Controller
     {
         [HttpGet("/Dashboard")]
         public async Task<IActionResult> Index()
@@ -17,6 +20,13 @@ namespace WorkStack.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (userId is null)
+            {
+                return Forbid();
+            }
+
+            var currentUser = await userManager.FindByIdAsync(userId);
+
+            if (currentUser is null)
             {
                 return Forbid();
             }
@@ -66,8 +76,9 @@ namespace WorkStack.Controllers
             // Calculate overdue status after the database query.
             foreach (var task in myTasks)
             {
-                task.IsOverdue = task.DueDate.HasValue
-                    && task.DueDate.Value < now;
+                task.IsOverdue =
+                    task.DueDate.HasValue &&
+                    task.DueDate.Value < now;
             }
 
             // Counts are calculated from the complete assigned-task query.
@@ -79,23 +90,45 @@ namespace WorkStack.Controllers
 
             var dueSoonTaskCount = await assignedTaskQuery
                 .CountAsync(task =>
-                    task.DueDate.HasValue
-                    && task.DueDate.Value >= now
-                    && task.DueDate.Value <= dueSoonLimit);
+                    task.DueDate.HasValue &&
+                    task.DueDate.Value >= now &&
+                    task.DueDate.Value <= dueSoonLimit);
 
             var urgentTaskCount = await assignedTaskQuery
-                .CountAsync(task => task.Priority == TaskPriority.Urgent);
+                .CountAsync(task =>
+                    task.Priority == TaskPriority.Urgent);
+
+            /*
+             * Use the WorkStack username for the dashboard.
+             *
+             * If the user has not chosen a custom username yet,
+             * Identity still contains the email as the temporary
+             * username. In that case we show "Set your username"
+             * instead of exposing the email as the display name.
+             */
+            var displayName = currentUser.UserName;
+
+            if (string.IsNullOrWhiteSpace(displayName) ||
+                string.Equals(
+                    displayName,
+                    currentUser.Email,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                displayName = "Set your username";
+            }
 
             var model = new DashboardViewModel
             {
-                DisplayName = User.Identity?.Name,
-                Email = User.FindFirstValue(ClaimTypes.Email),
+                DisplayName = displayName,
+
+                Email = currentUser.Email,
 
                 Workspaces = workspaces,
 
                 WorkspaceCount = workspaces.Count,
 
-                BoardCount = workspaces.Sum(workspace => workspace.BoardCount),
+                BoardCount = workspaces.Sum(
+                    workspace => workspace.BoardCount),
 
                 WorkspaceMembershipCount = workspaces.Sum(
                     workspace => workspace.MemberCount),

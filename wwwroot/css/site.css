@@ -7304,3 +7304,984 @@ button:focus-visible {
         width: 100%;
     }
 }
+/* ============================================================
+   WORKSTACK AUTHENTICATION + ACCOUNT UI
+   ============================================================ */
+
+.ws-account-menu {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ws-account-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 5px 8px 5px 5px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    color: var(--ws-text);
+    text-decoration: none;
+    transition: background-color .18s ease, border-color .18s ease;
+}
+
+    .ws-account-profile:hover {
+        color: var(--ws-text);
+        background: var(--ws-surface);
+        border-color: var(--ws-border);
+    }
+
+.ws-account-avatar {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    border-radius: 10px;
+    background: var(--ws-primary);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 800;
+}
+
+.ws-account-copy {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.15;
+}
+
+.ws-account-name {
+    max-width: 150px;
+    overflow: hidden;
+    color: var(--ws-text);
+    font-size: .82rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ws-account-label {
+    margin-top: 3px;
+    color: var(--ws-muted);
+    font-size: .68rem;
+}
+
+.ws-account-manage,
+.ws-account-logout {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 1px solid var(--ws-border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ws-muted);
+    text-decoration: none;
+    transition: color .18s ease, background-color .18s ease, border-color .18s ease;
+}
+
+    .ws-account-manage:hover,
+    .ws-account-logout:hover {
+        color: var(--ws-text);
+        background: var(--ws-surface);
+        border-color: var(--ws-border-strong, var(--ws-border));
+    }
+
+    .ws-account-manage svg,
+    .ws-account-logout svg {
+        width: 17px;
+        height: 17px;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.7;
+    }
+
+.ws-account-logout-form {
+    margin: 0;
+}
+
+.ws-public-account-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ws-public-login-link,
+.ws-public-register-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 0 15px;
+    border-radius: 10px;
+    font-size: .82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease;
+}
+
+.ws-public-login-link {
+    color: var(--ws-text);
+}
+
+    .ws-public-login-link:hover {
+        color: var(--ws-text);
+        background: var(--ws-surface);
+    }
+
+.ws-public-register-link {
+    border: 1px solid var(--ws-primary);
+    background: var(--ws-primary);
+    color: #fff;
+}
+
+    .ws-public-register-link:hover {
+        color: #fff;
+        background: var(--ws-primary-hover);
+    }
+
+
+/* ============================================================
+   AUTH PAGES
+   ============================================================ */
+
+.ws-auth-page {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    padding: 48px 24px 64px;
+}
+
+.ws-auth-shell {
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(420px, .8fr);
+    width: min(1120px, 100%);
+    min-height: 640px;
+    margin: 0 auto;
+    overflow: hidden;
+    border: 1px solid var(--ws-border);
+    border-radius: 24px;
+    background: var(--ws-surface);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .24);
+}
+
+.ws-auth-intro {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 46px;
+    overflow: hidden;
+    background: radial-gradient(circle at 15% 15%, rgba(108, 99, 255, .18), transparent 35%), radial-gradient(circle at 90% 80%, rgba(108, 99, 255, .10), transparent 30%), var(--ws-surface-2, var(--ws-surface));
+    border-right: 1px solid var(--ws-border);
+}
+
+    .ws-auth-intro::after {
+        content: "";
+        position: absolute;
+        right: -100px;
+        bottom: -100px;
+        width: 280px;
+        height: 280px;
+        border: 1px solid rgba(255, 255, 255, .06);
+        border-radius: 50%;
+        box-shadow: 0 0 0 40px rgba(255, 255, 255, .025), 0 0 0 80px rgba(255, 255, 255, .018);
+        pointer-events: none;
+    }
+
+.ws-auth-brand {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+    color: var(--ws-text);
+    font-size: 1rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.ws-auth-intro-content {
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+    margin-bottom: auto;
+    padding: 70px 0 30px;
+}
+
+.ws-auth-eyebrow,
+.ws-mobile-auth-label {
+    color: var(--ws-primary);
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+}
+
+.ws-auth-intro h1 {
+    max-width: 520px;
+    margin: 14px 0 18px;
+    color: var(--ws-text);
+    font-size: clamp(2.7rem, 5vw, 4.5rem);
+    font-weight: 800;
+    letter-spacing: -.055em;
+    line-height: .98;
+}
+
+.ws-auth-intro p {
+    max-width: 470px;
+    margin: 0;
+    color: var(--ws-muted);
+    font-size: .98rem;
+    line-height: 1.75;
+}
+
+.ws-auth-feature-list {
+    display: grid;
+    gap: 13px;
+    margin-top: 34px;
+}
+
+.ws-auth-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--ws-text);
+    font-size: .84rem;
+    font-weight: 600;
+}
+
+.ws-auth-feature-icon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    border: 1px solid var(--ws-border);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .025);
+    color: var(--ws-primary);
+}
+
+    .ws-auth-feature-icon svg {
+        width: 16px;
+        height: 16px;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.7;
+    }
+
+.ws-auth-stat {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 25px;
+}
+
+    .ws-auth-stat strong {
+        color: var(--ws-text);
+        font-size: .86rem;
+    }
+
+    .ws-auth-stat span {
+        color: var(--ws-muted);
+        font-size: .78rem;
+    }
+
+.ws-auth-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 46px;
+    background: var(--ws-bg, #0a0a0f);
+}
+
+.ws-auth-card {
+    width: min(430px, 100%);
+}
+
+.ws-auth-card-header {
+    margin-bottom: 30px;
+}
+
+.ws-auth-mobile-label {
+    display: none;
+}
+
+.ws-auth-card-header h2 {
+    margin: 0;
+    color: var(--ws-text);
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -.035em;
+}
+
+.ws-auth-card-header p {
+    margin: 8px 0 0;
+    color: var(--ws-muted);
+    font-size: .86rem;
+    line-height: 1.6;
+}
+
+.ws-form-field {
+    margin-bottom: 20px;
+}
+
+    .ws-form-field > label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--ws-text);
+        font-size: .78rem;
+        font-weight: 700;
+    }
+
+.ws-auth-input-wrap {
+    position: relative;
+}
+
+    .ws-auth-input-wrap svg {
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        width: 17px;
+        height: 17px;
+        transform: translateY(-50%);
+        fill: none;
+        stroke: var(--ws-muted);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.6;
+        pointer-events: none;
+    }
+
+    .ws-auth-input-wrap input {
+        width: 100%;
+        min-height: 48px;
+        padding: 0 14px 0 43px;
+        border: 1px solid var(--ws-border);
+        border-radius: 11px;
+        outline: none;
+        background: var(--ws-surface);
+        color: var(--ws-text);
+        font-size: .84rem;
+        transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+        .ws-auth-input-wrap input::placeholder {
+            color: var(--ws-muted);
+            opacity: .7;
+        }
+
+        .ws-auth-input-wrap input:focus {
+            border-color: var(--ws-primary);
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, .13);
+        }
+
+.ws-auth-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin: 4px 0 22px;
+}
+
+.ws-remember-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ws-muted);
+    font-size: .76rem;
+    cursor: pointer;
+}
+
+    .ws-remember-option input {
+        width: 15px;
+        height: 15px;
+        accent-color: var(--ws-primary);
+    }
+
+.ws-auth-options a,
+.ws-auth-footer a {
+    color: var(--ws-primary);
+    font-size: .76rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+    .ws-auth-options a:hover,
+    .ws-auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+.ws-auth-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 49px;
+    border: 1px solid var(--ws-primary);
+    border-radius: 11px;
+    background: var(--ws-primary);
+    color: #fff;
+    font-size: .82rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform .18s ease, background-color .18s ease;
+}
+
+    .ws-auth-submit:hover {
+        background: var(--ws-primary-hover);
+        transform: translateY(-1px);
+    }
+
+    .ws-auth-submit svg {
+        width: 17px;
+        height: 17px;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.8;
+    }
+
+.ws-auth-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 24px;
+    color: var(--ws-muted);
+    font-size: .76rem;
+    text-align: center;
+}
+
+.ws-auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 25px 0 18px;
+    color: var(--ws-muted);
+    font-size: .7rem;
+}
+
+    .ws-auth-divider::before,
+    .ws-auth-divider::after {
+        content: "";
+        height: 1px;
+        flex: 1;
+        background: var(--ws-border);
+    }
+
+.ws-auth-external-form {
+    display: grid;
+    gap: 8px;
+}
+
+.ws-auth-external-button {
+    min-height: 45px;
+    border: 1px solid var(--ws-border);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--ws-text);
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+    .ws-auth-external-button:hover {
+        background: var(--ws-surface);
+    }
+
+.ws-auth-validation {
+    margin-bottom: 18px;
+    padding: 11px 13px;
+    border: 1px solid rgba(239, 68, 68, .28);
+    border-radius: 10px;
+    background: rgba(239, 68, 68, .08);
+    color: #fca5a5;
+    font-size: .76rem;
+}
+
+.ws-field-validation {
+    display: block;
+    margin-top: 6px;
+    color: #fca5a5;
+    font-size: .72rem;
+}
+
+
+/* ============================================================
+   ACCOUNT SETTINGS
+   ============================================================ */
+
+.ws-account-page {
+    width: min(920px, 100%);
+    margin: 0 auto;
+}
+
+.ws-account-page-header {
+    margin-bottom: 28px;
+}
+
+    .ws-account-page-header h1 {
+        margin: 6px 0 7px;
+        color: var(--ws-text);
+        font-size: clamp(1.8rem, 3vw, 2.35rem);
+        font-weight: 800;
+        letter-spacing: -.04em;
+    }
+
+    .ws-account-page-header p {
+        margin: 0;
+        color: var(--ws-muted);
+        font-size: .84rem;
+    }
+
+.ws-page-eyebrow {
+    color: var(--ws-primary);
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .14em;
+}
+
+.ws-account-settings-card {
+    overflow: hidden;
+    border: 1px solid var(--ws-border);
+    border-radius: 18px;
+    background: var(--ws-surface);
+}
+
+.ws-settings-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 24px 26px;
+    border-bottom: 1px solid var(--ws-border);
+}
+
+.ws-settings-icon {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border: 1px solid rgba(108, 99, 255, .24);
+    border-radius: 11px;
+    background: rgba(108, 99, 255, .09);
+    color: var(--ws-primary);
+}
+
+    .ws-settings-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.6;
+    }
+
+.ws-settings-card-header h2 {
+    margin: 1px 0 5px;
+    color: var(--ws-text);
+    font-size: 1rem;
+    font-weight: 750;
+}
+
+.ws-settings-card-header p {
+    margin: 0;
+    color: var(--ws-muted);
+    font-size: .76rem;
+    line-height: 1.5;
+}
+
+.ws-account-form {
+    padding: 26px;
+}
+
+.ws-account-input {
+    width: 100%;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1px solid var(--ws-border);
+    border-radius: 10px;
+    outline: none;
+    background: var(--ws-bg, #0a0a0f);
+    color: var(--ws-text);
+    font-size: .82rem;
+    transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+    .ws-account-input:focus {
+        border-color: var(--ws-primary);
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, .13);
+    }
+
+.ws-account-input-disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.ws-account-field-note {
+    display: block;
+    margin-top: 7px;
+    color: var(--ws-muted);
+    font-size: .7rem;
+    line-height: 1.5;
+}
+
+.ws-account-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 8px;
+}
+
+.ws-settings-save {
+    min-height: 43px;
+    padding: 0 18px;
+    border: 1px solid var(--ws-primary);
+    border-radius: 10px;
+    background: var(--ws-primary);
+    color: #fff;
+    font-size: .78rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: background-color .18s ease, transform .18s ease;
+}
+
+    .ws-settings-save:hover {
+        background: var(--ws-primary-hover);
+        transform: translateY(-1px);
+    }
+
+.ws-password-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 2px;
+    padding: 11px 12px;
+    border: 1px solid var(--ws-border);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .018);
+    color: var(--ws-muted);
+    font-size: .7rem;
+    line-height: 1.5;
+}
+
+    .ws-password-note svg {
+        width: 16px;
+        height: 16px;
+        flex: 0 0 16px;
+        margin-top: 1px;
+        fill: none;
+        stroke: var(--ws-primary);
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.6;
+    }
+
+
+/* ============================================================
+   ACCOUNT RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .ws-auth-shell {
+        grid-template-columns: 1fr;
+        min-height: auto;
+    }
+
+    .ws-auth-intro {
+        min-height: 360px;
+        padding: 34px;
+        border-right: 0;
+        border-bottom: 1px solid var(--ws-border);
+    }
+
+    .ws-auth-intro-content {
+        padding: 50px 0 0;
+    }
+
+    .ws-auth-intro h1 {
+        font-size: clamp(2.4rem, 7vw, 3.6rem);
+    }
+
+    .ws-auth-feature-list {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .ws-auth-feature {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 640px) {
+    .ws-auth-page {
+        min-height: auto;
+        padding: 24px 14px 40px;
+    }
+
+    .ws-auth-shell {
+        border-radius: 18px;
+    }
+
+    .ws-auth-intro {
+        min-height: auto;
+        padding: 26px 22px;
+    }
+
+    .ws-auth-intro-content {
+        padding: 45px 0 5px;
+    }
+
+    .ws-auth-intro h1 {
+        font-size: 2.55rem;
+    }
+
+    .ws-auth-feature-list {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .ws-auth-feature {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .ws-auth-panel {
+        padding: 30px 20px;
+    }
+
+    .ws-auth-card-header h2 {
+        font-size: 1.7rem;
+    }
+
+    .ws-account-copy {
+        display: none;
+    }
+
+    .ws-account-profile {
+        padding-right: 5px;
+    }
+
+    .ws-account-page-header {
+        margin-bottom: 20px;
+    }
+
+    .ws-settings-card-header {
+        padding: 20px;
+    }
+
+    .ws-account-form {
+        padding: 20px;
+    }
+
+    .ws-account-form-actions {
+        justify-content: stretch;
+    }
+
+    .ws-settings-save {
+        width: 100%;
+    }
+}
+/* ============================================================
+   WORKSTACK SIMPLE AUTH CARD
+   ============================================================ */
+
+.ws-simple-auth-card {
+    width: min(440px, 100%);
+    margin: auto;
+    padding: 42px;
+    border: 1px solid var(--ws-border);
+    border-radius: 20px;
+    background: var(--ws-surface);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .22);
+    text-align: center;
+}
+
+.ws-simple-auth-icon {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    margin: 0 auto 22px;
+    border: 1px solid rgba(108, 99, 255, .25);
+    border-radius: 14px;
+    background: rgba(108, 99, 255, .09);
+    color: var(--ws-primary);
+}
+
+    .ws-simple-auth-icon svg {
+        width: 24px;
+        height: 24px;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.7;
+    }
+
+.ws-simple-auth-card h1 {
+    margin: 8px 0 10px;
+    color: var(--ws-text);
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -.04em;
+}
+
+.ws-simple-auth-card p {
+    margin: 0 auto 28px;
+    max-width: 330px;
+    color: var(--ws-muted);
+    font-size: .84rem;
+    line-height: 1.65;
+}
+
+.ws-simple-auth-card .ws-auth-submit {
+    margin-top: 4px;
+}
+
+.ws-simple-auth-back {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--ws-muted);
+    font-size: .76rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+    .ws-simple-auth-back:hover {
+        color: var(--ws-text);
+    }
+
+@media (max-width: 640px) {
+    .ws-simple-auth-card {
+        padding: 30px 22px;
+        border-radius: 16px;
+    }
+}
+/* ============================================================
+   ACCOUNT SETTINGS - EMAIL REFINEMENTS
+   ============================================================ */
+
+.ws-settings-card-eyebrow {
+    display: block;
+    margin-bottom: 0.28rem;
+    color: var(--ws-primary);
+    font-size: 0.68rem;
+    font-weight: 750;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.ws-account-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+    .ws-account-input-wrap > svg {
+        position: absolute;
+        left: 1rem;
+        z-index: 2;
+        width: 1.05rem;
+        height: 1.05rem;
+        fill: none;
+        stroke: var(--ws-muted);
+        stroke-width: 1.7;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        pointer-events: none;
+    }
+
+    .ws-account-input-wrap .ws-account-input {
+        width: 100%;
+        padding-left: 3rem;
+    }
+
+        .ws-account-input-wrap .ws-account-input:focus {
+            border-color: var(--ws-primary);
+            box-shadow: 0 0 0 3px rgb(99 102 241 / 0.12);
+        }
+
+        .ws-account-input-wrap .ws-account-input:disabled {
+            cursor: not-allowed;
+            opacity: 0.72;
+        }
+
+.ws-account-help {
+    display: block;
+    margin-top: 0.55rem;
+    color: var(--ws-muted);
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.ws-account-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--ws-border);
+}
+
+.ws-settings-save {
+    display: inline-flex;
+    min-height: 2.65rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    padding: 0.65rem 1.05rem;
+    border: 1px solid var(--ws-primary);
+    border-radius: 0.55rem;
+    background: var(--ws-primary);
+    color: #fff;
+    font-size: 0.86rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+    .ws-settings-save svg {
+        width: 1rem;
+        height: 1rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+    .ws-settings-save:hover {
+        border-color: var(--ws-primary-hover);
+        background: var(--ws-primary-hover);
+        color: #fff;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 22px rgb(99 102 241 / 0.18);
+    }
+
+    .ws-settings-save:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px rgb(99 102 241 / 0.18);
+    }
+
+@media (max-width: 640px) {
+
+    .ws-account-form-actions {
+        justify-content: stretch;
+    }
+
+    .ws-settings-save {
+        width: 100%;
+    }
+}

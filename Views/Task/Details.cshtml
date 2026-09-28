@@ -78,12 +78,14 @@
         {
             <div class="ws-task-hero-actions">
 
+                <!-- EDIT -->
+
                 <a asp-controller="Task"
                    asp-action="Edit"
                    asp-route-workspaceId="@Model.WorkspaceId"
                    asp-route-boardId="@Model.BoardId"
                    asp-route-listId="@Model.ListId"
-                   asp-route-id="@Model.Id"
+                   asp-route-taskId="@Model.Id"
                    class="ws-task-action-primary">
 
                     Edit task
@@ -91,12 +93,14 @@
                 </a>
 
 
+                <!-- DELETE -->
+
                 <form asp-controller="Task"
                       asp-action="Delete"
                       asp-route-workspaceId="@Model.WorkspaceId"
                       asp-route-boardId="@Model.BoardId"
                       asp-route-listId="@Model.ListId"
-                      asp-route-id="@Model.Id"
+                      asp-route-taskId="@Model.Id"
                       method="post"
                       onsubmit="return confirm('Are you sure you want to delete this task?');">
 
@@ -133,6 +137,7 @@
                 <div class="ws-task-panel-header">
 
                     <div>
+
                         <span class="ws-task-panel-eyebrow">
                             DETAILS
                         </span>
@@ -140,6 +145,7 @@
                         <h2>
                             Description
                         </h2>
+
                     </div>
 
                 </div>
@@ -170,6 +176,7 @@
                 <div class="ws-task-panel-header">
 
                     <div>
+
                         <span class="ws-task-panel-eyebrow">
                             COLLABORATION
                         </span>
@@ -177,6 +184,7 @@
                         <h2>
                             Comments
                         </h2>
+
                     </div>
 
                     <span class="ws-task-count">
@@ -201,27 +209,14 @@
 
                 <form asp-controller="Task"
                       asp-action="AddComment"
+                      asp-route-workspaceId="@Model.WorkspaceId"
+                      asp-route-boardId="@Model.BoardId"
+                      asp-route-listId="@Model.ListId"
+                      asp-route-taskId="@Model.Id"
                       method="post"
                       class="ws-task-comment-form">
 
                     @Html.AntiForgeryToken()
-
-                    <input type="hidden"
-                           name="workspaceId"
-                           value="@Model.WorkspaceId" />
-
-                    <input type="hidden"
-                           name="boardId"
-                           value="@Model.BoardId" />
-
-                    <input type="hidden"
-                           name="listId"
-                           value="@Model.ListId" />
-
-                    <input type="hidden"
-                           name="taskId"
-                           value="@Model.Id" />
-
 
                     <textarea name="content"
                               rows="4"
@@ -273,12 +268,15 @@
 
                         @foreach (var comment in Model.Comments)
                         {
-                            var commentName = comment.UserName?.Trim() ?? string.Empty;
+                            var commentName =
+                                comment.UserName?.Trim() ?? string.Empty;
 
                             var commentInitial =
                                 string.IsNullOrWhiteSpace(commentName)
                                     ? "?"
-                                    : commentName.Substring(0, 1).ToUpperInvariant();
+                                    : commentName
+                                        .Substring(0, 1)
+                                        .ToUpperInvariant();
 
 
                             <article class="ws-task-comment">
@@ -299,39 +297,28 @@
                                             </strong>
 
                                             <time>
-                                                @comment.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                                @comment.CreatedAt
+                                                .ToLocalTime()
+                                                .ToString("dd MMM yyyy, hh:mm tt")
                                             </time>
 
                                         </div>
 
 
+                                        <!-- DELETE COMMENT -->
+
                                         <form asp-controller="Task"
                                               asp-action="DeleteComment"
+                                              asp-route-workspaceId="@Model.WorkspaceId"
+                                              asp-route-boardId="@Model.BoardId"
+                                              asp-route-listId="@Model.ListId"
+                                              asp-route-taskId="@Model.Id"
+                                              asp-route-commentId="@comment.Id"
                                               method="post"
                                               class="ws-task-comment-delete-form"
                                               onsubmit="return confirm('Delete this comment?');">
 
                                             @Html.AntiForgeryToken()
-
-                                            <input type="hidden"
-                                                   name="workspaceId"
-                                                   value="@Model.WorkspaceId" />
-
-                                            <input type="hidden"
-                                                   name="boardId"
-                                                   value="@Model.BoardId" />
-
-                                            <input type="hidden"
-                                                   name="listId"
-                                                   value="@Model.ListId" />
-
-                                            <input type="hidden"
-                                                   name="taskId"
-                                                   value="@Model.Id" />
-
-                                            <input type="hidden"
-                                                   name="commentId"
-                                                   value="@comment.Id" />
 
                                             <button type="submit">
                                                 Delete
@@ -371,6 +358,7 @@
                 <div class="ws-task-panel-header">
 
                     <div>
+
                         <span class="ws-task-panel-eyebrow">
                             OVERVIEW
                         </span>
@@ -378,6 +366,7 @@
                         <h2>
                             Task information
                         </h2>
+
                     </div>
 
                 </div>
@@ -405,7 +394,9 @@
                         </span>
 
                         <strong>
-                            @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                            @Model.CreatedAt
+                            .ToLocalTime()
+                            .ToString("dd MMM yyyy, hh:mm tt")
                         </strong>
 
                     </div>
@@ -418,7 +409,9 @@
                         </span>
 
                         <strong>
-                            @Model.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                            @Model.UpdatedAt
+                            .ToLocalTime()
+                            .ToString("dd MMM yyyy, hh:mm tt")
                         </strong>
 
                     </div>
@@ -435,6 +428,7 @@
                 <div class="ws-task-panel-header">
 
                     <div>
+
                         <span class="ws-task-panel-eyebrow">
                             PEOPLE
                         </span>
@@ -442,6 +436,7 @@
                         <h2>
                             Assignees
                         </h2>
+
                     </div>
 
                     <span class="ws-task-count">
@@ -463,12 +458,15 @@
 
                         @foreach (var assignee in Model.Assignees)
                         {
-                            var assigneeName = assignee.UserName?.Trim() ?? string.Empty;
+                            var assigneeName =
+                                assignee.UserName?.Trim() ?? string.Empty;
 
                             var assigneeInitial =
                                 string.IsNullOrWhiteSpace(assigneeName)
                                     ? "?"
-                                    : assigneeName.Substring(0, 1).ToUpperInvariant();
+                                    : assigneeName
+                                        .Substring(0, 1)
+                                        .ToUpperInvariant();
 
 
                             <div class="ws-task-assignee-row">
@@ -488,31 +486,18 @@
 
                                 @if (Model.CanManage)
                                 {
+                                    <!-- UNASSIGN -->
+
                                     <form asp-controller="Task"
                                           asp-action="Unassign"
+                                          asp-route-workspaceId="@Model.WorkspaceId"
+                                          asp-route-boardId="@Model.BoardId"
+                                          asp-route-listId="@Model.ListId"
+                                          asp-route-taskId="@Model.Id"
+                                          asp-route-userId="@assignee.UserId"
                                           method="post">
 
                                         @Html.AntiForgeryToken()
-
-                                        <input type="hidden"
-                                               name="workspaceId"
-                                               value="@Model.WorkspaceId" />
-
-                                        <input type="hidden"
-                                               name="boardId"
-                                               value="@Model.BoardId" />
-
-                                        <input type="hidden"
-                                               name="listId"
-                                               value="@Model.ListId" />
-
-                                        <input type="hidden"
-                                               name="taskId"
-                                               value="@Model.Id" />
-
-                                        <input type="hidden"
-                                               name="userId"
-                                               value="@assignee.UserId" />
 
                                         <button type="submit"
                                                 class="ws-task-remove-button">
@@ -539,28 +524,18 @@
                             Assign member
                         </div>
 
+
+                        <!-- ASSIGN -->
+
                         <form asp-controller="Task"
                               asp-action="Assign"
+                              asp-route-workspaceId="@Model.WorkspaceId"
+                              asp-route-boardId="@Model.BoardId"
+                              asp-route-listId="@Model.ListId"
+                              asp-route-taskId="@Model.Id"
                               method="post">
 
                             @Html.AntiForgeryToken()
-
-                            <input type="hidden"
-                                   name="workspaceId"
-                                   value="@Model.WorkspaceId" />
-
-                            <input type="hidden"
-                                   name="boardId"
-                                   value="@Model.BoardId" />
-
-                            <input type="hidden"
-                                   name="listId"
-                                   value="@Model.ListId" />
-
-                            <input type="hidden"
-                                   name="taskId"
-                                   value="@Model.Id" />
-
 
                             <select name="userId"
                                     class="ws-task-assign-select">
@@ -571,7 +546,8 @@
 
                                 @foreach (var member in Model.WorkspaceMembers)
                                 {
-                                    if (!Model.Assignees.Any(a => a.UserId == member.UserId))
+                                    if (!Model.Assignees.Any(
+                                        a => a.UserId == member.UserId))
                                     {
                                         <option value="@member.UserId">
                                             @member.UserName

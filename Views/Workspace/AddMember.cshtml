@@ -1,15 +1,24 @@
 @model WorkStack.Models.ViewModels.AddWorkspaceMemberViewModel
 
+@using WorkStack.Models.Enums
+
 @{
     ViewData["Title"] = "Add workspace member";
 
     var workspaceId = (int)ViewData["WorkspaceId"]!;
 
+    var currentWorkspaceRole =
+        ViewData["CurrentWorkspaceRole"] is WorkspaceRole role
+            ? role
+            : WorkspaceRole.Member;
+
     var canAssignManager =
-        ViewData["CanAssignManager"] is true;
+        currentWorkspaceRole == WorkspaceRole.Owner;
 }
 
+
 <div class="ws-member-form-page">
+
 
     <!-- =========================================================
          BACK NAVIGATION
@@ -19,7 +28,9 @@
        asp-route-id="@workspaceId"
        class="ws-member-form-back-link">
 
-        <span aria-hidden="true">←</span>
+        <span aria-hidden="true">
+            ←
+        </span>
 
         Back to members
 
@@ -57,16 +68,37 @@
              aria-hidden="true">
 
             <svg viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="8"></circle>
-                <path d="M12 10v5"></path>
-                <path d="M12 7.5h.01"></path>
+
+                <circle cx="12"
+                        cy="12"
+                        r="8">
+                </circle>
+
+                <path d="M12 10v5">
+                </path>
+
+                <path d="M12 7.5h.01">
+                </path>
+
             </svg>
 
         </div>
 
+
         <div>
 
-            @if (!canAssignManager)
+            @if (canAssignManager)
+            {
+                <strong>
+                    Owner access
+                </strong>
+
+                <p>
+                    You are the workspace Owner.
+                    You can add Members or Managers to this workspace.
+                </p>
+            }
+            else
             {
                 <strong>
                     Manager access
@@ -75,17 +107,6 @@
                 <p>
                     You can add Members to this workspace.
                     Only the workspace Owner can add a Manager.
-                </p>
-            }
-            else
-            {
-                <strong>
-                    Workspace roles
-                </strong>
-
-                <p>
-                    You can add either a Member or a Manager.
-                    Managers can help manage workspace members.
                 </p>
             }
 
@@ -125,11 +146,18 @@
             @Html.AntiForgeryToken()
 
 
+            <!-- =================================================
+                 VALIDATION SUMMARY
+                 ================================================= -->
+
             <div asp-validation-summary="ModelOnly"
                  class="ws-member-validation-summary">
             </div>
 
 
+            <!-- =================================================
+                 TEMP DATA ERROR
+                 ================================================= -->
             @if (TempData["AddMemberError"] is string addMemberError)
             {
                 <div class="ws-member-form-error"
@@ -147,7 +175,9 @@
             }
 
 
-            <!-- EMAIL -->
+            <!-- =================================================
+                 EMAIL
+                 ================================================= -->
 
             <div class="ws-member-form-field">
 
@@ -174,7 +204,9 @@
             </div>
 
 
-            <!-- ROLE -->
+            <!-- =================================================
+                 ROLE
+                 ================================================= -->
 
             <div class="ws-member-form-field">
 
@@ -182,16 +214,19 @@
                     Workspace role
                 </label>
 
+
                 @if (canAssignManager)
                 {
+                    <!-- OWNER CAN SELECT MEMBER OR MANAGER -->
+
                     <select asp-for="Role"
                             class="ws-member-form-input">
 
-                        <option value="3">
+                        <option value="@WorkspaceRole.Member">
                             Member
                         </option>
 
-                        <option value="2">
+                        <option value="@WorkspaceRole.Manager">
                             Manager
                         </option>
 
@@ -199,24 +234,31 @@
                 }
                 else
                 {
+                    <!-- MANAGER CAN ONLY ADD MEMBER -->
+
                     <input type="hidden"
                            asp-for="Role"
-                           value="3" />
+                           value="@WorkspaceRole.Member" />
 
                     <select class="ws-member-form-input"
                             disabled>
 
-                        <option value="3">
+                        <option value="@WorkspaceRole.Member">
                             Member
                         </option>
 
                     </select>
                 }
 
+
                 <span asp-validation-for="Role"
                       class="ws-member-validation">
                 </span>
 
+
+                <!-- =================================================
+                     ROLE EXPLANATION
+                     ================================================= -->
 
                 <div class="ws-member-role-explanation">
 
@@ -239,6 +281,7 @@
                         </div>
 
                     </div>
+
 
                     @if (canAssignManager)
                     {
@@ -268,7 +311,9 @@
             </div>
 
 
-            <!-- ACTIONS -->
+            <!-- =================================================
+                 ACTIONS
+                 ================================================= -->
 
             <div class="ws-member-form-actions">
 
@@ -278,6 +323,7 @@
                     Add member
 
                 </button>
+
 
                 <a asp-action="Members"
                    asp-route-id="@workspaceId"
@@ -295,6 +341,9 @@
 
 </div>
 
+
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
 }

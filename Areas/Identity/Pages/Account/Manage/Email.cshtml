@@ -6,65 +6,220 @@
     ViewData["ActivePage"] = ManageNavPages.Email;
 }
 
-<h3>@ViewData["Title"]</h3>
+<div class="ws-account-page">
 
-<partial name="_StatusMessage" for="StatusMessage" />
+    <!-- =========================================================
+         PAGE HEADER
+         ========================================================= -->
 
-<div class="row">
-    <div class="col-md-6">
+    <div class="ws-account-page-header">
 
-        <form id="email-form" method="post">
+        <div>
+            <span class="ws-page-eyebrow">
+                ACCOUNT SETTINGS
+            </span>
 
-            <div asp-validation-summary="All"
-                 class="text-danger"
-                 role="alert">
+            <h1>
+                Email address
+            </h1>
+
+            <p>
+                Manage the email address connected to your WorkStack account.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- =========================================================
+         STATUS MESSAGE
+         ========================================================= -->
+    @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+    {
+        <partial name="_StatusMessage"
+                 for="StatusMessage" />
+    }
+
+
+    <!-- =========================================================
+         EMAIL SETTINGS
+         ========================================================= -->
+
+    <section class="ws-account-settings-card">
+
+        <!-- CARD HEADER -->
+
+        <div class="ws-settings-card-header">
+
+            <div class="ws-settings-icon" aria-hidden="true">
+
+                <svg viewBox="0 0 24 24">
+                    <rect x="3.5"
+                          y="5.5"
+                          width="17"
+                          height="13"
+                          rx="2" />
+
+                    <path d="m4.5 7 7.5 6 7.5-6" />
+                </svg>
+
             </div>
 
-            <div class="form-floating mb-3">
+            <div>
 
-                <input asp-for="Email"
-                       class="form-control"
-                       disabled />
+                <span class="ws-settings-card-eyebrow">
+                    CONTACT INFORMATION
+                </span>
 
-                <label asp-for="Email"
-                       class="form-label">
+                <h2>
+                    Email settings
+                </h2>
+
+                <p>
+                    Update the email address used for your WorkStack account.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================================
+             FORM
+             ===================================================== -->
+
+        <form id="email-form"
+              method="post"
+              class="ws-account-form">
+
+            <!-- =================================================
+                 VALIDATION SUMMARY
+
+                 Only show the red error box when there are
+                 actual validation errors.
+                 ================================================= -->
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div asp-validation-summary="All"
+                     class="ws-auth-validation"
+                     role="alert">
+                </div>
+            }
+
+
+            <!-- =================================================
+                 CURRENT EMAIL
+                 ================================================= -->
+
+            <div class="ws-form-field">
+
+                <label asp-for="Email">
                     Current email
                 </label>
 
-            </div>
+                <div class="ws-account-input-wrap">
 
+                    <svg viewBox="0 0 24 24"
+                         aria-hidden="true">
 
-            <div class="form-floating mb-3">
+                        <rect x="3.5"
+                              y="5.5"
+                              width="17"
+                              height="13"
+                              rx="2" />
 
-                <input asp-for="Input.NewEmail"
-                       class="form-control"
-                       autocomplete="email"
-                       aria-required="true"
-                       placeholder="Enter your new email." />
+                        <path d="m4.5 7 7.5 6 7.5-6" />
 
-                <label asp-for="Input.NewEmail"
-                       class="form-label">
-                    New email
-                </label>
+                    </svg>
 
-                <span asp-validation-for="Input.NewEmail"
-                      class="text-danger">
+                    <input asp-for="Email"
+                           class="ws-account-input"
+                           disabled />
+
+                </div>
+
+                <span class="ws-account-help">
+                    This is the email address currently associated with your account.
                 </span>
 
             </div>
 
 
-            <button id="change-email-button"
-                    type="submit"
-                    class="w-100 btn btn-lg btn-primary">
-                Change email
-            </button>
+            <!-- =================================================
+                 NEW EMAIL
+                 ================================================= -->
+
+            <div class="ws-form-field">
+
+                <label asp-for="Input.NewEmail">
+                    New email address
+                </label>
+
+                <div class="ws-account-input-wrap">
+
+                    <svg viewBox="0 0 24 24"
+                         aria-hidden="true">
+
+                        <rect x="3.5"
+                              y="5.5"
+                              width="17"
+                              height="13"
+                              rx="2" />
+
+                        <path d="m4.5 7 7.5 6 7.5-6" />
+
+                    </svg>
+
+                    <input asp-for="Input.NewEmail"
+                           class="ws-account-input"
+                           autocomplete="email"
+                           aria-required="true"
+                           placeholder="Enter your new email address" />
+
+                </div>
+
+                <span asp-validation-for="Input.NewEmail"
+                      class="ws-field-validation">
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTION
+                 ================================================= -->
+
+            <div class="ws-account-form-actions">
+
+                <button id="change-email-button"
+                        type="submit"
+                        class="ws-settings-save">
+
+                    <span>
+                        Change email
+                    </span>
+
+                    <svg viewBox="0 0 24 24"
+                         aria-hidden="true">
+
+                        <path d="M5 12h13" />
+                        <path d="m13 6 6 6-6 6" />
+
+                    </svg>
+
+                </button>
+
+            </div>
 
         </form>
 
-    </div>
+    </section>
+
 </div>
 
+
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
 }

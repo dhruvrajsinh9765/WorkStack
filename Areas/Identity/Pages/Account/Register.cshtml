@@ -1,64 +1,176 @@
 @page
 @model RegisterModel
+
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Create account";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="ws-auth-page">
+    <div class="ws-auth-shell ws-auth-shell-register">
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
+        <section class="ws-auth-intro">
+            <div class="ws-auth-brand">
+                <span class="ws-brand-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 5.5h7v6H4zM13 5.5h7v3h-7zM13 10.5h7v8h-7zM4 13.5h7v5H4z" />
+                    </svg>
+                </span>
+                <span>WorkStack</span>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
+
+            <div class="ws-auth-intro-content">
+                <span class="ws-auth-eyebrow">GET STARTED</span>
+
+                <h1>Build your<br />workflow.</h1>
+
+                <p>
+                    Create your WorkStack account and start organizing
+                    projects, tasks, and team collaboration.
+                </p>
+
+                <div class="ws-auth-stat">
+                    <strong>One workspace.</strong>
+                    <span>Your work, organized in one place.</span>
+                </div>
+
+                <div class="ws-auth-stat">
+                    <strong>Clear workflow.</strong>
+                    <span>Move from ideas to completed tasks.</span>
+                </div>
+
+                <div class="ws-auth-stat">
+                    <strong>Team ready.</strong>
+                    <span>Bring your workspace members together.</span>
+                </div>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+        </section>
+
+        <section class="ws-auth-panel">
+            <div class="ws-auth-card">
+
+                <div class="ws-auth-card-header">
+                    <span class="ws-auth-mobile-label">WORKSTACK</span>
+                    <h2>Create your account</h2>
+                    <p>Set up your account to start using WorkStack.</p>
+                </div>
+
+                <form id="registerForm"
+                      asp-route-returnUrl="@Model.ReturnUrl"
+                      method="post">
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="ws-auth-validation"
+                         role="alert">
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+
+                    <div class="ws-form-field">
+                        <label asp-for="Input.Email">Email address</label>
+
+                        <div class="ws-auth-input-wrap">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 6.5h16v11H4z" />
+                                <path d="m4 7 8 6 8-6" />
+                            </svg>
+
+                            <input asp-for="Input.Email"
+                                   autocomplete="username"
+                                   aria-required="true"
+                                   placeholder="you@example.com" />
                         </div>
+
+                        <span asp-validation-for="Input.Email"
+                              class="ws-field-validation">
+                        </span>
+                    </div>
+
+                    <div class="ws-form-field">
+                        <label asp-for="Input.Password">Password</label>
+
+                        <div class="ws-auth-input-wrap">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <rect x="5" y="10" width="14" height="10" rx="2" />
+                                <path d="M8 10V7.5a4 4 0 0 1 8 0V10" />
+                            </svg>
+
+                            <input asp-for="Input.Password"
+                                   autocomplete="new-password"
+                                   aria-required="true"
+                                   placeholder="Create a password" />
+                        </div>
+
+                        <span asp-validation-for="Input.Password"
+                              class="ws-field-validation">
+                        </span>
+                    </div>
+
+                    <div class="ws-form-field">
+                        <label asp-for="Input.ConfirmPassword">
+                            Confirm password
+                        </label>
+
+                        <div class="ws-auth-input-wrap">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M5 12.5 9.5 17 19 7.5" />
+                            </svg>
+
+                            <input asp-for="Input.ConfirmPassword"
+                                   autocomplete="new-password"
+                                   aria-required="true"
+                                   placeholder="Enter your password again" />
+                        </div>
+
+                        <span asp-validation-for="Input.ConfirmPassword"
+                              class="ws-field-validation">
+                        </span>
+                    </div>
+
+                    <button id="registerSubmit"
+                            type="submit"
+                            class="ws-auth-submit">
+                        <span>Create account</span>
+
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 12h13M13 6l6 6-6 6" />
+                        </svg>
+                    </button>
+                </form>
+
+                <div class="ws-auth-footer">
+                    <span>Already have an account?</span>
+
+                    <a asp-page="./Login"
+                       asp-route-returnUrl="@Model.ReturnUrl">
+                        Sign in
+                    </a>
+                </div>
+
+                @if ((Model.ExternalLogins?.Count ?? 0) > 0)
+                {
+                    <div class="ws-auth-divider">
+                        <span>or continue with</span>
+                    </div>
+
+                    <form id="external-account"
+                          asp-page="./ExternalLogin"
+                          asp-route-returnUrl="@Model.ReturnUrl"
+                          method="post"
+                          class="ws-auth-external-form">
+
+                        @foreach (var provider in Model.ExternalLogins!)
+                        {
+                            <button type="submit"
+                                    name="provider"
+                                    value="@provider.Name"
+                                    class="ws-auth-external-button">
+                                Continue with @provider.DisplayName
+                            </button>
+                        }
                     </form>
                 }
-            }
+
+            </div>
         </section>
+
     </div>
 </div>
 

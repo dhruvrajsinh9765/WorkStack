@@ -81,9 +81,7 @@
 
                     <span>
                         Created
-                        @Model.CreatedAt
-                        .ToLocalTime()
-                        .ToString("dd MMM yyyy")
+                        @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy")
                     </span>
 
                     <span class="ws-board-meta-divider"
@@ -93,9 +91,7 @@
 
                     <span>
                         Updated
-                        @Model.UpdatedAt
-                        .ToLocalTime()
-                        .ToString("dd MMM yyyy")
+                        @Model.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy")
                     </span>
 
                     <span class="ws-board-meta-divider"
@@ -672,9 +668,7 @@
 
                                                     <span>
                                                         Due
-                                                        @task.DueDate
-                                                        .Value
-                                                        .ToString("dd MMM yyyy")
+                                                        @task.DueDate.Value.ToString("dd MMM yyyy")
                                                     </span>
 
                                                 </div>

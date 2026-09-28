@@ -1,21 +1,43 @@
 @page
 @model LogoutModel
+
 @{
     ViewData["Title"] = "Log out";
 }
 
-<header>
-    <h1>@ViewData["Title"]</h1>
-    @{
-        if (User.Identity?.IsAuthenticated ?? false)
-        {
-            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-                <button type="submit" class="nav-link btn btn-link text-dark">Click here to Logout</button>
-            </form>
-        }
-        else
-        {
-            <p>You have successfully logged out of the application.</p>
-        }
-    }
-</header>
+<div class="ws-auth-page">
+    <div class="ws-simple-auth-card">
+
+        <div class="ws-simple-auth-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19H10" />
+                <path d="M14 8l4 4-4 4M18 12H9" />
+            </svg>
+        </div>
+
+        <span class="ws-auth-eyebrow">WORKSTACK</span>
+
+        <h1>Sign out</h1>
+
+        <p>
+            Are you sure you want to sign out of your WorkStack account?
+        </p>
+
+        <form method="post">
+            <button type="submit" class="ws-auth-submit">
+                <span>Sign out</span>
+
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M14 8l4 4-4 4M18 12H9" />
+                </svg>
+            </button>
+        </form>
+
+        <a asp-controller="Dashboard"
+           asp-action="Index"
+           class="ws-simple-auth-back">
+            Back to dashboard
+        </a>
+
+    </div>
+</div>

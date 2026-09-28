@@ -2,58 +2,70 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav">
+@if (SignInManager.IsSignedIn(User))
+{
+    <div class="ws-account-menu">
+        <a class="ws-account-profile"
+           asp-controller="Profile"
+           asp-action="Index">
+            <span class="ws-account-avatar" aria-hidden="true">
+                @{
+                    var displayName = User.Identity?.Name?.Trim() ?? string.Empty;
+                    var initial = string.IsNullOrWhiteSpace(displayName)
+                        ? "U"
+                        : displayName.Substring(0, 1).ToUpperInvariant();
+                }
+                @initial
+            </span>
 
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark"
-               asp-controller="Profile"
-               asp-action="Index">
-                Profile
-            </a>
-        </li>
+            <span class="ws-account-copy">
+                <span class="ws-account-name">
+                    @(string.IsNullOrWhiteSpace(displayName) ? "User" : displayName)
+                </span>
+                <span class="ws-account-label">My profile</span>
+            </span>
+        </a>
 
-        <li class="nav-item">
-            <a class="nav-link text-dark"
-               asp-area="Identity"
-               asp-page="/Account/Manage/Index"
-               title="Manage">
-                Hello @User.Identity?.Name!
-            </a>
-        </li>
+        <a class="ws-account-manage"
+           asp-area="Identity"
+           asp-page="/Account/Manage/Index"
+           title="Manage account"
+           aria-label="Manage account">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z" />
+                <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-1.41 1.41-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.09h-2v-.09a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-1.41-1.41.06-.06A1.7 1.7 0 0 0 9.4 15a1.7 1.7 0 0 0-1.56-1.03h-.09v-2h.09A1.7 1.7 0 0 0 9.4 10.94a1.7 1.7 0 0 0-.34-1.88L9 9l1.41-1.41.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56v-.09h2v.09a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06L19.76 9l-.06.06a1.7 1.7 0 0 0-.34 1.88 1.7 1.7 0 0 0 1.56 1.03h.09v2h-.09A1.7 1.7 0 0 0 19.4 15Z" />
+            </svg>
+        </a>
 
-        <li class="nav-item">
-            <form class="form-inline"
-                  asp-area="Identity"
-                  asp-page="/Account/Logout"
-                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+        <form asp-area="Identity"
+              asp-page="/Account/Logout"
+              asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })"
+              class="ws-account-logout-form">
+            <button type="submit"
+                    class="ws-account-logout"
+                    aria-label="Log out"
+                    title="Log out">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M10 5H6.5A1.5 1.5 0 0 0 5 6.5v11A1.5 1.5 0 0 0 6.5 19H10" />
+                    <path d="M14 8l4 4-4 4M18 12H9" />
+                </svg>
+            </button>
+        </form>
+    </div>
+}
+else
+{
+    <div class="ws-public-account-links">
+        <a class="ws-public-login-link"
+           asp-area="Identity"
+           asp-page="/Account/Login">
+            Log in
+        </a>
 
-                <button type="submit"
-                        class="nav-link btn btn-link text-dark">
-                    Logout
-                </button>
-
-            </form>
-        </li>
-    }
-    else
-    {
-        <li class="nav-item">
-            <a class="nav-link text-dark"
-               asp-area="Identity"
-               asp-page="/Account/Register">
-                Register
-            </a>
-        </li>
-
-        <li class="nav-item">
-            <a class="nav-link text-dark"
-               asp-area="Identity"
-               asp-page="/Account/Login">
-                Login
-            </a>
-        </li>
-    }
-
-</ul>
+        <a class="ws-public-register-link"
+           asp-area="Identity"
+           asp-page="/Account/Register">
+            Get started
+        </a>
+    </div>
+}
