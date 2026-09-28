@@ -156,6 +156,7 @@ namespace WorkStack.Controllers
             }
 
             workspace.Name = model.Name.Trim();
+
             workspace.Description =
                 string.IsNullOrWhiteSpace(model.Description)
                     ? null
@@ -468,6 +469,42 @@ namespace WorkStack.Controllers
                 return Forbid();
             }
 
+            // Do not allow a member to be removed while
+            // application data still references that user.
+            //
+            // This prevents DeleteBehavior.Restrict from
+            // producing a database foreign-key exception.
+
+            var hasCreatedTasks = await context.Tasks
+                .AnyAsync(task =>
+                    task.CreatorId == userId &&
+                    task.List.Board.WorkspaceId == workspaceId);
+
+            var hasAssignedTasks = await context.TaskAssignees
+                .AnyAsync(assignee =>
+                    assignee.UserId == userId &&
+                    assignee.Task.List.Board.WorkspaceId == workspaceId);
+
+            var hasComments = await context.Comments
+                .AnyAsync(comment =>
+                    comment.UserId == userId &&
+                    comment.Task.List.Board.WorkspaceId == workspaceId);
+
+            if (hasCreatedTasks ||
+                hasAssignedTasks ||
+                hasComments)
+            {
+                TempData["MemberRemoveError"] =
+                    "This member cannot be removed while they are referenced by tasks or comments. Remove their task assignments and handle their task/comment data first.";
+
+                return RedirectToAction(
+                    nameof(Members),
+                    new
+                    {
+                        id = workspaceId
+                    });
+            }
+
             context.WorkspaceMembers.Remove(targetMember);
 
             await context.SaveChangesAsync();
@@ -525,6 +562,37 @@ namespace WorkStack.Controllers
             }
 
             ViewData["WorkspaceId"] = id;
+
+            var currentUserId = User.FindFirstValue(
+                ClaimTypes.NameIdentifier);
+
+            if (currentUserId is null)
+            {
+                return Forbid();
+            }
+
+            var currentRole = await context.WorkspaceMembers
+                .Where(member =>
+                    member.WorkspaceId == id &&
+                    member.UserId == currentUserId)
+                .Select(member =>
+                    (WorkspaceRole?)member.Role)
+                .FirstOrDefaultAsync();
+
+            if (currentRole is null)
+            {
+                return NotFound();
+            }
+
+            // Managers may add Members.
+            // Only Owners may add Managers.
+            if (model.Role == WorkspaceRole.Manager &&
+                currentRole != WorkspaceRole.Owner)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Role),
+                    "Only the workspace Owner can add a Manager.");
+            }
 
             if (model.Role is not
                 (WorkspaceRole.Member or WorkspaceRole.Manager))
@@ -622,16 +690,26 @@ namespace WorkStack.Controllers
 
             var workspace = new Workspace
             {
-                Name = model.Name,
-                Description = model.Description,
-                OwnerId = userId
+                Name = model.Name.Trim(),
+
+                Description =
+                    string.IsNullOrWhiteSpace(model.Description)
+                        ? null
+                        : model.Description.Trim(),
+
+                OwnerId = userId,
+
+                CreatedAt = DateTime.UtcNow,
+
+                UpdatedAt = DateTime.UtcNow
             };
 
             workspace.Members.Add(
                 new WorkspaceMember
                 {
                     UserId = userId,
-                    Role = WorkspaceRole.Owner
+                    Role = WorkspaceRole.Owner,
+                    JoinedAt = DateTime.UtcNow
                 });
 
             context.Workspaces.Add(workspace);

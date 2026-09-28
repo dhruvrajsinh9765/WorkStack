@@ -6,27 +6,24 @@
 
 <div class="container-fluid py-4">
 
-    <!-- Back to Board -->
+    <!-- Back -->
     <div class="mb-3">
         <a asp-controller="Board"
            asp-action="Details"
            asp-route-workspaceId="@Model.WorkspaceId"
-           asp-route-id="@Model.BoardId"
+           asp-route-boardId="@Model.BoardId"
            class="btn btn-outline-secondary btn-sm">
             ← Back to Board
         </a>
     </div>
 
 
-    <!-- =========================================================
-         TASK HEADER
-         ========================================================= -->
-
+    <!-- Task Header -->
     <div class="card shadow-sm border-0 mb-4">
 
         <div class="card-body">
 
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3">
+            <div class="d-flex justify-content-between align-items-start gap-3">
 
                 <div>
 
@@ -51,11 +48,10 @@
                             @Model.Priority
                         </span>
 
-
                         @if (Model.DueDate.HasValue)
                         {
                             <span class="badge bg-light text-dark border">
-                                Due: @Model.DueDate.Value.ToLocalTime().ToString("dd MMM yyyy")
+                                Due: @Model.DueDate.Value.ToString("dd MMM yyyy")
                             </span>
                         }
                         else
@@ -70,28 +66,26 @@
                 </div>
 
 
-                <!-- Task Actions -->
                 @if (Model.CanManage)
                 {
-                    <div class="d-flex flex-wrap gap-2">
+                    <div class="d-flex gap-2">
 
                         <a asp-controller="Task"
                            asp-action="Edit"
                            asp-route-workspaceId="@Model.WorkspaceId"
                            asp-route-boardId="@Model.BoardId"
                            asp-route-listId="@Model.ListId"
-                           asp-route-taskId="@Model.Id"
+                           asp-route-id="@Model.Id"
                            class="btn btn-primary">
                             Edit Task
                         </a>
-
 
                         <form asp-controller="Task"
                               asp-action="Delete"
                               asp-route-workspaceId="@Model.WorkspaceId"
                               asp-route-boardId="@Model.BoardId"
                               asp-route-listId="@Model.ListId"
-                              asp-route-taskId="@Model.Id"
+                              asp-route-id="@Model.Id"
                               method="post"
                               onsubmit="return confirm('Are you sure you want to delete this task?');">
 
@@ -114,15 +108,10 @@
     </div>
 
 
-
     <div class="row g-4">
 
-        <!-- =====================================================
-             LEFT COLUMN
-             ===================================================== -->
-
+        <!-- LEFT SIDE -->
         <div class="col-lg-8">
-
 
             <!-- Description -->
             <div class="card shadow-sm border-0 mb-4">
@@ -132,7 +121,6 @@
                     <h5 class="fw-semibold mb-3">
                         Description
                     </h5>
-
 
                     @if (string.IsNullOrWhiteSpace(Model.Description))
                     {
@@ -152,11 +140,7 @@
             </div>
 
 
-
-            <!-- =================================================
-                 COMMENTS
-                 ================================================= -->
-
+            <!-- Comments -->
             <div class="card shadow-sm border-0 mb-4">
 
                 <div class="card-body">
@@ -169,14 +153,26 @@
                     <!-- Add Comment -->
                     <form asp-controller="Task"
                           asp-action="AddComment"
-                          asp-route-workspaceId="@Model.WorkspaceId"
-                          asp-route-boardId="@Model.BoardId"
-                          asp-route-listId="@Model.ListId"
-                          asp-route-taskId="@Model.Id"
                           method="post"
                           class="mb-4">
 
                         @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="workspaceId"
+                               value="@Model.WorkspaceId" />
+
+                        <input type="hidden"
+                               name="boardId"
+                               value="@Model.BoardId" />
+
+                        <input type="hidden"
+                               name="listId"
+                               value="@Model.ListId" />
+
+                        <input type="hidden"
+                               name="taskId"
+                               value="@Model.Id" />
 
                         <div class="mb-2">
 
@@ -196,7 +192,6 @@
                     </form>
 
 
-
                     <!-- Existing Comments -->
                     @if (Model.Comments.Count == 0)
                     {
@@ -212,7 +207,7 @@
                             {
                                 <div class="border rounded p-3">
 
-                                    <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
 
                                         <div>
 
@@ -229,15 +224,30 @@
 
                                         <form asp-controller="Task"
                                               asp-action="DeleteComment"
-                                              asp-route-workspaceId="@Model.WorkspaceId"
-                                              asp-route-boardId="@Model.BoardId"
-                                              asp-route-listId="@Model.ListId"
-                                              asp-route-taskId="@Model.Id"
-                                              asp-route-commentId="@comment.Id"
                                               method="post"
                                               class="d-inline">
 
                                             @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="workspaceId"
+                                                   value="@Model.WorkspaceId" />
+
+                                            <input type="hidden"
+                                                   name="boardId"
+                                                   value="@Model.BoardId" />
+
+                                            <input type="hidden"
+                                                   name="listId"
+                                                   value="@Model.ListId" />
+
+                                            <input type="hidden"
+                                                   name="taskId"
+                                                   value="@Model.Id" />
+
+                                            <input type="hidden"
+                                                   name="commentId"
+                                                   value="@comment.Id" />
 
                                             <button type="submit"
                                                     class="btn btn-sm btn-outline-danger">
@@ -266,13 +276,8 @@
         </div>
 
 
-
-        <!-- =====================================================
-             RIGHT COLUMN
-             ===================================================== -->
-
+        <!-- RIGHT SIDE -->
         <div class="col-lg-4">
-
 
             <!-- Task Information -->
             <div class="card shadow-sm border-0 mb-4">
@@ -327,11 +332,7 @@
             </div>
 
 
-
-            <!-- =================================================
-                 ASSIGNEES
-                 ================================================= -->
-
+            <!-- Assignees -->
             <div class="card shadow-sm border-0">
 
                 <div class="card-body">
@@ -364,14 +365,29 @@
                                     {
                                         <form asp-controller="Task"
                                               asp-action="Unassign"
-                                              asp-route-workspaceId="@Model.WorkspaceId"
-                                              asp-route-boardId="@Model.BoardId"
-                                              asp-route-listId="@Model.ListId"
-                                              asp-route-taskId="@Model.Id"
-                                              asp-route-userId="@assignee.UserId"
                                               method="post">
 
                                             @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="workspaceId"
+                                                   value="@Model.WorkspaceId" />
+
+                                            <input type="hidden"
+                                                   name="boardId"
+                                                   value="@Model.BoardId" />
+
+                                            <input type="hidden"
+                                                   name="listId"
+                                                   value="@Model.ListId" />
+
+                                            <input type="hidden"
+                                                   name="taskId"
+                                                   value="@Model.Id" />
+
+                                            <input type="hidden"
+                                                   name="userId"
+                                                   value="@assignee.UserId" />
 
                                             <button type="submit"
                                                     class="btn btn-sm btn-outline-danger">
@@ -388,7 +404,6 @@
                     }
 
 
-                    <!-- Assign Member -->
                     @if (Model.CanManage)
                     {
                         <hr class="my-4" />
@@ -400,13 +415,25 @@
 
                         <form asp-controller="Task"
                               asp-action="Assign"
-                              asp-route-workspaceId="@Model.WorkspaceId"
-                              asp-route-boardId="@Model.BoardId"
-                              asp-route-listId="@Model.ListId"
-                              asp-route-taskId="@Model.Id"
                               method="post">
 
                             @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="workspaceId"
+                                   value="@Model.WorkspaceId" />
+
+                            <input type="hidden"
+                                   name="boardId"
+                                   value="@Model.BoardId" />
+
+                            <input type="hidden"
+                                   name="listId"
+                                   value="@Model.ListId" />
+
+                            <input type="hidden"
+                                   name="taskId"
+                                   value="@Model.Id" />
 
 
                             <div class="mb-3">
@@ -421,8 +448,7 @@
 
                                     @foreach (var member in Model.WorkspaceMembers)
                                     {
-                                        if (!Model.Assignees.Any(
-                                            assignee => assignee.UserId == member.UserId))
+                                        if (!Model.Assignees.Any(a => a.UserId == member.UserId))
                                         {
                                             <option value="@member.UserId">
                                                 @member.UserName

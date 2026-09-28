@@ -2,62 +2,219 @@
 
 @{
     ViewData["Title"] = "Workspace members";
+
     var workspaceId = (int)ViewData["WorkspaceId"]!;
-    var showActionsColumn = Model.Any(member => member.CanBeRemovedByCurrentUser || member.CanChangeRole);
+
+    var showActionsColumn =
+        Model.Any(member =>
+            member.CanBeRemovedByCurrentUser ||
+            member.CanChangeRole);
 }
 
-<h1>Workspace members</h1>
+<div class="container-fluid py-4">
 
-@if (ViewData["CanManageMembers"] is true)
-{
-    <a asp-action="AddMember" asp-route-id="@workspaceId" class="btn btn-primary mb-3">Add member</a>
-}
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
 
-@if (!Model.Any())
-{
-    <p>This workspace has no members yet.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Email</th>
-                <th scope="col">Role</th>
-                <th scope="col">Joined date</th>
-                @if (showActionsColumn)
-                {
-                    <th scope="col">Actions</th>
-                }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var member in Model)
-            {
-                <tr>
-                    <td>@(member.Email ?? "Email unavailable")</td>
-                    <td>@member.Role</td>
-                    <td>@member.JoinedAt.ToString("d")</td>
-                    @if (showActionsColumn)
-                    {
-                        <td>
-                            @if (member.CanChangeRole)
+        <div>
+            <div class="text-muted small mb-1">
+                Workspace
+            </div>
+
+            <h1 class="mb-1">
+                Workspace members
+            </h1>
+
+            <p class="text-muted mb-0">
+                Manage the people who have access to this workspace.
+            </p>
+        </div>
+
+
+        @if (ViewData["CanManageMembers"] is true)
+        {
+            <a asp-action="AddMember"
+               asp-route-id="@workspaceId"
+               class="btn btn-primary">
+
+                Add member
+
+            </a>
+        }
+
+    </div>
+
+
+    @if (TempData["MemberRemoveError"] is string removeError)
+    {
+        <div class="alert alert-warning" role="alert">
+
+            @removeError
+
+        </div>
+    }
+
+
+    @if (!Model.Any())
+    {
+        <div class="ws-empty-state">
+
+            <h3 class="h4">
+                No members found
+            </h3>
+
+            <p class="mb-0">
+                Add members to start collaborating in this workspace.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="ws-card overflow-hidden">
+
+            <div class="table-responsive">
+
+                <table class="table table-dark table-hover align-middle mb-0">
+
+                    <thead>
+
+                        <tr>
+
+                            <th class="px-4 py-3">
+                                Email
+                            </th>
+
+                            <th class="py-3">
+                                Role
+                            </th>
+
+                            <th class="py-3">
+                                Joined
+                            </th>
+
+                            @if (showActionsColumn)
                             {
-                                <a asp-action="ChangeMemberRole" asp-route-workspaceId="@workspaceId" asp-route-userId="@member.UserId" class="btn btn-outline-primary btn-sm">Change role</a>
+                                <th class="px-4 py-3 text-end">
+                                    Actions
+                                </th>
                             }
-                            @if (member.CanBeRemovedByCurrentUser)
-                            {
-                                <form asp-action="RemoveMember" asp-route-workspaceId="@workspaceId" asp-route-userId="@member.UserId" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to remove this member?');">Remove</button>
-                                </form>
-                            }
-                        </td>
-                    }
-                </tr>
-            }
-        </tbody>
-    </table>
-}
 
-<a asp-action="Details" asp-route-id="@workspaceId" class="btn btn-secondary">Back to workspace</a>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var member in Model)
+                        {
+                            <tr>
+
+                                <td class="px-4 py-3">
+
+                                    <span class="fw-semibold">
+                                        @(member.Email ?? "Email unavailable")
+                                    </span>
+
+                                </td>
+
+
+                                <td class="py-3">
+
+                                    <span class="badge rounded-pill
+                                        @(member.Role switch
+                                          {
+                                              WorkStack.Models.Enums.WorkspaceRole.Owner
+                                                  => "bg-danger",
+
+                                              WorkStack.Models.Enums.WorkspaceRole.Manager
+                                                  => "bg-warning text-dark",
+
+                                              _ => "bg-secondary"
+                                          })">
+
+                                        @member.Role
+
+                                    </span>
+
+                                </td>
+
+
+                                <td class="py-3">
+
+                                    @member.JoinedAt.ToLocalTime().ToString("dd MMM yyyy")
+
+                                </td>
+
+
+                                @if (showActionsColumn)
+                                {
+                                    <td class="px-4 py-3 text-end">
+
+                                        <div class="d-flex justify-content-end flex-wrap gap-2">
+
+                                            @if (member.CanChangeRole)
+                                            {
+                                                <a asp-action="ChangeMemberRole"
+                                                   asp-route-workspaceId="@workspaceId"
+                                                   asp-route-userId="@member.UserId"
+                                                   class="btn btn-outline-primary btn-sm">
+
+                                                    Change role
+
+                                                </a>
+                                            }
+
+
+                                            @if (member.CanBeRemovedByCurrentUser)
+                                            {
+                                                <form asp-action="RemoveMember"
+                                                      asp-route-workspaceId="@workspaceId"
+                                                      asp-route-userId="@member.UserId"
+                                                      method="post"
+                                                      class="d-inline">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <button type="submit"
+                                                            class="btn btn-outline-danger btn-sm"
+                                                            onclick="return confirm('Are you sure you want to remove this member?');">
+
+                                                        Remove
+
+                                                    </button>
+
+                                                </form>
+                                            }
+
+                                        </div>
+
+                                    </td>
+                                }
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    }
+
+
+    <div class="mt-4">
+
+        <a asp-action="Details"
+           asp-route-id="@workspaceId"
+           class="btn btn-outline-secondary">
+
+            ← Back to workspace
+
+        </a>
+
+    </div>
+
+</div>

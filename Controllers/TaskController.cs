@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkStack.Data;
@@ -11,9 +10,7 @@ using WorkStack.Models.ViewModels;
 namespace WorkStack.Controllers
 {
     [Authorize]
-    public class TaskController(
-        ApplicationDbContext context,
-        UserManager<IdentityUser> userManager) : Controller
+    public class TaskController(ApplicationDbContext context) : Controller
     {
         // =========================================================
         // CREATE - GET
@@ -71,6 +68,7 @@ namespace WorkStack.Controllers
             return View(model);
         }
 
+
         // =========================================================
         // CREATE - POST
         // =========================================================
@@ -106,6 +104,8 @@ namespace WorkStack.Controllers
             model.ListId = listId;
             model.ListName = list.Name;
 
+            model.AssigneeIds ??= new List<string>();
+
             // Reload members if validation fails.
             model.WorkspaceMembers = await context.WorkspaceMembers
                 .Where(member => member.WorkspaceId == workspaceId)
@@ -135,9 +135,10 @@ namespace WorkStack.Controllers
             {
                 Title = model.Title.Trim(),
 
-                Description = string.IsNullOrWhiteSpace(model.Description)
-                    ? null
-                    : model.Description.Trim(),
+                Description =
+                    string.IsNullOrWhiteSpace(model.Description)
+                        ? null
+                        : model.Description.Trim(),
 
                 ListId = listId,
 
@@ -170,11 +171,12 @@ namespace WorkStack.Controllers
 
                 foreach (var memberId in validMemberIds)
                 {
-                    context.TaskAssignees.Add(new TaskAssignee
-                    {
-                        TaskId = task.Id,
-                        UserId = memberId
-                    });
+                    context.TaskAssignees.Add(
+                        new TaskAssignee
+                        {
+                            TaskId = task.Id,
+                            UserId = memberId
+                        });
                 }
 
                 await context.SaveChangesAsync();
@@ -189,6 +191,7 @@ namespace WorkStack.Controllers
                     boardId
                 });
         }
+
 
         // =========================================================
         // DETAILS
@@ -311,6 +314,7 @@ namespace WorkStack.Controllers
             return View(model);
         }
 
+
         // =========================================================
         // EDIT - GET
         // =========================================================
@@ -364,6 +368,7 @@ namespace WorkStack.Controllers
             return View(model);
         }
 
+
         // =========================================================
         // EDIT - POST
         // =========================================================
@@ -402,9 +407,10 @@ namespace WorkStack.Controllers
 
             task.Title = model.Title.Trim();
 
-            task.Description = string.IsNullOrWhiteSpace(model.Description)
-                ? null
-                : model.Description.Trim();
+            task.Description =
+                string.IsNullOrWhiteSpace(model.Description)
+                    ? null
+                    : model.Description.Trim();
 
             task.Priority = model.Priority;
 
@@ -424,6 +430,7 @@ namespace WorkStack.Controllers
                     taskId
                 });
         }
+
 
         // =========================================================
         // DELETE
@@ -469,6 +476,7 @@ namespace WorkStack.Controllers
                 });
         }
 
+
         // =========================================================
         // MOVE TASK
         // =========================================================
@@ -512,7 +520,6 @@ namespace WorkStack.Controllers
             if (targetList is null)
                 return NotFound();
 
-            // Do nothing if the task is already in that list.
             if (task.ListId != targetList.Id)
             {
                 task.ListId = targetList.Id;
@@ -530,6 +537,7 @@ namespace WorkStack.Controllers
                     boardId
                 });
         }
+
 
         // =========================================================
         // ASSIGN
@@ -577,11 +585,12 @@ namespace WorkStack.Controllers
 
             if (!alreadyAssigned)
             {
-                context.TaskAssignees.Add(new TaskAssignee
-                {
-                    TaskId = taskId,
-                    UserId = userId
-                });
+                context.TaskAssignees.Add(
+                    new TaskAssignee
+                    {
+                        TaskId = taskId,
+                        UserId = userId
+                    });
 
                 await context.SaveChangesAsync();
             }
@@ -596,6 +605,7 @@ namespace WorkStack.Controllers
                     taskId
                 });
         }
+
 
         // =========================================================
         // UNASSIGN
@@ -644,6 +654,7 @@ namespace WorkStack.Controllers
                 });
         }
 
+
         // =========================================================
         // ADD COMMENT
         // =========================================================
@@ -672,8 +683,26 @@ namespace WorkStack.Controllers
             if (!taskExists)
                 return NotFound();
 
-            if (string.IsNullOrWhiteSpace(content))
+            var trimmedContent = content?.Trim() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(trimmedContent))
             {
+                return RedirectToAction(
+                    nameof(Details),
+                    new
+                    {
+                        workspaceId,
+                        boardId,
+                        listId,
+                        taskId
+                    });
+            }
+
+            if (trimmedContent.Length > 2000)
+            {
+                TempData["CommentError"] =
+                    "Comment cannot be longer than 2000 characters.";
+
                 return RedirectToAction(
                     nameof(Details),
                     new
@@ -691,13 +720,14 @@ namespace WorkStack.Controllers
             if (userId is null)
                 return Forbid();
 
-            context.Comments.Add(new Comment
-            {
-                TaskId = taskId,
-                UserId = userId,
-                Content = content.Trim(),
-                CreatedAt = DateTime.UtcNow
-            });
+            context.Comments.Add(
+                new Comment
+                {
+                    TaskId = taskId,
+                    UserId = userId,
+                    Content = trimmedContent,
+                    CreatedAt = DateTime.UtcNow
+                });
 
             await context.SaveChangesAsync();
 
@@ -711,6 +741,7 @@ namespace WorkStack.Controllers
                     taskId
                 });
         }
+
 
         // =========================================================
         // DELETE COMMENT
@@ -763,6 +794,7 @@ namespace WorkStack.Controllers
                 });
         }
 
+
         // =========================================================
         // HELPERS
         // =========================================================
@@ -777,6 +809,7 @@ namespace WorkStack.Controllers
                 return null;
 
             return await context.WorkspaceMembers
+                .AsNoTracking()
                 .FirstOrDefaultAsync(member =>
                     member.WorkspaceId == workspaceId &&
                     member.UserId == userId);
