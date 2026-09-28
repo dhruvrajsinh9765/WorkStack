@@ -1,0 +1,338 @@
+﻿@model WorkStack.Models.ViewModels.TaskDetailsViewModel
+
+@{
+    ViewData["Title"] = Model.Title;
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+
+<div class="container-fluid py-4">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <div class="text-muted small mb-1">
+                @Model.ListName
+            </div>
+
+            <h1 class="mb-2">@Model.Title</h1>
+
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-secondary">
+                    @Model.Priority
+                </span>
+
+                @if (Model.DueDate.HasValue)
+                {
+                    <span class="badge bg-dark">
+                        Due @Model.DueDate.Value.ToString("dd MMM yyyy")
+                    </span>
+                }
+            </div>
+        </div>
+
+        @if (Model.CanManage)
+        {
+            <div class="d-flex gap-2">
+                <a asp-controller="Task"
+                   asp-action="Edit"
+                   asp-route-workspaceId="@Model.WorkspaceId"
+                   asp-route-boardId="@Model.BoardId"
+                   asp-route-listId="@Model.ListId"
+                   asp-route-taskId="@Model.Id"
+                   class="btn btn-primary">
+                    Edit
+                </a>
+
+                <form asp-controller="Task"
+                      asp-action="Delete"
+                      asp-route-workspaceId="@Model.WorkspaceId"
+                      asp-route-boardId="@Model.BoardId"
+                      asp-route-listId="@Model.ListId"
+                      asp-route-taskId="@Model.Id"
+                      method="post"
+                      onsubmit="return confirm('Delete this task? This action cannot be undone.');">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="btn btn-outline-danger">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+
+    <div class="row g-4">
+
+        <!-- MAIN CONTENT -->
+        <div class="col-lg-8">
+
+            <!-- DESCRIPTION -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h2 class="h5 mb-3">Description</h2>
+
+                    @if (string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p class="text-muted mb-0">
+                            No description provided.
+                        </p>
+                    }
+                    else
+                    {
+                        <p class="mb-0"
+                           style="white-space: pre-wrap;">@Model.Description</p>
+                    }
+                </div>
+            </div>
+
+            <!-- COMMENTS -->
+            <div class="card">
+                <div class="card-body">
+
+                    <h2 class="h5 mb-3">
+                        Comments
+                    </h2>
+
+                    <form asp-controller="Task"
+                          asp-action="AddComment"
+                          asp-route-workspaceId="@Model.WorkspaceId"
+                          asp-route-boardId="@Model.BoardId"
+                          asp-route-listId="@Model.ListId"
+                          asp-route-taskId="@Model.Id"
+                          method="post"
+                          class="mb-4">
+
+                        @Html.AntiForgeryToken()
+
+                        <textarea name="content"
+                                  class="form-control mb-2"
+                                  rows="3"
+                                  maxlength="2000"
+                                  placeholder="Write a comment..."></textarea>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Add Comment
+                        </button>
+                    </form>
+
+                    @if (Model.Comments.Count == 0)
+                    {
+                        <div class="text-muted">
+                            No comments yet.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column gap-3">
+
+                            @foreach (var comment in Model.Comments)
+                            {
+                                <div class="border rounded p-3">
+
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>
+                                            @comment.UserName
+                                        </strong>
+
+                                        <small class="text-muted">
+                                            @comment.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                                        </small>
+                                    </div>
+
+                                    <div style="white-space: pre-wrap;">
+                                        @comment.Content
+                                    </div>
+
+                                    @if (comment.UserId == currentUserId)
+                                    {
+                                        <form asp-controller="Task"
+                                              asp-action="DeleteComment"
+                                              asp-route-workspaceId="@Model.WorkspaceId"
+                                              asp-route-boardId="@Model.BoardId"
+                                              asp-route-listId="@Model.ListId"
+                                              asp-route-taskId="@Model.Id"
+                                              asp-route-commentId="@comment.Id"
+                                              method="post"
+                                              class="mt-2">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            }
+
+                        </div>
+                    }
+
+                </div>
+            </div>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="col-lg-4">
+
+            <!-- TASK INFO -->
+            <div class="card mb-4">
+                <div class="card-body">
+
+                    <h2 class="h5 mb-3">
+                        Task Information
+                    </h2>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">
+                            Created by
+                        </div>
+
+                        <div>
+                            @Model.CreatorName
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="text-muted small">
+                            Created
+                        </div>
+
+                        <div>
+                            @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="text-muted small">
+                            Last updated
+                        </div>
+
+                        <div>
+                            @Model.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ASSIGNEES -->
+            <div class="card mb-4">
+                <div class="card-body">
+
+                    <h2 class="h5 mb-3">
+                        Assignees
+                    </h2>
+
+                    @if (Model.Assignees.Count == 0)
+                    {
+                        <p class="text-muted">
+                            No one assigned.
+                        </p>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column gap-2">
+
+                            @foreach (var assignee in Model.Assignees)
+                            {
+                                <div class="d-flex justify-content-between align-items-center border rounded p-2">
+
+                                    <span>
+                                        @assignee.UserName
+                                    </span>
+
+                                    @if (Model.CanManage)
+                                    {
+                                        <form asp-controller="Task"
+                                              asp-action="Unassign"
+                                              asp-route-workspaceId="@Model.WorkspaceId"
+                                              asp-route-boardId="@Model.BoardId"
+                                              asp-route-listId="@Model.ListId"
+                                              asp-route-taskId="@Model.Id"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="userId"
+                                                   value="@assignee.UserId" />
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                Remove
+                                            </button>
+                                        </form>
+                                    }
+
+                                </div>
+                            }
+
+                        </div>
+                    }
+
+                    @if (Model.CanManage)
+                    {
+                        <hr />
+
+                        <div class="text-muted small mb-2">
+                            Workspace members
+                        </div>
+
+                        <div class="d-flex flex-column gap-2">
+
+                            @foreach (var member in Model.WorkspaceMembers)
+                            {
+                                @if (!member.IsAssigned)
+                                {
+                                    <form asp-controller="Task"
+                                          asp-action="Assign"
+                                          asp-route-workspaceId="@Model.WorkspaceId"
+                                          asp-route-boardId="@Model.BoardId"
+                                          asp-route-listId="@Model.ListId"
+                                          asp-route-taskId="@Model.Id"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="userId"
+                                               value="@member.UserId" />
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-primary w-100 text-start">
+                                            + @member.UserName
+                                        </button>
+                                    </form>
+                                }
+                            }
+
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+            <!-- NAVIGATION -->
+            <div class="card">
+                <div class="card-body">
+
+                    <a asp-controller="Board"
+                       asp-action="Details"
+                       asp-route-workspaceId="@Model.WorkspaceId"
+                       asp-route-boardId="@Model.BoardId"
+                       class="btn btn-secondary w-100">
+                        Back to Board
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>

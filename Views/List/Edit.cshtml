@@ -1,0 +1,94 @@
+﻿@model WorkStack.Models.List
+
+@{
+    ViewData["Title"] = "Edit List";
+
+    var workspaceId = (int)ViewData["WorkspaceId"]!;
+    var boardId = (int)ViewData["BoardId"]!;
+    var boardName = ViewData["BoardName"]?.ToString() ?? "Board";
+}
+
+<div class="container py-4">
+
+    <div class="mb-4">
+
+        <div class="text-muted small mb-1">
+            @boardName
+        </div>
+
+        <h1 class="mb-1">
+            Edit List
+        </h1>
+
+        <p class="text-muted mb-0">
+            Change the name of this list.
+        </p>
+
+    </div>
+
+    <div class="card">
+
+        <div class="card-body">
+
+            <form asp-controller="List"
+                  asp-action="Edit"
+                  asp-route-workspaceId="@workspaceId"
+                  asp-route-boardId="@boardId"
+                  asp-route-listId="@Model.Id"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-3">
+
+                    <label for="name" class="form-label">
+                        List Name
+                    </label>
+
+                    <input type="text"
+                           id="name"
+                           name="name"
+                           value="@Model.Name"
+                           class="form-control"
+                           maxlength="100"
+                           required
+                           autofocus />
+
+                    @Html.ValidationMessage(
+                        "name",
+                        new { @class = "text-danger" })
+
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Save Changes
+                    </button>
+
+                    <a asp-controller="Board"
+                       asp-action="Details"
+                       asp-route-workspaceId="@workspaceId"
+                       asp-route-boardId="@boardId"
+                       class="btn btn-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -17,5 +17,9 @@ namespace WorkStack.Models.ViewModels
         public DateTime UpdatedAt { get; set; }
 
         public bool CanManageBoards { get; set; }
+
+        public List<ListViewModel> Lists { get; set; } = new();
+
+        public bool CanManageLists { get; set; }
     }
 }

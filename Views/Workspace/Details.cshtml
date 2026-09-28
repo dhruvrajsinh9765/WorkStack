@@ -2,17 +2,116 @@
 
 @{
     ViewData["Title"] = Model.Name;
+
+    var isOwner = Model.Role == WorkStack.Models.Enums.WorkspaceRole.Owner;
 }
 
-<div class="mb-3">
-    <h1>@Model.Name</h1>
-    @if (!string.IsNullOrWhiteSpace(Model.Description))
-    {
-        <p>@Model.Description</p>
-    }
-    <p><strong>Your role:</strong> @Model.Role</p>
-</div>
+@if (TempData["WorkspaceDeleteError"] is string deleteError)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @deleteError
 
-<a asp-action="Index" class="btn btn-secondary">Back to workspaces</a>
-<a asp-action="Members" asp-route-id="@Model.Id" class="btn btn-outline-primary">Members</a>
-<a asp-controller="Board" asp-action="Index" asp-route-workspaceId="@Model.Id" class="btn btn-outline-primary">Boards</a>
+        <button type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close">
+        </button>
+    </div>
+}
+
+<div class="container-fluid py-4">
+
+    <!-- Workspace Header -->
+    <div class="d-flex justify-content-between align-items-start mb-4">
+
+        <div>
+            <div class="text-muted small mb-1">
+                Workspace
+            </div>
+
+            <h1 class="mb-2">
+                @Model.Name
+            </h1>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Description))
+            {
+                <p class="text-muted mb-2">
+                    @Model.Description
+                </p>
+            }
+
+            <span class="badge bg-secondary">
+                @Model.Role
+            </span>
+        </div>
+
+        @if (isOwner)
+        {
+            <div class="d-flex gap-2">
+
+                <a asp-controller="Workspace"
+                   asp-action="Edit"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-primary">
+                    Edit Workspace
+                </a>
+
+                <form asp-controller="Workspace"
+                      asp-action="Delete"
+                      asp-route-id="@Model.Id"
+                      method="post"
+                      onsubmit="return confirm('Are you sure you want to delete this workspace? This action cannot be undone.');">
+
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="btn btn-outline-danger">
+                        Delete Workspace
+                    </button>
+
+                </form>
+
+            </div>
+        }
+
+    </div>
+
+
+    <!-- Workspace Actions -->
+    <div class="card">
+
+        <div class="card-body">
+
+            <h2 class="h5 mb-3">
+                Workspace
+            </h2>
+
+            <div class="d-flex flex-wrap gap-2">
+
+                <a asp-controller="Workspace"
+                   asp-action="Index"
+                   class="btn btn-secondary">
+                    Back to Workspaces
+                </a>
+
+                <a asp-controller="Workspace"
+                   asp-action="Members"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-outline-primary">
+                    Members
+                </a>
+
+                <a asp-controller="Board"
+                   asp-action="Index"
+                   asp-route-workspaceId="@Model.Id"
+                   class="btn btn-outline-primary">
+                    Boards
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,203 @@
+﻿@model WorkStack.Models.ViewModels.CreateTaskViewModel
+
+@{
+    ViewData["Title"] = "Create Task";
+}
+
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+        <div class="text-muted small mb-1">
+            Task
+        </div>
+
+        <h1 class="mb-2">
+            Create Task
+        </h1>
+
+        <p class="text-muted mb-0">
+            Add a task to <strong>@Model.ListName</strong>.
+        </p>
+    </div>
+
+
+    <div class="row">
+
+        <div class="col-lg-8">
+
+            <div class="card">
+
+                <div class="card-body">
+
+                    <form asp-controller="Task"
+                          asp-action="Create"
+                          asp-route-workspaceId="@Model.WorkspaceId"
+                          asp-route-boardId="@Model.BoardId"
+                          asp-route-listId="@Model.ListId"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+
+                        <!-- TITLE -->
+                        <div class="mb-3">
+
+                            <label asp-for="Title"
+                                   class="form-label">
+                                Title
+                            </label>
+
+                            <input asp-for="Title"
+                                   class="form-control"
+                                   maxlength="200"
+                                   placeholder="Enter task title" />
+
+                            <span asp-validation-for="Title"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- DESCRIPTION -->
+                        <div class="mb-3">
+
+                            <label asp-for="Description"
+                                   class="form-label">
+                                Description
+                            </label>
+
+                            <textarea asp-for="Description"
+                                      class="form-control"
+                                      rows="6"
+                                      maxlength="5000"
+                                      placeholder="Describe the task..."></textarea>
+
+                            <span asp-validation-for="Description"
+                                  class="text-danger">
+                            </span>
+
+                        </div>
+
+
+                        <!-- PRIORITY + DATE -->
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+
+                                <label asp-for="Priority"
+                                       class="form-label">
+                                    Priority
+                                </label>
+
+                                <select asp-for="Priority"
+                                        class="form-select"
+                                        asp-items="Html.GetEnumSelectList<WorkStack.Models.Enums.TaskPriority>()">
+                                </select>
+
+                            </div>
+
+
+                            <div class="col-md-6 mb-3">
+
+                                <label asp-for="DueDate"
+                                       class="form-label">
+                                    Due Date
+                                </label>
+
+                                <input asp-for="DueDate"
+                                       type="date"
+                                       class="form-control" />
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- ASSIGNEES -->
+                        <div class="mb-4">
+
+                            <label class="form-label">
+                                Assign To
+                            </label>
+
+                            <div class="border rounded p-3">
+
+                                @if (Model.WorkspaceMembers.Count == 0)
+                                {
+                                    <div class="text-muted">
+                                        No workspace members available.
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="d-flex flex-column gap-2">
+
+                                        @foreach (var member in Model.WorkspaceMembers)
+                                        {
+                                            <div class="form-check">
+
+                                                <input class="form-check-input"
+                                                       type="checkbox"
+                                                       name="AssigneeIds"
+                                                       value="@member.UserId"
+                                                       id="member-@member.UserId"
+                                                @(member.IsAssigned ? "checked" : "") />
+
+                                                <label class="form-check-label"
+                                                       for="member-@member.UserId">
+                                                    @member.UserName
+                                                </label>
+
+                                            </div>
+                                        }
+
+                                    </div>
+                                }
+
+                            </div>
+
+                            <div class="form-text">
+                                You can assign one or more workspace members.
+                            </div>
+
+                        </div>
+
+
+                        <!-- BUTTONS -->
+                        <div class="d-flex gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Create Task
+                            </button>
+
+                            <a asp-controller="Board"
+                               asp-action="Details"
+                               asp-route-workspaceId="@Model.WorkspaceId"
+                               asp-route-boardId="@Model.BoardId"
+                               class="btn btn-secondary">
+                                Cancel
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
