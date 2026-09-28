@@ -13,14 +13,21 @@ namespace WorkStack.Models.ViewModels
 
         public int ListId { get; set; }
 
-        [Required]
-        [StringLength(200)]
+        [Required(ErrorMessage = "Task title is required.")]
+        [StringLength(
+            200,
+            ErrorMessage = "Task title cannot be longer than 200 characters.")]
         public string Title { get; set; } = string.Empty;
 
-        [StringLength(5000)]
+        [StringLength(
+            5000,
+            ErrorMessage = "Task description cannot be longer than 5000 characters.")]
         public string? Description { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Task priority is required.")]
+        [EnumDataType(
+            typeof(TaskPriority),
+            ErrorMessage = "Select a valid task priority.")]
         public TaskPriority Priority { get; set; } = TaskPriority.Medium;
 
         public DateTime? DueDate { get; set; }

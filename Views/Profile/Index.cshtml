@@ -1,0 +1,182 @@
+﻿@model WorkStack.Models.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<div class="container-fluid py-4">
+
+    <!-- PROFILE HEADER -->
+    <div class="mb-4">
+
+        <div class="text-muted small mb-1">
+            Account
+        </div>
+
+        <h1 class="mb-2">
+            My Profile
+        </h1>
+
+        <p class="text-muted mb-0">
+            View your WorkStack account information.
+        </p>
+
+    </div>
+
+
+    <!-- PROFILE CARD -->
+    <div class="card shadow-sm"
+         style="max-width: 760px;">
+
+        <div class="card-body p-4">
+
+            <!-- PROFILE IDENTITY -->
+            <div class="d-flex align-items-center gap-3 mb-4">
+
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                     style="width: 64px; height: 64px; font-size: 1.5rem; font-weight: 600;">
+
+                    @(string.IsNullOrWhiteSpace(Model.UserName)
+                        ? "U"
+                        : Model.UserName.Substring(0, 1).ToUpper())
+
+                </div>
+
+                <div>
+
+                    <h2 class="h4 mb-1">
+                        @Model.UserName
+                    </h2>
+
+                    <div class="text-muted">
+                        WorkStack User
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACCOUNT INFORMATION -->
+            <div class="border rounded">
+
+                <div class="p-3 border-bottom">
+
+                    <div class="text-muted small">
+                        Username
+                    </div>
+
+                    <div class="fw-semibold mt-1">
+                        @Model.UserName
+                    </div>
+
+                </div>
+
+
+                <div class="p-3 border-bottom">
+
+                    <div class="text-muted small">
+                        Email
+                    </div>
+
+                    <div class="fw-semibold mt-1">
+                        @Model.Email
+                    </div>
+
+                </div>
+
+
+                <div class="p-3">
+
+                    <div class="text-muted small">
+                        Email status
+                    </div>
+
+                    <div class="mt-1">
+
+                        @if (Model.EmailConfirmed)
+                        {
+                            <span class="badge bg-success">
+                                Confirmed
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning text-dark">
+                                Not confirmed
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- WORKSPACE SUMMARY -->
+            <div class="mt-4">
+
+                <h3 class="h5 mb-3">
+                    Workspace activity
+                </h3>
+
+                <div class="border rounded p-3">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div>
+
+                            <div class="fw-semibold">
+                                Workspaces
+                            </div>
+
+                            <div class="text-muted small">
+                                Workspaces you are currently a member of.
+                            </div>
+
+                        </div>
+
+                        <div class="text-end">
+
+                            <div class="fs-4 fw-semibold">
+                                @Model.WorkspaceCount
+                            </div>
+
+                            <div class="text-muted small">
+                                @(Model.WorkspaceCount == 1
+                                    ? "workspace"
+                                    : "workspaces")
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACCOUNT ACTIONS -->
+            <div class="d-flex flex-wrap gap-2 mt-4">
+
+                <a asp-area="Identity"
+                   asp-page="/Account/Manage/Index"
+                   class="btn btn-primary">
+                    Manage Account
+                </a>
+
+                <a asp-controller="Dashboard"
+                   asp-action="Index"
+                   class="btn btn-outline-secondary">
+                    Back to Dashboard
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

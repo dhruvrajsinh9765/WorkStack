@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +21,7 @@ namespace WorkStack.Controllers
         // ============================================================
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? search)
         {
             var userId = User.FindFirstValue(
                 ClaimTypes.NameIdentifier);
@@ -30,11 +31,26 @@ namespace WorkStack.Controllers
                 return Forbid();
             }
 
-            var workspaces = await context.WorkspaceMembers
+            search = search?.Trim() ?? string.Empty;
+
+            var workspacesQuery = context.WorkspaceMembers
                 .Where(member => member.UserId == userId)
-                .Select(member => member.Workspace)
+                .Select(member => member.Workspace);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                workspacesQuery = workspacesQuery.Where(workspace =>
+                    workspace.Name.Contains(search) ||
+                    (workspace.Description != null &&
+                     workspace.Description.Contains(search)));
+            }
+
+            var workspaces = await workspacesQuery
                 .AsNoTracking()
+                .OrderBy(workspace => workspace.Name)
                 .ToListAsync();
+
+            ViewData["Search"] = search;
 
             return View(workspaces);
         }
@@ -148,6 +164,41 @@ namespace WorkStack.Controllers
                 return NotFound();
             }
 
+            // Normalize user input before applying
+            // custom validation rules.
+            model.Name = (model.Name ?? string.Empty).Trim();
+
+            model.Description =
+                string.IsNullOrWhiteSpace(model.Description)
+                    ? null
+                    : model.Description.Trim();
+
+            // Remove validation results generated from the
+            // untrimmed values and validate the normalized values.
+            ModelState.Remove(nameof(model.Name));
+            ModelState.Remove(nameof(model.Description));
+
+            if (string.IsNullOrWhiteSpace(model.Name))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Name),
+                    "Workspace name is required.");
+            }
+            else if (model.Name.Length > 100)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Name),
+                    "Workspace name cannot be longer than 100 characters.");
+            }
+
+            if (model.Description is not null &&
+                model.Description.Length > 500)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Description),
+                    "Workspace description cannot be longer than 500 characters.");
+            }
+
             if (!ModelState.IsValid)
             {
                 ViewData["WorkspaceId"] = id;
@@ -155,12 +206,9 @@ namespace WorkStack.Controllers
                 return View(model);
             }
 
-            workspace.Name = model.Name.Trim();
+            workspace.Name = model.Name;
 
-            workspace.Description =
-                string.IsNullOrWhiteSpace(model.Description)
-                    ? null
-                    : model.Description.Trim();
+            workspace.Description = model.Description;
 
             workspace.UpdatedAt = DateTime.UtcNow;
 
@@ -584,6 +632,35 @@ namespace WorkStack.Controllers
                 return NotFound();
             }
 
+            // Normalize email before using it for lookup.
+            model.Email =
+                (model.Email ?? string.Empty).Trim();
+
+            // The DataAnnotations validation may have evaluated
+            // the untrimmed value during model binding, so remove
+            // the old email validation result and validate the
+            // normalized value here.
+            ModelState.Remove(nameof(model.Email));
+
+            if (string.IsNullOrWhiteSpace(model.Email))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    "Email address is required.");
+            }
+            else if (model.Email.Length > 256)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    "Email address cannot be longer than 256 characters.");
+            }
+            else if (!new EmailAddressAttribute().IsValid(model.Email))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Email),
+                    "Enter a valid email address.");
+            }
+
             // Managers may add Members.
             // Only Owners may add Managers.
             if (model.Role == WorkspaceRole.Manager &&
@@ -675,6 +752,41 @@ namespace WorkStack.Controllers
         public async Task<IActionResult> Create(
             CreateWorkspaceViewModel model)
         {
+            // Normalize input before validation.
+            model.Name =
+                (model.Name ?? string.Empty).Trim();
+
+            model.Description =
+                string.IsNullOrWhiteSpace(model.Description)
+                    ? null
+                    : model.Description.Trim();
+
+            // Remove validation results generated from the
+            // untrimmed values and validate the normalized values.
+            ModelState.Remove(nameof(model.Name));
+            ModelState.Remove(nameof(model.Description));
+
+            if (string.IsNullOrWhiteSpace(model.Name))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Name),
+                    "Workspace name is required.");
+            }
+            else if (model.Name.Length > 100)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Name),
+                    "Workspace name cannot be longer than 100 characters.");
+            }
+
+            if (model.Description is not null &&
+                model.Description.Length > 500)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Description),
+                    "Workspace description cannot be longer than 500 characters.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -690,12 +802,9 @@ namespace WorkStack.Controllers
 
             var workspace = new Workspace
             {
-                Name = model.Name.Trim(),
+                Name = model.Name,
 
-                Description =
-                    string.IsNullOrWhiteSpace(model.Description)
-                        ? null
-                        : model.Description.Trim(),
+                Description = model.Description,
 
                 OwnerId = userId,
 

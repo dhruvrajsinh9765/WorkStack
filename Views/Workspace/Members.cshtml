@@ -13,6 +13,10 @@
 
 <div class="container-fluid py-4">
 
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
 
         <div>
@@ -44,16 +48,46 @@
     </div>
 
 
+    <!-- =========================================================
+         SUCCESS / ERROR MESSAGES
+         ========================================================= -->
     @if (TempData["MemberRemoveError"] is string removeError)
     {
-        <div class="alert alert-warning" role="alert">
+        <div class="alert alert-warning alert-dismissible fade show"
+             role="alert">
 
             @removeError
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
 
         </div>
     }
 
 
+    @if (TempData["MemberRemoveSuccess"] is string removeSuccess)
+    {
+        <div class="alert alert-success alert-dismissible fade show"
+             role="alert">
+
+            @removeSuccess
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- =========================================================
+         MEMBERS TABLE
+         ========================================================= -->
     @if (!Model.Any())
     {
         <div class="ws-empty-state">
@@ -62,9 +96,20 @@
                 No members found
             </h3>
 
-            <p class="mb-0">
+            <p class="mb-3">
                 Add members to start collaborating in this workspace.
             </p>
+
+            @if (ViewData["CanManageMembers"] is true)
+            {
+                <a asp-action="AddMember"
+                   asp-route-id="@workspaceId"
+                   class="btn btn-primary">
+
+                    Add the first member
+
+                </a>
+            }
 
         </div>
     }
@@ -110,6 +155,8 @@
                         {
                             <tr>
 
+                                <!-- EMAIL -->
+
                                 <td class="px-4 py-3">
 
                                     <span class="fw-semibold">
@@ -118,6 +165,8 @@
 
                                 </td>
 
+
+                                <!-- ROLE -->
 
                                 <td class="py-3">
 
@@ -140,13 +189,18 @@
                                 </td>
 
 
+                                <!-- JOINED DATE -->
+
                                 <td class="py-3">
 
-                                    @member.JoinedAt.ToLocalTime().ToString("dd MMM yyyy")
+                                    @member.JoinedAt
+                                    .ToLocalTime()
+                                    .ToString("dd MMM yyyy")
 
                                 </td>
 
 
+                                <!-- ACTIONS -->
                                 @if (showActionsColumn)
                                 {
                                     <td class="px-4 py-3 text-end">
@@ -204,6 +258,10 @@
         </div>
     }
 
+
+    <!-- =========================================================
+         BACK
+         ========================================================= -->
 
     <div class="mt-4">
 

@@ -2,6 +2,10 @@
 
 @{
     ViewData["Title"] = Model.Name;
+
+    var hasFilters =
+        !string.IsNullOrWhiteSpace(Model.Search) ||
+        !string.IsNullOrWhiteSpace(Model.Priority);
 }
 
 <div class="container-fluid py-4">
@@ -87,6 +91,164 @@
     </div>
 
 
+    <!-- TASK SEARCH & FILTER -->
+    <div class="card mb-4">
+
+        <div class="card-body">
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                <div>
+                    <h2 class="h5 mb-1">
+                        Find Tasks
+                    </h2>
+
+                    <p class="text-muted small mb-0">
+                        Search tasks by title or filter them by priority.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <form asp-controller="Board"
+                  asp-action="Details"
+                  method="get">
+
+                <input type="hidden"
+                       name="workspaceId"
+                       value="@Model.WorkspaceId" />
+
+                <input type="hidden"
+                       name="boardId"
+                       value="@Model.Id" />
+
+
+                <div class="row g-2">
+
+                    <!-- SEARCH -->
+                    <div class="col-md-6">
+
+                        <label for="taskSearch"
+                               class="form-label">
+                            Search tasks
+                        </label>
+
+                        <input id="taskSearch"
+                               type="text"
+                               name="search"
+                               value="@Model.Search"
+                               class="form-control"
+                               placeholder="Search by task title..."
+                               aria-label="Search tasks by title" />
+
+                    </div>
+
+
+                    <!-- PRIORITY -->
+                    <div class="col-md-3">
+
+                        <label for="taskPriority"
+                               class="form-label">
+                            Priority
+                        </label>
+
+                        <select id="taskPriority"
+                                name="priority"
+                                class="form-select">
+
+                            <option value="">
+                                All priorities
+                            </option>
+
+                            @foreach (var priority in Enum.GetValues<WorkStack.Models.Enums.TaskPriority>())
+                            {
+                                if (Model.Priority.Equals(
+                                    priority.ToString(),
+                                    StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <option value="@priority" selected>
+                                        @priority
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@priority">
+                                        @priority
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- BUTTONS -->
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Search
+                        </button>
+
+                        @if (hasFilters)
+                        {
+                            <a asp-controller="Board"
+                               asp-action="Details"
+                               asp-route-workspaceId="@Model.WorkspaceId"
+                               asp-route-boardId="@Model.Id"
+                               class="btn btn-outline-secondary">
+                                Clear
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- FILTER STATUS -->
+    @if (hasFilters)
+    {
+        <div class="alert alert-light border mb-4">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <strong>Filters active</strong>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Search))
+                    {
+                        <span class="ms-2">
+                            Search:
+                            <strong>@Model.Search</strong>
+                        </span>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Priority))
+                    {
+                        <span class="ms-2">
+                            Priority:
+                            <strong>@Model.Priority</strong>
+                        </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+
     <!-- LIST HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-3">
 
@@ -158,8 +320,17 @@
                                 </h3>
 
                                 <div class="text-muted small">
+
+                                    @if (hasFilters)
+                                    {
+                                        @list.Tasks.Count
+                                        @(list.Tasks.Count == 1 ? "matching task" : "matching tasks")
+                                        <span class="mx-1">·</span>
+                                    }
+
                                     @list.TaskCount
                                     @(list.TaskCount == 1 ? "task" : "tasks")
+
                                 </div>
 
                             </div>
@@ -279,7 +450,24 @@
                         @if (list.Tasks.Count == 0)
                         {
                             <div class="border rounded p-4 text-center text-muted mb-3">
-                                No tasks yet
+
+                                @if (hasFilters)
+                                {
+                                    <div>
+                                        No matching tasks
+                                    </div>
+
+                                    <div class="small mt-1">
+                                        Try changing your search or priority filter.
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div>
+                                        No tasks yet
+                                    </div>
+                                }
+
                             </div>
                         }
                         else

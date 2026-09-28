@@ -106,6 +106,65 @@ namespace WorkStack.Controllers
 
             model.AssigneeIds ??= new List<string>();
 
+            // Normalize task input before validation.
+            model.Title =
+                (model.Title ?? string.Empty).Trim();
+
+            model.Description =
+                string.IsNullOrWhiteSpace(model.Description)
+                    ? null
+                    : model.Description.Trim();
+
+            // Remove validation results generated from the
+            // untrimmed values and validate the normalized values.
+            ModelState.Remove(nameof(model.Title));
+            ModelState.Remove(nameof(model.Description));
+
+            if (string.IsNullOrWhiteSpace(model.Title))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Title),
+                    "Task title is required.");
+            }
+            else if (model.Title.Length > 200)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Title),
+                    "Task title cannot be longer than 200 characters.");
+            }
+
+            if (model.Description is not null &&
+                model.Description.Length > 5000)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Description),
+                    "Task description cannot be longer than 5000 characters.");
+            }
+
+            // Only allow users who are actual members of this workspace.
+            var validMemberIds = await context.WorkspaceMembers
+                .Where(member =>
+                    member.WorkspaceId == workspaceId)
+                .Select(member => member.UserId)
+                .ToListAsync();
+
+            var validMemberIdSet =
+                validMemberIds.ToHashSet();
+
+            var invalidAssigneeIds = model.AssigneeIds
+                .Where(id =>
+                    string.IsNullOrWhiteSpace(id) ||
+                    !validMemberIdSet.Contains(id))
+                .Distinct()
+                .ToList();
+
+            if (invalidAssigneeIds.Count > 0)
+            {
+                ModelState.AddModelError(
+                    nameof(model.AssigneeIds),
+                    "One or more selected assignees are not members of this workspace.");
+            }
+
             // Reload members if validation fails.
             model.WorkspaceMembers = await context.WorkspaceMembers
                 .Where(member => member.WorkspaceId == workspaceId)
@@ -133,12 +192,9 @@ namespace WorkStack.Controllers
 
             var task = new WorkStack.Models.Task
             {
-                Title = model.Title.Trim(),
+                Title = model.Title,
 
-                Description =
-                    string.IsNullOrWhiteSpace(model.Description)
-                        ? null
-                        : model.Description.Trim(),
+                Description = model.Description,
 
                 ListId = listId,
 
@@ -157,19 +213,15 @@ namespace WorkStack.Controllers
 
             await context.SaveChangesAsync();
 
-            // Only allow assigning users who are actually
-            // members of this workspace.
+            // At this point all submitted assignee IDs have
+            // already been verified as workspace members.
             if (model.AssigneeIds.Count > 0)
             {
-                var validMemberIds = await context.WorkspaceMembers
-                    .Where(member =>
-                        member.WorkspaceId == workspaceId &&
-                        model.AssigneeIds.Contains(member.UserId))
-                    .Select(member => member.UserId)
+                var uniqueAssigneeIds = model.AssigneeIds
                     .Distinct()
-                    .ToListAsync();
+                    .ToList();
 
-                foreach (var memberId in validMemberIds)
+                foreach (var memberId in uniqueAssigneeIds)
                 {
                     context.TaskAssignees.Add(
                         new TaskAssignee
@@ -402,15 +454,47 @@ namespace WorkStack.Controllers
             if (task is null)
                 return NotFound();
 
-            if (!ModelState.IsValid)
-                return View(model);
+            // Normalize task input before validation.
+            model.Title =
+                (model.Title ?? string.Empty).Trim();
 
-            task.Title = model.Title.Trim();
-
-            task.Description =
+            model.Description =
                 string.IsNullOrWhiteSpace(model.Description)
                     ? null
                     : model.Description.Trim();
+
+            // Remove validation results generated from the
+            // untrimmed values and validate the normalized values.
+            ModelState.Remove(nameof(model.Title));
+            ModelState.Remove(nameof(model.Description));
+
+            if (string.IsNullOrWhiteSpace(model.Title))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Title),
+                    "Task title is required.");
+            }
+            else if (model.Title.Length > 200)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Title),
+                    "Task title cannot be longer than 200 characters.");
+            }
+
+            if (model.Description is not null &&
+                model.Description.Length > 5000)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Description),
+                    "Task description cannot be longer than 5000 characters.");
+            }
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            task.Title = model.Title;
+
+            task.Description = model.Description;
 
             task.Priority = model.Priority;
 
@@ -560,6 +644,24 @@ namespace WorkStack.Controllers
             if (!CanManageTasks(membership.Role))
                 return Forbid();
 
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                TempData["TaskAssignmentError"] =
+                    "A valid workspace member must be selected.";
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new
+                    {
+                        workspaceId,
+                        boardId,
+                        listId,
+                        taskId
+                    });
+            }
+
+            userId = userId.Trim();
+
             var taskExists = await context.Tasks
                 .AnyAsync(item =>
                     item.Id == taskId &&
@@ -576,7 +678,20 @@ namespace WorkStack.Controllers
                     member.UserId == userId);
 
             if (!isWorkspaceMember)
-                return BadRequest();
+            {
+                TempData["TaskAssignmentError"] =
+                    "The selected user is not a member of this workspace.";
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new
+                    {
+                        workspaceId,
+                        boardId,
+                        listId,
+                        taskId
+                    });
+            }
 
             var alreadyAssigned = await context.TaskAssignees
                 .AnyAsync(assignee =>
@@ -627,6 +742,13 @@ namespace WorkStack.Controllers
 
             if (!CanManageTasks(membership.Role))
                 return Forbid();
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest();
+            }
+
+            userId = userId.Trim();
 
             var assignment = await context.TaskAssignees
                 .FirstOrDefaultAsync(assignee =>
@@ -683,10 +805,14 @@ namespace WorkStack.Controllers
             if (!taskExists)
                 return NotFound();
 
-            var trimmedContent = content?.Trim() ?? string.Empty;
+            var trimmedContent =
+                content?.Trim() ?? string.Empty;
 
             if (string.IsNullOrWhiteSpace(trimmedContent))
             {
+                TempData["CommentError"] =
+                    "Comment cannot be empty.";
+
                 return RedirectToAction(
                     nameof(Details),
                     new

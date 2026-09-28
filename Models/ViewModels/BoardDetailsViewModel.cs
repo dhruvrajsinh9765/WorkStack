@@ -18,6 +18,10 @@ namespace WorkStack.Models.ViewModels
 
         public bool CanManageBoards { get; set; }
 
+        public string Search { get; set; } = string.Empty;
+
+        public string Priority { get; set; } = string.Empty;
+
         public List<ListViewModel> Lists { get; set; } = new();
 
         public bool CanManageLists { get; set; }

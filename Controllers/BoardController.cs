@@ -17,7 +17,9 @@ namespace WorkStack.Controllers
         // ============================================================
 
         [HttpGet("/Workspace/{workspaceId:int}/Boards")]
-        public async Task<IActionResult> Index(int workspaceId)
+        public async Task<IActionResult> Index(
+            int workspaceId,
+            string? search)
         {
             var membership = await GetCurrentMembershipAsync(workspaceId);
 
@@ -31,8 +33,20 @@ namespace WorkStack.Controllers
                 return NotFound();
             }
 
-            var boards = await context.Boards
-                .Where(board => board.WorkspaceId == workspaceId)
+            search = search?.Trim() ?? string.Empty;
+
+            var boardsQuery = context.Boards
+                .Where(board => board.WorkspaceId == workspaceId);
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                boardsQuery = boardsQuery.Where(board =>
+                    board.Name.Contains(search) ||
+                    (board.Description != null &&
+                     board.Description.Contains(search)));
+            }
+
+            var boards = await boardsQuery
                 .AsNoTracking()
                 .OrderBy(board => board.Name)
                 .Select(board => new BoardListItemViewModel
@@ -48,9 +62,11 @@ namespace WorkStack.Controllers
                 WorkspaceId = workspaceId,
                 WorkspaceName = membership.WorkspaceName!,
                 CanManageBoards = CanManageBoards(membership.Role.Value),
+                Search = search,
                 Boards = boards
             });
         }
+
 
         // ============================================================
         // CREATE BOARD - GET
@@ -72,6 +88,7 @@ namespace WorkStack.Controllers
             return View(new BoardFormViewModel());
         }
 
+
         // ============================================================
         // CREATE BOARD - POST
         // ============================================================
@@ -91,6 +108,41 @@ namespace WorkStack.Controllers
             }
 
             ViewData["WorkspaceId"] = workspaceId;
+
+            // Normalize input before validation.
+            model.Name =
+                (model.Name ?? string.Empty).Trim();
+
+            model.Description =
+                string.IsNullOrWhiteSpace(model.Description)
+                    ? null
+                    : model.Description.Trim();
+
+            // Remove validation results generated from the
+            // untrimmed values and validate the normalized values.
+            ModelState.Remove(nameof(model.Name));
+            ModelState.Remove(nameof(model.Description));
+
+            if (string.IsNullOrWhiteSpace(model.Name))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Name),
+                    "Board name is required.");
+            }
+            else if (model.Name.Length > 100)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Name),
+                    "Board name cannot be longer than 100 characters.");
+            }
+
+            if (model.Description is not null &&
+                model.Description.Length > 500)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Description),
+                    "Board description cannot be longer than 500 characters.");
+            }
 
             if (!ModelState.IsValid)
             {
@@ -118,6 +170,7 @@ namespace WorkStack.Controllers
                 });
         }
 
+
         // ============================================================
         // BOARD DETAILS
         // ============================================================
@@ -125,7 +178,9 @@ namespace WorkStack.Controllers
         [HttpGet("/Workspace/{workspaceId:int}/Boards/{boardId:int}")]
         public async Task<IActionResult> Details(
             int workspaceId,
-            int boardId)
+            int boardId,
+            string? search,
+            string? priority)
         {
             var membership =
                 await GetCurrentMembershipAsync(workspaceId);
@@ -138,6 +193,24 @@ namespace WorkStack.Controllers
             if (membership.Role is null)
             {
                 return NotFound();
+            }
+
+            search = search?.Trim() ?? string.Empty;
+            priority = priority?.Trim() ?? string.Empty;
+
+            TaskPriority? selectedPriority = null;
+
+            if (!string.IsNullOrWhiteSpace(priority) &&
+                Enum.TryParse<TaskPriority>(
+                    priority,
+                    true,
+                    out var parsedPriority))
+            {
+                selectedPriority = parsedPriority;
+            }
+            else
+            {
+                priority = string.Empty;
             }
 
             var board = await context.Boards
@@ -164,6 +237,10 @@ namespace WorkStack.Controllers
                     CanManageBoards =
                         CanManageBoards(membership.Role.Value),
 
+                    Search = search,
+
+                    Priority = priority,
+
                     Lists = board.Lists
                         .OrderBy(list => list.Position)
                         .Select(list => new ListViewModel
@@ -174,9 +251,17 @@ namespace WorkStack.Controllers
 
                             Position = list.Position,
 
+                            // Keep this as the total number of tasks
+                            // in the list, regardless of filters.
                             TaskCount = list.Tasks.Count(),
 
                             Tasks = list.Tasks
+                                .Where(task =>
+                                    string.IsNullOrWhiteSpace(search) ||
+                                    task.Title.Contains(search))
+                                .Where(task =>
+                                    selectedPriority == null ||
+                                    task.Priority == selectedPriority.Value)
                                 .OrderBy(task => task.CreatedAt)
                                 .Select(task => new TaskCardViewModel
                                 {
@@ -211,6 +296,7 @@ namespace WorkStack.Controllers
 
             return View(board);
         }
+
 
         // ============================================================
         // EDIT BOARD - GET
@@ -253,6 +339,7 @@ namespace WorkStack.Controllers
             return View(board);
         }
 
+
         // ============================================================
         // EDIT BOARD - POST
         // ============================================================
@@ -286,6 +373,41 @@ namespace WorkStack.Controllers
 
             ViewData["BoardId"] = boardId;
 
+            // Normalize input before validation.
+            model.Name =
+                (model.Name ?? string.Empty).Trim();
+
+            model.Description =
+                string.IsNullOrWhiteSpace(model.Description)
+                    ? null
+                    : model.Description.Trim();
+
+            // Remove validation results generated from the
+            // untrimmed values and validate the normalized values.
+            ModelState.Remove(nameof(model.Name));
+            ModelState.Remove(nameof(model.Description));
+
+            if (string.IsNullOrWhiteSpace(model.Name))
+            {
+                ModelState.AddModelError(
+                    nameof(model.Name),
+                    "Board name is required.");
+            }
+            else if (model.Name.Length > 100)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Name),
+                    "Board name cannot be longer than 100 characters.");
+            }
+
+            if (model.Description is not null &&
+                model.Description.Length > 500)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Description),
+                    "Board description cannot be longer than 500 characters.");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -307,6 +429,7 @@ namespace WorkStack.Controllers
                     boardId
                 });
         }
+
 
         // ============================================================
         // DELETE BOARD - POST
@@ -366,6 +489,7 @@ namespace WorkStack.Controllers
                 });
         }
 
+
         // ============================================================
         // GET CURRENT WORKSPACE MEMBERSHIP
         // ============================================================
@@ -403,6 +527,7 @@ namespace WorkStack.Controllers
                 membership?.WorkspaceName);
         }
 
+
         // ============================================================
         // CHECK MANAGEMENT ACCESS
         // ============================================================
@@ -427,6 +552,7 @@ namespace WorkStack.Controllers
                 ? null
                 : Forbid();
         }
+
 
         // ============================================================
         // CHECK BOARD MANAGEMENT ROLE

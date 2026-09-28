@@ -8,7 +8,10 @@ namespace WorkStack.Models.ViewModels
 
         public bool CanManageBoards { get; set; }
 
-        public IReadOnlyList<BoardListItemViewModel> Boards { get; set; } = Array.Empty<BoardListItemViewModel>();
+        public string Search { get; set; } = string.Empty;
+
+        public IReadOnlyList<BoardListItemViewModel> Boards { get; set; }
+            = Array.Empty<BoardListItemViewModel>();
     }
 
     public class BoardListItemViewModel
