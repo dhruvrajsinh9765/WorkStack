@@ -8,87 +8,181 @@
     var boardName = ViewData["BoardName"]?.ToString() ?? "Board";
 }
 
-<div class="container py-4">
+<div class="ws-list-form-page">
 
-    <div class="mb-4">
+    <a asp-controller="Board"
+       asp-action="Details"
+       asp-route-workspaceId="@workspaceId"
+       asp-route-boardId="@boardId"
+       class="ws-list-form-back">
 
-        <div class="text-muted small mb-1">
-            @boardName
-        </div>
+        <span aria-hidden="true">←</span>
+        <span>Back to board</span>
 
-        <h1 class="mb-1">
-            Edit List
-        </h1>
+    </a>
 
-        <p class="text-muted mb-0">
-            Change the name of this list.
-        </p>
 
-    </div>
+    <div class="ws-list-form-layout">
 
-    <div class="card">
+        <!-- INTRO -->
 
-        <div class="card-body">
+        <section class="ws-list-form-intro">
+
+            <div class="ws-list-form-icon"
+                 aria-hidden="true">
+
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 20h4L19 9l-4-4L4 16z"></path>
+                    <path d="m13.5 6.5 4 4"></path>
+                </svg>
+
+            </div>
+
+            <p class="ws-list-form-eyebrow">
+                LIST SETTINGS
+            </p>
+
+            <h1>
+                Edit list
+            </h1>
+
+            <p>
+                Update the name of this workflow stage to keep
+                your board clear and easy to understand.
+            </p>
+
+
+            <div class="ws-list-form-context">
+
+                <span class="ws-list-form-context-label">
+                    BOARD
+                </span>
+
+                <strong>
+                    @boardName
+                </strong>
+
+
+                <span class="ws-list-form-context-label ws-list-form-context-secondary">
+                    CURRENT LIST
+                </span>
+
+                <strong>
+                    @Model.Name
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- FORM -->
+
+        <section class="ws-list-form-card">
+
+            <div class="ws-list-form-card-header">
+
+                <div>
+
+                    <span class="ws-list-form-card-label">
+                        LIST DETAILS
+                    </span>
+
+                    <h2>
+                        Update the workflow stage
+                    </h2>
+
+                    <p>
+                        Change the list name and save your changes.
+                    </p>
+
+                </div>
+
+            </div>
+
 
             <form asp-controller="List"
                   asp-action="Edit"
                   asp-route-workspaceId="@workspaceId"
                   asp-route-boardId="@boardId"
                   asp-route-listId="@Model.Id"
-                  method="post">
+                  method="post"
+                  class="ws-list-form">
 
                 @Html.AntiForgeryToken()
 
+
                 <div asp-validation-summary="ModelOnly"
-                     class="text-danger mb-3">
+                     class="ws-list-validation-summary"
+                     role="alert">
                 </div>
 
-                <div class="mb-3">
 
-                    <label for="name" class="form-label">
-                        List Name
+                <div class="ws-list-form-field">
+
+                    <label for="name"
+                           class="ws-list-form-label">
+                        List name
                     </label>
 
                     <input type="text"
                            id="name"
                            name="name"
                            value="@Model.Name"
-                           class="form-control"
+                           class="ws-list-form-input"
                            maxlength="100"
                            required
+                           autocomplete="off"
                            autofocus />
+
 
                     @Html.ValidationMessage(
                         "name",
-                        new { @class = "text-danger" })
+                        new { @class = "ws-list-form-error" })
+
+
+                    <span class="ws-list-form-hint">
+                        Choose a clear name that describes this stage of your workflow.
+                    </span>
 
                 </div>
 
-                <div class="d-flex gap-2">
 
-                    <button type="submit"
-                            class="btn btn-primary">
-                        Save Changes
-                    </button>
+                <div class="ws-list-form-actions">
 
                     <a asp-controller="Board"
                        asp-action="Details"
                        asp-route-workspaceId="@workspaceId"
                        asp-route-boardId="@boardId"
-                       class="btn btn-secondary">
+                       class="ws-list-form-cancel">
+
                         Cancel
+
                     </a>
+
+
+                    <button type="submit"
+                            class="ws-list-form-submit">
+
+                        Save changes
+
+                        <span aria-hidden="true">→</span>
+
+                    </button>
 
                 </div>
 
             </form>
 
-        </div>
+        </section>
 
     </div>
 
 </div>
 
+
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
 }

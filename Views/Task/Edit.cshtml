@@ -4,24 +4,89 @@
     ViewData["Title"] = "Edit Task";
 }
 
-<div class="container-fluid py-4">
+<div class="ws-task-form-page">
 
-    <div class="mb-4">
-        <div class="text-muted small mb-1">Task</div>
+    <a asp-controller="Task"
+       asp-action="Details"
+       asp-route-workspaceId="@Model.WorkspaceId"
+       asp-route-boardId="@Model.BoardId"
+       asp-route-listId="@Model.ListId"
+       asp-route-taskId="@Model.Id"
+       class="ws-task-form-back">
 
-        <h1 class="mb-2">
-            Edit Task
-        </h1>
+        <span aria-hidden="true">←</span>
+        <span>Back to task</span>
 
-        <p class="text-muted mb-0">
-            Update the task details and save your changes.
-        </p>
-    </div>
+    </a>
 
 
-    <div class="card shadow-sm border-0">
+    <div class="ws-task-form-layout">
 
-        <div class="card-body">
+        <!-- INTRO -->
+
+        <section class="ws-task-form-intro">
+
+            <div class="ws-task-form-icon" aria-hidden="true">
+
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 20h4L19 9l-4-4L4 16z"></path>
+                    <path d="m13.5 6.5 4 4"></path>
+                </svg>
+
+            </div>
+
+            <p class="ws-task-form-eyebrow">
+                TASK SETTINGS
+            </p>
+
+            <h1>
+                Edit task
+            </h1>
+
+            <p>
+                Update the task details, priority, or due date
+                to keep your team's work accurate.
+            </p>
+
+            <div class="ws-task-form-context">
+
+                <span class="ws-task-form-context-label">
+                    TASK
+                </span>
+
+                <strong>
+                    @Model.Title
+                </strong>
+
+            </div>
+
+        </section>
+
+
+        <!-- FORM -->
+
+        <section class="ws-task-form-card">
+
+            <div class="ws-task-form-card-header">
+
+                <div>
+
+                    <span class="ws-task-form-card-label">
+                        TASK DETAILS
+                    </span>
+
+                    <h2>
+                        Update the work
+                    </h2>
+
+                    <p>
+                        Make your changes and save when you're ready.
+                    </p>
+
+                </div>
+
+            </div>
+
 
             <form asp-controller="Task"
                   asp-action="Edit"
@@ -29,101 +94,104 @@
                   asp-route-boardId="@Model.BoardId"
                   asp-route-listId="@Model.ListId"
                   asp-route-taskId="@Model.Id"
-                  method="post">
+                  method="post"
+                  class="ws-task-form">
 
                 @Html.AntiForgeryToken()
 
                 <div asp-validation-summary="ModelOnly"
-                     class="text-danger mb-3"></div>
+                     class="ws-task-validation-summary"
+                     role="alert">
+                </div>
 
 
-                <!-- Title -->
-                <div class="mb-3">
+                <!-- TITLE -->
+
+                <div class="ws-task-form-field">
 
                     <label asp-for="Title"
-                           class="form-label">
-                        Title
+                           class="ws-task-form-label">
                     </label>
 
                     <input asp-for="Title"
-                           class="form-control"
+                           class="ws-task-form-input"
                            maxlength="200"
-                           placeholder="Enter task title" />
+                           placeholder="Task title"
+                           autocomplete="off"
+                           autofocus />
 
                     <span asp-validation-for="Title"
-                          class="text-danger"></span>
+                          class="ws-task-form-error">
+                    </span>
 
                 </div>
 
 
-                <!-- Description -->
-                <div class="mb-3">
+                <!-- DESCRIPTION -->
+
+                <div class="ws-task-form-field">
 
                     <label asp-for="Description"
-                           class="form-label">
-                        Description
+                           class="ws-task-form-label">
                     </label>
 
                     <textarea asp-for="Description"
-                              class="form-control"
+                              class="ws-task-form-input ws-task-form-textarea"
                               rows="6"
                               maxlength="5000"
                               placeholder="Describe the task..."></textarea>
 
                     <span asp-validation-for="Description"
-                          class="text-danger"></span>
+                          class="ws-task-form-error">
+                    </span>
 
                 </div>
 
 
-                <!-- Priority + Due Date -->
-                <div class="row">
+                <!-- PRIORITY / DATE -->
 
-                    <div class="col-md-6 mb-3">
+                <div class="ws-task-form-grid">
+
+                    <div class="ws-task-form-field">
 
                         <label asp-for="Priority"
-                               class="form-label">
-                            Priority
+                               class="ws-task-form-label">
                         </label>
 
                         <select asp-for="Priority"
-                                class="form-select"
+                                class="ws-task-form-input ws-task-form-select"
                                 asp-items="Html.GetEnumSelectList<WorkStack.Models.Enums.TaskPriority>()">
                         </select>
 
                         <span asp-validation-for="Priority"
-                              class="text-danger"></span>
+                              class="ws-task-form-error">
+                        </span>
 
                     </div>
 
 
-                    <div class="col-md-6 mb-3">
+                    <div class="ws-task-form-field">
 
                         <label asp-for="DueDate"
-                               class="form-label">
-                            Due Date
+                               class="ws-task-form-label">
                         </label>
 
                         <input asp-for="DueDate"
                                type="date"
-                               class="form-control" />
+                               class="ws-task-form-input" />
 
                         <span asp-validation-for="DueDate"
-                              class="text-danger"></span>
+                              class="ws-task-form-error">
+                        </span>
 
                     </div>
 
                 </div>
 
 
-                <!-- Actions -->
-                <div class="d-flex gap-2 mt-4">
+                <!-- ACTIONS -->
 
-                    <button type="submit"
-                            class="btn btn-primary">
-                        Save Changes
-                    </button>
-
+                <div class="ws-task-form-actions">
 
                     <a asp-controller="Task"
                        asp-action="Details"
@@ -131,15 +199,23 @@
                        asp-route-boardId="@Model.BoardId"
                        asp-route-listId="@Model.ListId"
                        asp-route-taskId="@Model.Id"
-                       class="btn btn-secondary">
+                       class="ws-task-form-cancel">
                         Cancel
                     </a>
+
+                    <button type="submit"
+                            class="ws-task-form-submit">
+
+                        Save changes
+                        <span aria-hidden="true">→</span>
+
+                    </button>
 
                 </div>
 
             </form>
 
-        </div>
+        </section>
 
     </div>
 
@@ -147,5 +223,7 @@
 
 
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
 }

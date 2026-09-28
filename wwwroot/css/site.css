@@ -5906,3 +5906,1401 @@ button:focus-visible {
         width: 100%;
     }
 }
+/* ============================================================
+   WORKSTACK TASK UI
+   Create + Edit + Details
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   TASK FORMS
+   ------------------------------------------------------------ */
+
+.ws-task-form-page {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.ws-task-form-back,
+.ws-task-details-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+    color: #818CF8;
+    font-size: 0.7rem;
+    font-weight: 620;
+    text-decoration: none;
+}
+
+    .ws-task-form-back:hover,
+    .ws-task-details-back:hover {
+        color: #C7D2FE;
+        text-decoration: none;
+    }
+
+.ws-task-form-layout {
+    display: grid;
+    grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.ws-task-form-intro {
+    position: sticky;
+    top: 5.5rem;
+    padding: 1.15rem;
+    border: 1px solid var(--ws-border);
+    border-radius: 0.72rem;
+    background: linear-gradient( 145deg, rgb(99 102 241 / 0.08), transparent 55% ), #111A29;
+}
+
+.ws-task-form-icon {
+    display: grid;
+    width: 2.9rem;
+    height: 2.9rem;
+    margin-bottom: 1rem;
+    place-items: center;
+    border: 1px solid rgb(129 140 248 / 0.2);
+    border-radius: 0.7rem;
+    background: #312E81;
+    color: #C7D2FE;
+}
+
+    .ws-task-form-icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.55;
+    }
+
+.ws-task-form-eyebrow {
+    margin: 0 0 0.35rem;
+    color: #818CF8;
+    font-size: 0.6rem;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+}
+
+.ws-task-form-intro h1 {
+    margin: 0;
+    color: var(--ws-text);
+    font-size: clamp(1.65rem, 3vw, 2.1rem);
+    font-weight: 720;
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+}
+
+.ws-task-form-intro > p:not(.ws-task-form-eyebrow) {
+    margin: 0.65rem 0 0;
+    color: var(--ws-muted);
+    font-size: 0.72rem;
+    line-height: 1.6;
+}
+
+.ws-task-form-context {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 1.25rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--ws-border);
+    color: #CBD5E1;
+    font-size: 0.65rem;
+}
+
+.ws-task-form-context-label {
+    color: #64748B;
+    font-size: 0.55rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+}
+
+.ws-task-form-card {
+    overflow: hidden;
+    border: 1px solid var(--ws-border);
+    border-radius: 0.72rem;
+    background: var(--ws-surface);
+    box-shadow: 0 12px 35px rgb(0 0 0 / 0.08);
+}
+
+.ws-task-form-card-header {
+    padding: 1.05rem 1.1rem;
+    border-bottom: 1px solid var(--ws-border);
+    background: #111A29;
+}
+
+.ws-task-form-card-label {
+    display: block;
+    margin-bottom: 0.22rem;
+    color: #818CF8;
+    font-size: 0.57rem;
+    font-weight: 750;
+    letter-spacing: 0.09em;
+}
+
+.ws-task-form-card-header h2 {
+    margin: 0;
+    color: var(--ws-text);
+    font-size: 0.98rem;
+    font-weight: 680;
+}
+
+.ws-task-form-card-header p {
+    margin: 0.28rem 0 0;
+    color: #64748B;
+    font-size: 0.64rem;
+}
+
+.ws-task-form {
+    padding: 1.1rem;
+}
+
+.ws-task-validation-summary {
+    margin-bottom: 0.9rem;
+    padding: 0.65rem 0.7rem;
+    border: 1px solid rgb(239 68 68 / 0.24);
+    border-radius: 0.48rem;
+    background: rgb(239 68 68 / 0.06);
+    color: #FCA5A5;
+    font-size: 0.65rem;
+}
+
+    .ws-task-validation-summary:empty {
+        display: none;
+    }
+
+.ws-task-form-field {
+    margin-bottom: 1rem;
+}
+
+.ws-task-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem;
+}
+
+.ws-task-form-label {
+    display: block;
+    margin-bottom: 0.38rem;
+    color: #CBD5E1;
+    font-size: 0.67rem;
+    font-weight: 650;
+}
+
+.ws-task-form-input {
+    display: block;
+    width: 100%;
+    min-height: 2.55rem;
+    padding: 0.58rem 0.68rem;
+    border: 1px solid #2C394F;
+    border-radius: 0.48rem;
+    outline: none;
+    background: #0F1726;
+    color: var(--ws-text);
+    font-size: 0.71rem;
+    transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+    .ws-task-form-input::placeholder {
+        color: #526078;
+    }
+
+    .ws-task-form-input:hover {
+        border-color: #3A4A65;
+    }
+
+    .ws-task-form-input:focus {
+        border-color: #6366F1;
+        background: #10192A;
+        box-shadow: 0 0 0 3px rgb(99 102 241 / 0.09);
+    }
+
+.ws-task-form-textarea {
+    min-height: 135px;
+    resize: vertical;
+    line-height: 1.55;
+}
+
+.ws-task-form-select {
+    cursor: pointer;
+}
+
+.ws-task-form-error {
+    display: block;
+    margin-top: 0.32rem;
+    color: #FCA5A5;
+    font-size: 0.61rem;
+}
+
+.ws-task-form-hint {
+    display: block;
+    margin-top: 0.32rem;
+    color: #526078;
+    font-size: 0.58rem;
+    line-height: 1.45;
+}
+
+
+/* ------------------------------------------------------------
+   ASSIGNEES
+   ------------------------------------------------------------ */
+
+.ws-task-assignee-box {
+    overflow: hidden;
+    border: 1px solid #2C394F;
+    border-radius: 0.55rem;
+    background: #0F1726;
+}
+
+.ws-task-assignee-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.ws-task-assignee-option {
+    position: relative;
+    display: flex;
+    min-height: 3rem;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 0.7rem;
+    border-bottom: 1px solid #202C40;
+    cursor: pointer;
+    color: #CBD5E1;
+    font-size: 0.68rem;
+    transition: background-color 140ms ease;
+}
+
+    .ws-task-assignee-option:last-child {
+        border-bottom: 0;
+    }
+
+    .ws-task-assignee-option:hover {
+        background: #141F31;
+    }
+
+.ws-task-assignee-checkbox {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.ws-task-assignee-check {
+    display: grid;
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 1rem;
+    place-items: center;
+    border: 1px solid #3A4A65;
+    border-radius: 0.25rem;
+    color: transparent;
+    font-size: 0.58rem;
+    font-weight: 800;
+}
+
+.ws-task-assignee-checkbox:checked ~ .ws-task-assignee-check {
+    border-color: #6366F1;
+    background: #6366F1;
+    color: #fff;
+}
+
+.ws-task-assignee-checkbox:focus-visible ~ .ws-task-assignee-check {
+    box-shadow: 0 0 0 3px rgb(99 102 241 / 0.15);
+}
+
+.ws-task-assignee-avatar {
+    display: grid;
+    width: 1.7rem;
+    height: 1.7rem;
+    flex: 0 0 1.7rem;
+    place-items: center;
+    border-radius: 50%;
+    background: #252D59;
+    color: #C7D2FE;
+    font-size: 0.58rem;
+    font-weight: 750;
+}
+
+.ws-task-assignee-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ws-task-empty-assignees {
+    padding: 0.85rem;
+    color: #64748B;
+    font-size: 0.65rem;
+}
+
+.ws-task-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    margin-top: 1.2rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--ws-border);
+}
+
+.ws-task-form-cancel,
+.ws-task-form-submit {
+    display: inline-flex;
+    min-height: 2.35rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.48rem;
+    font-size: 0.67rem;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.ws-task-form-cancel {
+    border: 1px solid #344258;
+    background: #172233;
+    color: var(--ws-text-secondary);
+}
+
+    .ws-task-form-cancel:hover {
+        border-color: #4A5A74;
+        background: #202D41;
+        color: var(--ws-text);
+        text-decoration: none;
+    }
+
+.ws-task-form-submit {
+    border: 1px solid var(--ws-primary);
+    background: var(--ws-primary);
+    color: #fff;
+    cursor: pointer;
+}
+
+    .ws-task-form-submit:hover {
+        border-color: var(--ws-primary-hover);
+        background: var(--ws-primary-hover);
+        color: #0B1120;
+    }
+
+
+/* ------------------------------------------------------------
+   TASK DETAILS
+   ------------------------------------------------------------ */
+
+.ws-task-details-page {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.ws-task-hero {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.25rem;
+    margin-bottom: 1rem;
+    padding: 1.2rem;
+    border: 1px solid var(--ws-border);
+    border-radius: 0.72rem;
+    background: linear-gradient( 135deg, rgb(99 102 241 / 0.08), transparent 48% ), var(--ws-surface);
+}
+
+.ws-task-hero-main {
+    min-width: 0;
+}
+
+.ws-task-hero-eyebrow {
+    margin-bottom: 0.4rem;
+    color: #818CF8;
+    font-size: 0.59rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.ws-task-hero h1 {
+    max-width: 760px;
+    margin: 0;
+    color: var(--ws-text);
+    font-size: clamp(1.45rem, 3vw, 2rem);
+    font-weight: 720;
+    letter-spacing: -0.04em;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.ws-task-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.75rem;
+}
+
+.ws-task-priority,
+.ws-task-date-badge {
+    display: inline-flex;
+    min-height: 1.8rem;
+    align-items: center;
+    gap: 0.38rem;
+    padding: 0.3rem 0.55rem;
+    border: 1px solid #334155;
+    border-radius: 0.4rem;
+    font-size: 0.59rem;
+    font-weight: 680;
+}
+
+.ws-task-priority-dot {
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.ws-task-priority.is-urgent {
+    border-color: rgb(239 68 68 / 0.3);
+    background: rgb(239 68 68 / 0.08);
+    color: #FCA5A5;
+}
+
+.ws-task-priority.is-high {
+    border-color: rgb(245 158 11 / 0.3);
+    background: rgb(245 158 11 / 0.08);
+    color: #FCD34D;
+}
+
+.ws-task-priority.is-medium {
+    border-color: rgb(99 102 241 / 0.3);
+    background: rgb(99 102 241 / 0.08);
+    color: #A5B4FC;
+}
+
+.ws-task-priority.is-low {
+    color: #94A3B8;
+}
+
+.ws-task-date-badge {
+    color: #CBD5E1;
+    background: #172233;
+}
+
+    .ws-task-date-badge.is-muted {
+        color: #64748B;
+    }
+
+.ws-task-hero-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+    .ws-task-hero-actions form {
+        margin: 0;
+    }
+
+.ws-task-action-primary,
+.ws-task-action-danger {
+    display: inline-flex;
+    min-height: 2.3rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 0.7rem;
+    border-radius: 0.45rem;
+    font-size: 0.64rem;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.ws-task-action-primary {
+    border: 1px solid var(--ws-primary);
+    background: var(--ws-primary);
+    color: #fff;
+}
+
+    .ws-task-action-primary:hover {
+        background: var(--ws-primary-hover);
+        border-color: var(--ws-primary-hover);
+        color: #0B1120;
+        text-decoration: none;
+    }
+
+.ws-task-action-danger {
+    border: 1px solid rgb(239 68 68 / 0.3);
+    background: rgb(239 68 68 / 0.05);
+    color: #FCA5A5;
+    cursor: pointer;
+}
+
+    .ws-task-action-danger:hover {
+        background: rgb(239 68 68 / 0.12);
+        color: #FECACA;
+    }
+
+
+/* ------------------------------------------------------------
+   DETAILS GRID
+   ------------------------------------------------------------ */
+
+.ws-task-details-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 330px);
+    gap: 1rem;
+    align-items: start;
+}
+
+.ws-task-details-main,
+.ws-task-details-sidebar {
+    min-width: 0;
+}
+
+.ws-task-details-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ws-task-panel {
+    margin-bottom: 1rem;
+    border: 1px solid var(--ws-border);
+    border-radius: 0.68rem;
+    background: var(--ws-surface);
+    overflow: hidden;
+}
+
+.ws-task-details-sidebar .ws-task-panel {
+    margin-bottom: 0;
+}
+
+.ws-task-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.95rem 1rem;
+    border-bottom: 1px solid var(--ws-border);
+}
+
+.ws-task-panel-eyebrow {
+    display: block;
+    margin-bottom: 0.2rem;
+    color: #818CF8;
+    font-size: 0.52rem;
+    font-weight: 750;
+    letter-spacing: 0.09em;
+}
+
+.ws-task-panel-header h2 {
+    margin: 0;
+    color: var(--ws-text);
+    font-size: 0.88rem;
+    font-weight: 680;
+}
+
+.ws-task-count {
+    display: inline-grid;
+    min-width: 1.55rem;
+    height: 1.55rem;
+    padding: 0 0.35rem;
+    place-items: center;
+    border: 1px solid #334155;
+    border-radius: 0.4rem;
+    background: #172233;
+    color: #94A3B8;
+    font-size: 0.57rem;
+    font-weight: 700;
+}
+
+.ws-task-description {
+    padding: 1rem;
+    color: #CBD5E1;
+    font-size: 0.7rem;
+    line-height: 1.75;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.ws-task-empty-text {
+    margin: 0;
+    color: #64748B;
+}
+
+
+/* ------------------------------------------------------------
+   COMMENTS
+   ------------------------------------------------------------ */
+
+.ws-task-comment-form {
+    margin: 1rem;
+    padding: 0.75rem;
+    border: 1px solid #2C394F;
+    border-radius: 0.55rem;
+    background: #0F1726;
+}
+
+.ws-task-comment-input {
+    display: block;
+    width: 100%;
+    min-height: 100px;
+    padding: 0.65rem;
+    border: 0;
+    outline: none;
+    resize: vertical;
+    background: transparent;
+    color: var(--ws-text);
+    font-size: 0.69rem;
+    line-height: 1.55;
+}
+
+    .ws-task-comment-input::placeholder {
+        color: #526078;
+    }
+
+.ws-task-comment-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid #202C40;
+}
+
+    .ws-task-comment-footer span {
+        color: #526078;
+        font-size: 0.56rem;
+    }
+
+.ws-task-comment-submit {
+    min-height: 2.1rem;
+    padding: 0.4rem 0.65rem;
+    border: 1px solid var(--ws-primary);
+    border-radius: 0.4rem;
+    background: var(--ws-primary);
+    color: #fff;
+    font-size: 0.61rem;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+    .ws-task-comment-submit:hover {
+        background: var(--ws-primary-hover);
+        border-color: var(--ws-primary-hover);
+        color: #0B1120;
+    }
+
+.ws-task-inline-error {
+    margin: 0.9rem 1rem 0;
+    padding: 0.65rem 0.7rem;
+    border: 1px solid rgb(239 68 68 / 0.25);
+    border-radius: 0.45rem;
+    background: rgb(239 68 68 / 0.06);
+    color: #FCA5A5;
+    font-size: 0.62rem;
+}
+
+.ws-task-comments-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+.ws-task-empty-icon {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-bottom: 0.25rem;
+    place-items: center;
+    border-radius: 50%;
+    background: #172233;
+    font-size: 0.8rem;
+}
+
+.ws-task-comments-empty strong {
+    color: #CBD5E1;
+    font-size: 0.68rem;
+}
+
+.ws-task-comments-empty span {
+    color: #526078;
+    font-size: 0.58rem;
+}
+
+.ws-task-comments-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.ws-task-comment {
+    display: flex;
+    gap: 0.7rem;
+    padding: 0.95rem 1rem;
+    border-top: 1px solid var(--ws-border);
+}
+
+.ws-task-comment-avatar {
+    display: grid;
+    width: 1.85rem;
+    height: 1.85rem;
+    flex: 0 0 1.85rem;
+    place-items: center;
+    border-radius: 50%;
+    background: #252D59;
+    color: #C7D2FE;
+    font-size: 0.6rem;
+    font-weight: 750;
+}
+
+.ws-task-comment-body {
+    min-width: 0;
+    flex: 1;
+}
+
+.ws-task-comment-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+    .ws-task-comment-top strong {
+        color: #CBD5E1;
+        font-size: 0.65rem;
+    }
+
+    .ws-task-comment-top time {
+        margin-left: 0.4rem;
+        color: #526078;
+        font-size: 0.54rem;
+    }
+
+.ws-task-comment-delete-form {
+    margin: 0;
+}
+
+    .ws-task-comment-delete-form button {
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #64748B;
+        font-size: 0.55rem;
+        cursor: pointer;
+    }
+
+        .ws-task-comment-delete-form button:hover {
+            color: #FCA5A5;
+        }
+
+.ws-task-comment-content {
+    margin-top: 0.42rem;
+    color: #94A3B8;
+    font-size: 0.67rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+
+/* ------------------------------------------------------------
+   TASK INFORMATION
+   ------------------------------------------------------------ */
+
+.ws-task-info-list {
+    padding: 0.25rem 1rem 0.7rem;
+}
+
+.ws-task-info-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid #202C40;
+}
+
+    .ws-task-info-row:last-child {
+        border-bottom: 0;
+    }
+
+    .ws-task-info-row span {
+        color: #526078;
+        font-size: 0.55rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+    .ws-task-info-row strong {
+        color: #CBD5E1;
+        font-size: 0.63rem;
+        font-weight: 600;
+    }
+
+
+/* ------------------------------------------------------------
+   ASSIGNEES
+   ------------------------------------------------------------ */
+
+.ws-task-assigned-list {
+    padding: 0.35rem 1rem 0.8rem;
+}
+
+.ws-task-assignee-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid #202C40;
+}
+
+    .ws-task-assignee-row:last-child {
+        border-bottom: 0;
+    }
+
+.ws-task-assignee-person {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.55rem;
+    color: #CBD5E1;
+    font-size: 0.63rem;
+}
+
+    .ws-task-assignee-person > span:last-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+.ws-task-assignee-avatar {
+    display: grid;
+    width: 1.75rem;
+    height: 1.75rem;
+    flex: 0 0 1.75rem;
+    place-items: center;
+    border-radius: 50%;
+    background: #252D59;
+    color: #C7D2FE;
+    font-size: 0.58rem;
+    font-weight: 750;
+}
+
+.ws-task-remove-button {
+    padding: 0.28rem 0.45rem;
+    border: 1px solid rgb(239 68 68 / 0.22);
+    border-radius: 0.35rem;
+    background: transparent;
+    color: #FCA5A5;
+    font-size: 0.52rem;
+    cursor: pointer;
+}
+
+    .ws-task-remove-button:hover {
+        background: rgb(239 68 68 / 0.08);
+    }
+
+.ws-task-sidebar-empty {
+    padding: 0.85rem 1rem 1rem;
+    color: #64748B;
+    font-size: 0.61rem;
+}
+
+.ws-task-assign-section {
+    margin: 0 1rem 1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--ws-border);
+}
+
+.ws-task-assign-title {
+    margin-bottom: 0.5rem;
+    color: #CBD5E1;
+    font-size: 0.62rem;
+    font-weight: 650;
+}
+
+.ws-task-assign-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.ws-task-assign-select {
+    width: 100%;
+    min-height: 2.35rem;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid #2C394F;
+    border-radius: 0.42rem;
+    outline: none;
+    background: #0F1726;
+    color: #CBD5E1;
+    font-size: 0.61rem;
+}
+
+    .ws-task-assign-select:focus {
+        border-color: #6366F1;
+        box-shadow: 0 0 0 3px rgb(99 102 241 / 0.09);
+    }
+
+.ws-task-assign-button {
+    min-height: 2.25rem;
+    border: 1px solid var(--ws-primary);
+    border-radius: 0.42rem;
+    background: var(--ws-primary);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 650;
+    cursor: pointer;
+}
+
+    .ws-task-assign-button:hover {
+        border-color: var(--ws-primary-hover);
+        background: var(--ws-primary-hover);
+        color: #0B1120;
+    }
+
+
+/* ------------------------------------------------------------
+   RESPONSIVE
+   ------------------------------------------------------------ */
+
+@media (max-width: 900px) {
+
+    .ws-task-form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .ws-task-form-intro {
+        position: static;
+    }
+
+    .ws-task-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .ws-task-details-sidebar {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+
+    .ws-task-hero {
+        flex-direction: column;
+    }
+
+    .ws-task-hero-actions {
+        width: 100%;
+    }
+
+    .ws-task-action-primary,
+    .ws-task-action-danger {
+        flex: 1;
+    }
+
+    .ws-task-form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .ws-task-details-sidebar {
+        display: flex;
+    }
+}
+
+@media (max-width: 520px) {
+
+    .ws-task-form-page,
+    .ws-task-details-page {
+        max-width: none;
+    }
+
+    .ws-task-form-intro,
+    .ws-task-form-card,
+    .ws-task-hero,
+    .ws-task-panel {
+        border-radius: 0.6rem;
+    }
+
+    .ws-task-form-intro {
+        padding: 0.9rem;
+    }
+
+    .ws-task-form-card-header,
+    .ws-task-form {
+        padding: 0.85rem;
+    }
+
+    .ws-task-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .ws-task-form-cancel,
+    .ws-task-form-submit {
+        width: 100%;
+    }
+
+    .ws-task-comment-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .ws-task-comment-submit {
+        width: 100%;
+    }
+
+    .ws-task-comment-top {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+}
+/* ============================================================
+   WORKSTACK LIST FORMS
+   Create + Edit List
+   ============================================================ */
+
+.ws-list-form-page {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.ws-list-form-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+    color: #818CF8;
+    font-size: 0.7rem;
+    font-weight: 620;
+    text-decoration: none;
+}
+
+    .ws-list-form-back:hover {
+        color: #C7D2FE;
+        text-decoration: none;
+    }
+
+
+/* ------------------------------------------------------------
+   Layout
+   ------------------------------------------------------------ */
+
+.ws-list-form-layout {
+    display: grid;
+    grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+
+/* ------------------------------------------------------------
+   Intro
+   ------------------------------------------------------------ */
+
+.ws-list-form-intro {
+    position: sticky;
+    top: 5.5rem;
+    padding: 1.15rem;
+    border: 1px solid var(--ws-border);
+    border-radius: 0.72rem;
+    background: linear-gradient( 145deg, rgb(99 102 241 / 0.08), transparent 55% ), #111A29;
+}
+
+.ws-list-form-icon {
+    display: grid;
+    width: 2.9rem;
+    height: 2.9rem;
+    margin-bottom: 1rem;
+    place-items: center;
+    border: 1px solid rgb(129 140 248 / 0.2);
+    border-radius: 0.7rem;
+    background: #312E81;
+    color: #C7D2FE;
+}
+
+    .ws-list-form-icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.55;
+    }
+
+.ws-list-form-eyebrow {
+    margin: 0 0 0.35rem;
+    color: #818CF8;
+    font-size: 0.6rem;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+}
+
+.ws-list-form-intro h1 {
+    margin: 0;
+    color: var(--ws-text);
+    font-size: clamp(1.65rem, 3vw, 2.1rem);
+    font-weight: 720;
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+}
+
+.ws-list-form-intro > p:not(.ws-list-form-eyebrow) {
+    margin: 0.65rem 0 0;
+    color: var(--ws-muted);
+    font-size: 0.72rem;
+    line-height: 1.6;
+}
+
+.ws-list-form-context {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-top: 1.25rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--ws-border);
+    color: #CBD5E1;
+    font-size: 0.65rem;
+}
+
+.ws-list-form-context-label {
+    color: #64748B;
+    font-size: 0.55rem;
+    font-weight: 750;
+    letter-spacing: 0.08em;
+}
+
+.ws-list-form-context-secondary {
+    margin-top: 0.6rem;
+}
+
+
+/* ------------------------------------------------------------
+   Form card
+   ------------------------------------------------------------ */
+
+.ws-list-form-card {
+    overflow: hidden;
+    border: 1px solid var(--ws-border);
+    border-radius: 0.72rem;
+    background: var(--ws-surface);
+    box-shadow: 0 12px 35px rgb(0 0 0 / 0.08);
+}
+
+.ws-list-form-card-header {
+    padding: 1.05rem 1.1rem;
+    border-bottom: 1px solid var(--ws-border);
+    background: #111A29;
+}
+
+.ws-list-form-card-label {
+    display: block;
+    margin-bottom: 0.22rem;
+    color: #818CF8;
+    font-size: 0.57rem;
+    font-weight: 750;
+    letter-spacing: 0.09em;
+}
+
+.ws-list-form-card-header h2 {
+    margin: 0;
+    color: var(--ws-text);
+    font-size: 0.98rem;
+    font-weight: 680;
+}
+
+.ws-list-form-card-header p {
+    margin: 0.28rem 0 0;
+    color: #64748B;
+    font-size: 0.64rem;
+}
+
+
+/* ------------------------------------------------------------
+   Form
+   ------------------------------------------------------------ */
+
+.ws-list-form {
+    padding: 1.1rem;
+}
+
+.ws-list-validation-summary {
+    margin-bottom: 0.9rem;
+    padding: 0.65rem 0.7rem;
+    border: 1px solid rgb(239 68 68 / 0.24);
+    border-radius: 0.48rem;
+    background: rgb(239 68 68 / 0.06);
+    color: #FCA5A5;
+    font-size: 0.65rem;
+}
+
+    .ws-list-validation-summary:empty {
+        display: none;
+    }
+
+.ws-list-form-field {
+    margin-bottom: 0;
+}
+
+.ws-list-form-label {
+    display: block;
+    margin-bottom: 0.38rem;
+    color: #CBD5E1;
+    font-size: 0.67rem;
+    font-weight: 650;
+}
+
+.ws-list-form-input {
+    display: block;
+    width: 100%;
+    min-height: 2.55rem;
+    padding: 0.58rem 0.68rem;
+    border: 1px solid #2C394F;
+    border-radius: 0.48rem;
+    outline: none;
+    background: #0F1726;
+    color: var(--ws-text);
+    font-size: 0.71rem;
+    transition: border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+}
+
+    .ws-list-form-input::placeholder {
+        color: #526078;
+    }
+
+    .ws-list-form-input:hover {
+        border-color: #3A4A65;
+    }
+
+    .ws-list-form-input:focus {
+        border-color: #6366F1;
+        background: #10192A;
+        box-shadow: 0 0 0 3px rgb(99 102 241 / 0.09);
+    }
+
+.ws-list-form-error {
+    display: block;
+    margin-top: 0.32rem;
+    color: #FCA5A5;
+    font-size: 0.61rem;
+}
+
+.ws-list-form-hint {
+    display: block;
+    margin-top: 0.32rem;
+    color: #526078;
+    font-size: 0.58rem;
+    line-height: 1.45;
+}
+
+
+/* ------------------------------------------------------------
+   Actions
+   ------------------------------------------------------------ */
+
+.ws-list-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.45rem;
+    margin-top: 1.2rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--ws-border);
+}
+
+.ws-list-form-cancel,
+.ws-list-form-submit {
+    display: inline-flex;
+    min-height: 2.35rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.75rem;
+    border-radius: 0.48rem;
+    font-size: 0.67rem;
+    font-weight: 650;
+    text-decoration: none;
+}
+
+.ws-list-form-cancel {
+    border: 1px solid #344258;
+    background: #172233;
+    color: var(--ws-text-secondary);
+}
+
+    .ws-list-form-cancel:hover {
+        border-color: #4A5A74;
+        background: #202D41;
+        color: var(--ws-text);
+        text-decoration: none;
+    }
+
+.ws-list-form-submit {
+    border: 1px solid var(--ws-primary);
+    background: var(--ws-primary);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 7px 18px rgb(99 102 241 / 0.12);
+}
+
+    .ws-list-form-submit:hover {
+        border-color: var(--ws-primary-hover);
+        background: var(--ws-primary-hover);
+        color: #0B1120;
+    }
+
+
+/* ------------------------------------------------------------
+   Responsive
+   ------------------------------------------------------------ */
+
+@media (max-width: 820px) {
+
+    .ws-list-form-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .ws-list-form-intro {
+        position: static;
+    }
+}
+
+@media (max-width: 520px) {
+
+    .ws-list-form-page {
+        max-width: none;
+    }
+
+    .ws-list-form-intro,
+    .ws-list-form-card {
+        border-radius: 0.62rem;
+    }
+
+    .ws-list-form-intro {
+        padding: 0.9rem;
+    }
+
+    .ws-list-form-card-header,
+    .ws-list-form {
+        padding: 0.85rem;
+    }
+
+    .ws-list-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .ws-list-form-cancel,
+    .ws-list-form-submit {
+        width: 100%;
+    }
+}
