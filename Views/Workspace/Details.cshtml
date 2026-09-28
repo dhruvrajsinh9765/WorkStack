@@ -3,70 +3,134 @@
 @{
     ViewData["Title"] = Model.Name;
 
-    var isOwner = Model.Role == WorkStack.Models.Enums.WorkspaceRole.Owner;
+    var isOwner =
+        Model.Role == WorkStack.Models.Enums.WorkspaceRole.Owner;
 }
 
-@if (TempData["WorkspaceDeleteError"] is string deleteError)
-{
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        @deleteError
+<div class="ws-workspace-details-page">
 
-        <button type="button"
-                class="btn-close"
-                data-bs-dismiss="alert"
-                aria-label="Close">
-        </button>
-    </div>
-}
+    <!-- =========================================================
+         BACK NAVIGATION
+         ========================================================= -->
 
-<div class="container-fluid py-4">
+    <a asp-controller="Workspace"
+       asp-action="Index"
+       class="ws-workspace-back-link">
 
-    <!-- Workspace Header -->
-    <div class="d-flex justify-content-between align-items-start mb-4">
+        <span aria-hidden="true">
+            ←
+        </span>
 
-        <div>
-            <div class="text-muted small mb-1">
-                Workspace
+        <span>
+            All workspaces
+        </span>
+
+    </a>
+
+
+    <!-- =========================================================
+         WORKSPACE HEADER
+         ========================================================= -->
+
+    <section class="ws-workspace-details-header">
+
+        <div class="ws-workspace-details-identity">
+
+            <div class="ws-workspace-details-mark"
+                 aria-hidden="true">
+
+                @{
+                    var workspaceName =
+                        Model.Name?.Trim() ?? string.Empty;
+
+                    var workspaceInitial =
+                        string.IsNullOrWhiteSpace(workspaceName)
+                            ? "W"
+                            : workspaceName
+                                .Substring(0, 1)
+                                .ToUpperInvariant();
+                }
+
+                @workspaceInitial
+
             </div>
 
-            <h1 class="mb-2">
-                @Model.Name
-            </h1>
 
-            @if (!string.IsNullOrWhiteSpace(Model.Description))
-            {
-                <p class="text-muted mb-2">
-                    @Model.Description
+            <div class="ws-workspace-details-heading">
+
+                <p class="ws-workspace-eyebrow">
+                    WORKSPACE
                 </p>
-            }
 
-            <span class="badge bg-secondary">
-                @Model.Role
-            </span>
+                <h1>
+                    @Model.Name
+                </h1>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p>
+                        @Model.Description
+                    </p>
+                }
+
+                <span class="ws-workspace-role-badge
+                    @(isOwner
+                          ? "ws-workspace-role-owner"
+                          : Model.Role ==
+                            WorkStack.Models.Enums.WorkspaceRole.Manager
+                              ? "ws-workspace-role-manager"
+                              : "ws-workspace-role-member")">
+
+                    @Model.Role
+
+                </span>
+
+            </div>
+
         </div>
+
 
         @if (isOwner)
         {
-            <div class="d-flex gap-2">
+            <div class="ws-workspace-details-actions">
 
                 <a asp-controller="Workspace"
                    asp-action="Edit"
                    asp-route-id="@Model.Id"
-                   class="btn btn-primary">
-                    Edit Workspace
+                   class="ws-workspace-secondary-action">
+
+                    <svg viewBox="0 0 24 24"
+                         aria-hidden="true">
+                        <path d="M12 20h9"></path>
+                        <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"></path>
+                    </svg>
+
+                    Edit workspace
+
                 </a>
 
                 <form asp-controller="Workspace"
                       asp-action="Delete"
                       asp-route-id="@Model.Id"
                       method="post"
+                      class="d-inline"
                       onsubmit="return confirm('Are you sure you want to delete this workspace? This action cannot be undone.');">
 
                     @Html.AntiForgeryToken()
 
                     <button type="submit"
-                            class="btn btn-outline-danger">
-                        Delete Workspace
+                            class="ws-workspace-danger-action">
+
+                        <svg viewBox="0 0 24 24"
+                             aria-hidden="true">
+                            <path d="M4 7h16"></path>
+                            <path d="M10 11v6M14 11v6"></path>
+                            <path d="M6 7l1 13h10l1-13"></path>
+                            <path d="M9 7V4h6v3"></path>
+                        </svg>
+
+                        Delete
+
                     </button>
 
                 </form>
@@ -74,44 +138,239 @@
             </div>
         }
 
-    </div>
+    </section>
 
 
-    <!-- Workspace Actions -->
-    <div class="card">
+    <!-- =========================================================
+         DELETE ERROR
+         ========================================================= -->
+    @if (TempData["WorkspaceDeleteError"] is string deleteError)
+    {
+        <div class="ws-workspace-alert"
+             role="alert">
 
-        <div class="card-body">
+            <div class="ws-workspace-alert-icon"
+                 aria-hidden="true">
 
-            <h2 class="h5 mb-3">
-                Workspace
-            </h2>
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 4 3.8 19h16.4z"></path>
+                    <path d="M12 9v4"></path>
+                    <path d="M12 16.5h.01"></path>
+                </svg>
 
-            <div class="d-flex flex-wrap gap-2">
+            </div>
 
-                <a asp-controller="Workspace"
-                   asp-action="Index"
-                   class="btn btn-secondary">
-                    Back to Workspaces
-                </a>
+            <div>
 
-                <a asp-controller="Workspace"
-                   asp-action="Members"
-                   asp-route-id="@Model.Id"
-                   class="btn btn-outline-primary">
-                    Members
-                </a>
+                <strong>
+                    Workspace couldn't be deleted
+                </strong>
 
-                <a asp-controller="Board"
-                   asp-action="Index"
-                   asp-route-workspaceId="@Model.Id"
-                   class="btn btn-outline-primary">
-                    Boards
-                </a>
+                <p>
+                    @deleteError
+                </p>
+
+            </div>
+
+        </div>
+    }
+
+
+    <!-- =========================================================
+         WORKSPACE NAVIGATION
+         ========================================================= -->
+
+    <section class="ws-workspace-hub">
+
+        <div class="ws-workspace-hub-heading">
+
+            <div>
+
+                <p class="ws-workspace-eyebrow">
+                    WORKSPACE HUB
+                </p>
+
+                <h2>
+                    Manage your workspace
+                </h2>
+
+                <p>
+                    Access the areas you use to organize work
+                    and collaborate with your team.
+                </p>
 
             </div>
 
         </div>
 
-    </div>
+
+        <div class="ws-workspace-hub-grid">
+
+            <!-- BOARDS -->
+
+            <a asp-controller="Board"
+               asp-action="Index"
+               asp-route-workspaceId="@Model.Id"
+               class="ws-workspace-hub-card">
+
+                <div class="ws-workspace-hub-card-icon
+                    ws-hub-icon-primary"
+                     aria-hidden="true">
+
+                    <svg viewBox="0 0 24 24">
+                        <rect x="4" y="5" width="16" height="14" rx="2"></rect>
+                        <path d="M9 5v14M15 5v14"></path>
+                    </svg>
+
+                </div>
+
+                <div class="ws-workspace-hub-card-content">
+
+                    <div class="ws-workspace-hub-card-title">
+
+                        <h3>
+                            Boards
+                        </h3>
+
+                        <span aria-hidden="true">
+                            →
+                        </span>
+
+                    </div>
+
+                    <p>
+                        Organize tasks, lists, and project work
+                        on collaborative boards.
+                    </p>
+
+                </div>
+
+            </a>
+
+
+            <!-- MEMBERS -->
+
+            <a asp-controller="Workspace"
+               asp-action="Members"
+               asp-route-id="@Model.Id"
+               class="ws-workspace-hub-card">
+
+                <div class="ws-workspace-hub-card-icon
+                    ws-hub-icon-blue"
+                     aria-hidden="true">
+
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="9" cy="8" r="3"></circle>
+                        <path d="M3.5 19c.7-3 2.5-4.5 5.5-4.5s4.8 1.5 5.5 4.5"></path>
+                        <path d="M16 11a2.5 2.5 0 1 0 0-5"></path>
+                        <path d="M17 14.5c2 .4 3.2 1.7 3.5 4"></path>
+                    </svg>
+
+                </div>
+
+                <div class="ws-workspace-hub-card-content">
+
+                    <div class="ws-workspace-hub-card-title">
+
+                        <h3>
+                            Members
+                        </h3>
+
+                        <span aria-hidden="true">
+                            →
+                        </span>
+
+                    </div>
+
+                    <p>
+                        Manage people, roles, and access
+                        to this workspace.
+                    </p>
+
+                </div>
+
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         WORKSPACE INFORMATION
+         ========================================================= -->
+
+    <section class="ws-workspace-information">
+
+        <div class="ws-workspace-information-header">
+
+            <div>
+
+                <p class="ws-workspace-eyebrow">
+                    DETAILS
+                </p>
+
+                <h2>
+                    Workspace information
+                </h2>
+
+            </div>
+
+        </div>
+
+
+        <div class="ws-workspace-information-grid">
+
+            <div class="ws-workspace-information-item">
+
+                <span>
+                    Workspace name
+                </span>
+
+                <strong>
+                    @Model.Name
+                </strong>
+
+            </div>
+
+
+            <div class="ws-workspace-information-item">
+
+                <span>
+                    Your role
+                </span>
+
+                <strong>
+                    @Model.Role
+                </strong>
+
+            </div>
+
+
+            <div class="ws-workspace-information-item
+                ws-workspace-information-wide">
+
+                <span>
+                    Description
+                </span>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <strong>
+                        @Model.Description
+                    </strong>
+                }
+                else
+                {
+                    <strong class="ws-information-muted">
+                        No description provided.
+                    </strong>
+                }
+
+            </div>
+
+        </div>
+
+    </section>
 
 </div>

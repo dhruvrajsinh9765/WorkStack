@@ -2,407 +2,620 @@
 
 @{
     ViewData["Title"] = "Dashboard";
+
+    var displayName = string.IsNullOrWhiteSpace(Model.DisplayName)
+        ? "there"
+        : Model.DisplayName;
+
+    var urgentCount = Model.UrgentTaskCount;
+    var dueSoonCount = Model.DueSoonTaskCount;
+
+    string GetPriorityClass(WorkStack.Models.Enums.TaskPriority priority)
+    {
+        return priority switch
+        {
+            WorkStack.Models.Enums.TaskPriority.Urgent => "ws-priority-badge ws-priority-urgent",
+            WorkStack.Models.Enums.TaskPriority.High => "ws-priority-badge ws-priority-high",
+            WorkStack.Models.Enums.TaskPriority.Medium => "ws-priority-badge ws-priority-medium",
+            _ => "ws-priority-badge ws-priority-low"
+        };
+    }
+
+    string GetRoleClass(WorkStack.Models.Enums.WorkspaceRole role)
+    {
+        return role switch
+        {
+            WorkStack.Models.Enums.WorkspaceRole.Owner => "ws-role-badge ws-role-owner",
+            WorkStack.Models.Enums.WorkspaceRole.Manager => "ws-role-badge ws-role-manager",
+            _ => "ws-role-badge ws-role-member"
+        };
+    }
+
+    string GetDueLabel(WorkStack.Models.ViewModels.DashboardTaskViewModel task)
+    {
+        if (!task.DueDate.HasValue)
+        {
+            return "No due date";
+        }
+
+        if (task.IsOverdue)
+        {
+            return "Overdue";
+        }
+
+        var today = DateTime.Today;
+        var dueDate = task.DueDate.Value.Date;
+
+        if (dueDate == today)
+        {
+            return "Due today";
+        }
+
+        if (dueDate == today.AddDays(1))
+        {
+            return "Due tomorrow";
+        }
+
+        return task.DueDate.Value.ToString("MMM d, yyyy");
+    }
 }
 
-<section class="ws-page-header d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3">
-    <div>
-        <p class="text-primary fw-semibold text-uppercase mb-2">Dashboard</p>
+<div class="ws-dashboard">
 
-        <h1 class="mb-2">
-            Welcome back@(string.IsNullOrWhiteSpace(Model.DisplayName) ? "" : $", {Model.DisplayName}")
-        </h1>
+    <!-- =========================================================
+         DASHBOARD HEADER
+         ========================================================= -->
 
-        @if (!string.IsNullOrWhiteSpace(Model.Email))
-        {
-            <p class="text-secondary mb-1">@Model.Email</p>
-        }
+    <section class="ws-dashboard-header">
 
-        <p class="mb-0">
-            Your workspaces, tasks, and deadlines at a glance.
-        </p>
-    </div>
+        <div class="ws-dashboard-heading">
 
-    <a asp-controller="Workspace"
-       asp-action="Index"
-       class="btn btn-outline-primary">
-        View workspaces
-    </a>
-</section>
-
-
-<!-- =========================================================
-     DASHBOARD SUMMARY
-     ========================================================= -->
-
-<section class="row g-3 mb-5" aria-label="Dashboard summary">
-
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="ws-card h-100 p-3 p-lg-4">
-            <p class="text-muted mb-1">Workspaces</p>
-            <p class="h2 mb-0">@Model.WorkspaceCount</p>
-            <small class="text-muted">Workspaces you belong to</small>
-        </div>
-    </div>
-
-
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="ws-card h-100 p-3 p-lg-4">
-            <p class="text-muted mb-1">Boards</p>
-            <p class="h2 mb-0">@Model.BoardCount</p>
-            <small class="text-muted">Across your workspaces</small>
-        </div>
-    </div>
-
-
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="ws-card h-100 p-3 p-lg-4">
-            <p class="text-muted mb-1">My Tasks</p>
-            <p class="h2 mb-0">@Model.MyTaskCount</p>
-            <small class="text-muted">Tasks assigned to you</small>
-        </div>
-    </div>
-
-
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="ws-card h-100 p-3 p-lg-4">
-            <p class="text-muted mb-1">Due Soon</p>
-            <p class="h2 mb-0">@Model.DueSoonTaskCount</p>
-            <small class="text-muted">Due within 7 days</small>
-        </div>
-    </div>
-
-</section>
-
-
-
-<!-- =========================================================
-     MY TASKS
-     ========================================================= -->
-
-<section class="mb-5" aria-labelledby="my-tasks-heading">
-
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3">
-
-        <div>
-            <h2 id="my-tasks-heading" class="h3 mb-1">
-                My Tasks
-            </h2>
-
-            <p class="text-muted mb-0">
-                Tasks currently assigned to you.
-            </p>
-        </div>
-
-
-        @if (Model.UrgentTaskCount > 0)
-        {
-            <span class="badge rounded-pill bg-danger px-3 py-2">
-                @Model.UrgentTaskCount urgent
-                @(Model.UrgentTaskCount == 1 ? "task" : "tasks")
-            </span>
-        }
-
-    </div>
-
-
-    @if (Model.MyTasks.Count == 0)
-    {
-        <div class="ws-empty-state">
-
-            <h3 class="h4">
-                No tasks assigned to you
-            </h3>
-
-            <p class="mb-0">
-                When someone assigns you a task, it will appear here.
-            </p>
-
-        </div>
-    }
-    else
-    {
-        <div class="ws-card overflow-hidden">
-
-            <div class="table-responsive">
-
-                <table class="table table-dark table-hover align-middle mb-0">
-
-                    <thead>
-                        <tr>
-
-                            <th class="px-4 py-3">
-                                Task
-                            </th>
-
-                            <th class="py-3">
-                                Workspace
-                            </th>
-
-                            <th class="py-3">
-                                Board
-                            </th>
-
-                            <th class="py-3">
-                                List
-                            </th>
-
-                            <th class="py-3">
-                                Priority
-                            </th>
-
-                            <th class="py-3">
-                                Due
-                            </th>
-
-                            <th class="px-4 py-3 text-end">
-                                Action
-                            </th>
-
-                        </tr>
-                    </thead>
-
-
-                    <tbody>
-
-                        @foreach (var task in Model.MyTasks)
-                        {
-                            <tr>
-
-                                <td class="px-4 py-3">
-
-                                    <div class="fw-semibold">
-                                        @task.Title
-                                    </div>
-
-                                </td>
-
-
-                                <td class="py-3">
-                                    <span class="text-secondary">
-                                        @task.WorkspaceName
-                                    </span>
-                                </td>
-
-
-                                <td class="py-3">
-                                    <span class="text-secondary">
-                                        @task.BoardName
-                                    </span>
-                                </td>
-
-
-                                <td class="py-3">
-                                    <span class="text-secondary">
-                                        @task.ListName
-                                    </span>
-                                </td>
-
-
-                                <td class="py-3">
-
-                                    <span class="badge
-                                        @(task.Priority switch
-                                          {
-                                              WorkStack.Models.Enums.TaskPriority.Urgent => "bg-danger",
-                                              WorkStack.Models.Enums.TaskPriority.High => "bg-warning text-dark",
-                                              WorkStack.Models.Enums.TaskPriority.Medium => "bg-primary",
-                                              _ => "bg-secondary"
-                                          })">
-
-                                        @task.Priority
-
-                                    </span>
-
-                                </td>
-
-
-                                <td class="py-3">
-
-                                    @if (!task.DueDate.HasValue)
-                                    {
-                                        <span class="text-muted">
-                                            No due date
-                                        </span>
-                                    }
-                                    else if (task.IsOverdue)
-                                    {
-                                        <span class="text-danger fw-semibold">
-
-                                            Overdue
-
-                                            <br />
-
-                                            <small>
-                                                @task.DueDate.Value.ToLocalTime().ToString("dd MMM yyyy")
-                                            </small>
-
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span>
-                                            @task.DueDate.Value.ToLocalTime().ToString("dd MMM yyyy")
-                                        </span>
-                                    }
-
-                                </td>
-
-
-                                <td class="px-4 py-3 text-end">
-
-                                    <a asp-controller="Task"
-                                       asp-action="Details"
-                                       asp-route-workspaceId="@task.WorkspaceId"
-                                       asp-route-boardId="@task.BoardId"
-                                       asp-route-listId="@task.ListId"
-                                       asp-route-taskId="@task.TaskId"
-                                       class="btn btn-sm btn-outline-primary">
-
-                                        Open
-
-                                    </a>
-
-                                </td>
-
-                            </tr>
-                        }
-
-                    </tbody>
-
-                </table>
-
+            <div class="ws-dashboard-eyebrow">
+                <span class="ws-dashboard-eyebrow-dot"></span>
+                WORKSPACE OVERVIEW
             </div>
 
-        </div>
+            <h1>
+                Welcome back, @displayName.
+            </h1>
 
-
-        @if (Model.MyTaskCount > Model.MyTasks.Count)
-        {
-            <p class="text-muted small mt-2 mb-0">
-
-                Showing the 10 most relevant tasks out of
-                @Model.MyTaskCount assigned tasks.
-
-            </p>
-        }
-
-    }
-
-</section>
-
-
-
-<!-- =========================================================
-     YOUR WORKSPACES
-     ========================================================= -->
-
-<section aria-labelledby="workspaces-heading">
-
-    <div class="d-flex justify-content-between align-items-center mb-3">
-
-        <div>
-
-            <h2 id="workspaces-heading" class="h3 mb-1">
-                Your Workspaces
-            </h2>
-
-            <p class="text-muted mb-0">
-                Workspaces and teams you belong to.
+            <p>
+                Here's a quick look at your work, tasks, and collaborative spaces.
             </p>
 
         </div>
 
-    </div>
-
-
-    @if (Model.Workspaces.Count == 0)
-    {
-        <div class="ws-empty-state">
-
-            <h3 class="h4">
-                No workspaces yet
-            </h3>
-
-            <p class="mb-3">
-                Create your first workspace to start organizing your team's work.
-            </p>
+        <div class="ws-dashboard-header-actions">
 
             <a asp-controller="Workspace"
-               asp-action="Create"
-               class="btn btn-primary">
-
-                Create workspace
-
+               asp-action="Index"
+               class="ws-dashboard-primary-action">
+                <span>View workspaces</span>
+                <span class="ws-action-arrow" aria-hidden="true">→</span>
             </a>
 
         </div>
-    }
-    else
+
+    </section>
+
+
+    <!-- =========================================================
+         OVERVIEW
+         ========================================================= -->
+
+    <section class="ws-dashboard-overview"
+             aria-label="Workspace overview">
+
+        <article class="ws-dashboard-stat-card">
+
+            <div class="ws-dashboard-stat-top">
+
+                <div class="ws-dashboard-stat-icon ws-stat-icon-indigo"
+                     aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 7.5h6l2 2h8v9H4z" />
+                        <path d="M4 7.5v-2h6l2 2" />
+                    </svg>
+                </div>
+
+                <span class="ws-dashboard-stat-label">
+                    Workspaces
+                </span>
+
+            </div>
+
+            <div class="ws-dashboard-stat-value">
+                @Model.WorkspaceCount
+            </div>
+
+            <p class="ws-dashboard-stat-description">
+                Spaces you're currently part of
+            </p>
+
+        </article>
+
+
+        <article class="ws-dashboard-stat-card">
+
+            <div class="ws-dashboard-stat-top">
+
+                <div class="ws-dashboard-stat-icon ws-stat-icon-blue"
+                     aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="4" y="5" width="16" height="14" rx="2" />
+                        <path d="M9 5v14M15 5v14" />
+                    </svg>
+                </div>
+
+                <span class="ws-dashboard-stat-label">
+                    Boards
+                </span>
+
+            </div>
+
+            <div class="ws-dashboard-stat-value">
+                @Model.BoardCount
+            </div>
+
+            <p class="ws-dashboard-stat-description">
+                Boards across your workspaces
+            </p>
+
+        </article>
+
+
+        <article class="ws-dashboard-stat-card">
+
+            <div class="ws-dashboard-stat-top">
+
+                <div class="ws-dashboard-stat-icon ws-stat-icon-violet"
+                     aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="5" y="4" width="14" height="16" rx="2" />
+                        <path d="m8 12 2.5 2.5L16 9" />
+                    </svg>
+                </div>
+
+                <span class="ws-dashboard-stat-label">
+                    My tasks
+                </span>
+
+            </div>
+
+            <div class="ws-dashboard-stat-value">
+                @Model.MyTaskCount
+            </div>
+
+            <p class="ws-dashboard-stat-description">
+                Tasks currently assigned to you
+            </p>
+
+        </article>
+
+
+        <article class="ws-dashboard-stat-card
+            @(Model.DueSoonTaskCount > 0
+                     ? "ws-dashboard-stat-card-attention"
+                     : null)">
+
+            <div class="ws-dashboard-stat-top">
+
+                <div class="ws-dashboard-stat-icon ws-stat-icon-amber"
+                     aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="8" />
+                        <path d="M12 7v5l3 2" />
+                    </svg>
+                </div>
+
+                <span class="ws-dashboard-stat-label">
+                    Due soon
+                </span>
+
+            </div>
+
+            <div class="ws-dashboard-stat-value">
+                @Model.DueSoonTaskCount
+            </div>
+
+            <p class="ws-dashboard-stat-description">
+                Tasks approaching their deadline
+            </p>
+
+        </article>
+
+    </section>
+
+
+    <!-- =========================================================
+         ATTENTION STRIP
+         ========================================================= -->
+    @if (urgentCount > 0 || dueSoonCount > 0)
     {
-        <div class="row g-3">
+        <section class="ws-dashboard-attention">
 
-            @foreach (var workspace in Model.Workspaces)
+            <div class="ws-dashboard-attention-icon"
+                 aria-hidden="true">
+
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 4 3.8 19h16.4z" />
+                    <path d="M12 9v4" />
+                    <path d="M12 16.5h.01" />
+                </svg>
+
+            </div>
+
+            <div class="ws-dashboard-attention-content">
+
+                <strong>
+                    Your attention may be needed
+                </strong>
+
+                <span>
+
+                    @if (urgentCount > 0)
+                    {
+                        <span>
+                            @urgentCount urgent
+                            @(urgentCount == 1 ? "task" : "tasks")
+                        </span>
+                    }
+
+                    @if (urgentCount > 0 && dueSoonCount > 0)
+                    {
+                        <span> · </span>
+                    }
+
+                    @if (dueSoonCount > 0)
+                    {
+                        <span>
+                            @dueSoonCount due soon
+                            @(dueSoonCount == 1 ? "task" : "tasks")
+                        </span>
+                    }
+
+                </span>
+
+            </div>
+
+        </section>
+    }
+
+
+    <!-- =========================================================
+         MAIN CONTENT GRID
+         ========================================================= -->
+
+    <div class="ws-dashboard-content-grid">
+
+        <!-- =====================================================
+             MY TASKS
+             ===================================================== -->
+
+        <section class="ws-dashboard-panel ws-dashboard-tasks-panel">
+
+            <div class="ws-dashboard-panel-header">
+
+                <div>
+
+                    <p class="ws-dashboard-panel-eyebrow">
+                        WORK QUEUE
+                    </p>
+
+                    <h2>
+                        My tasks
+                    </h2>
+
+                    <p>
+                        Work currently assigned to you.
+                    </p>
+
+                </div>
+
+                @if (Model.MyTaskCount > 0)
+                {
+                    <div class="ws-dashboard-panel-count">
+                        @Model.MyTaskCount
+                    </div>
+                }
+
+            </div>
+
+
+            @if (!Model.MyTasks.Any())
             {
-                <div class="col-12 col-md-6 col-xl-4">
+                <div class="ws-dashboard-empty">
 
-                    <article class="ws-card h-100 d-flex flex-column p-4">
+                    <div class="ws-dashboard-empty-icon"
+                         aria-hidden="true">
 
-                        <div class="d-flex justify-content-between align-items-start gap-3 mb-2">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="5" y="4" width="14" height="16" rx="2" />
+                            <path d="m8 12 2.5 2.5L16 9" />
+                        </svg>
 
-                            <h3 class="h5 mb-0">
-                                @workspace.WorkspaceName
-                            </h3>
+                    </div>
 
-                            <span class="badge rounded-pill text-bg-light border">
-                                @workspace.Role
-                            </span>
+                    <h3>
+                        You're all caught up
+                    </h3>
 
-                        </div>
+                    <p>
+                        There are no tasks currently assigned to you.
+                    </p>
 
+                </div>
+            }
+            else
+            {
+                <div class="ws-dashboard-task-list">
 
-                        <p class="text-secondary flex-grow-1 mb-4">
-
-                            @(string.IsNullOrWhiteSpace(workspace.Description)
-                                ? "No description provided."
-                                : workspace.Description)
-
-                        </p>
-
-
-                        <div class="d-flex gap-3 small text-muted mb-3">
-
-                            <span>
-                                @workspace.MemberCount
-                                @(workspace.MemberCount == 1 ? "member" : "members")
-                            </span>
-
-                            <span>
-                                @workspace.BoardCount
-                                @(workspace.BoardCount == 1 ? "board" : "boards")
-                            </span>
-
-                        </div>
-
-
-                        <a asp-controller="Workspace"
+                    @foreach (var task in Model.MyTasks)
+                    {
+                        <a asp-controller="Task"
                            asp-action="Details"
-                           asp-route-id="@workspace.WorkspaceId"
-                           class="btn btn-outline-primary align-self-start">
+                           asp-route-workspaceId="@task.WorkspaceId"
+                           asp-route-boardId="@task.BoardId"
+                           asp-route-listId="@task.ListId"
+                           asp-route-id="@task.TaskId"
+                           class="ws-dashboard-task-row">
 
-                            Open workspace
+                            <div class="ws-dashboard-task-main">
 
-                            <span aria-hidden="true">
-                                →
-                            </span>
+                                <div class="ws-dashboard-task-title">
+                                    @task.Title
+                                </div>
+
+                                <div class="ws-dashboard-task-context">
+
+                                    <span>
+                                        @task.WorkspaceName
+                                    </span>
+
+                                    <span class="ws-context-separator">
+                                        /
+                                    </span>
+
+                                    <span>
+                                        @task.BoardName
+                                    </span>
+
+                                    <span class="ws-context-separator">
+                                        /
+                                    </span>
+
+                                    <span>
+                                        @task.ListName
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="ws-dashboard-task-meta">
+
+                                <span class="@GetPriorityClass(task.Priority)">
+                                    @task.Priority
+                                </span>
+
+
+                                <span class="ws-dashboard-task-due
+                                    @(task.IsOverdue
+                                          ? "ws-task-due-overdue"
+                                          : null)">
+
+                                    @if (task.IsOverdue)
+                                    {
+                                        <span class="ws-dashboard-due-dot"></span>
+                                    }
+
+                                    @GetDueLabel(task)
+
+                                </span>
+
+
+                                <span class="ws-dashboard-task-arrow"
+                                      aria-hidden="true">
+                                    →
+                                </span>
+
+                            </div>
 
                         </a>
+                    }
 
-                    </article>
+                </div>
+
+
+                @if (Model.MyTaskCount > Model.MyTasks.Count)
+                {
+                    <div class="ws-dashboard-panel-footer">
+
+                        <span>
+                            Showing the most relevant
+                            @Model.MyTasks.Count
+                            of @Model.MyTaskCount tasks.
+                        </span>
+
+                    </div>
+                }
+            }
+
+        </section>
+
+
+        <!-- =====================================================
+             WORKSPACES
+             ===================================================== -->
+
+        <section class="ws-dashboard-panel ws-dashboard-workspaces-panel">
+
+            <div class="ws-dashboard-panel-header">
+
+                <div>
+
+                    <p class="ws-dashboard-panel-eyebrow">
+                        COLLABORATION
+                    </p>
+
+                    <h2>
+                        Your workspaces
+                    </h2>
+
+                    <p>
+                        Teams and projects you're working with.
+                    </p>
+
+                </div>
+
+                <a asp-controller="Workspace"
+                   asp-action="Index"
+                   class="ws-dashboard-panel-link">
+
+                    View all
+                    <span aria-hidden="true">→</span>
+
+                </a>
+
+            </div>
+
+
+            @if (!Model.Workspaces.Any())
+            {
+                <div class="ws-dashboard-empty">
+
+                    <div class="ws-dashboard-empty-icon"
+                         aria-hidden="true">
+
+                        <svg viewBox="0 0 24 24">
+                            <path d="M4 7.5h6l2 2h8v9H4z" />
+                            <path d="M4 7.5v-2h6l2 2" />
+                        </svg>
+
+                    </div>
+
+                    <h3>
+                        No workspaces yet
+                    </h3>
+
+                    <p>
+                        Create a workspace to start organizing
+                        collaborative work.
+                    </p>
+
+                    <a asp-controller="Workspace"
+                       asp-action="Create"
+                       class="ws-dashboard-secondary-action">
+                        Create workspace
+                    </a>
+
+                </div>
+            }
+            else
+            {
+                <div class="ws-dashboard-workspace-list">
+
+                    @foreach (var workspace in Model.Workspaces)
+                    {
+                        var workspaceName = workspace.WorkspaceName?.Trim() ?? string.Empty;
+
+                        var workspaceInitial = string.IsNullOrWhiteSpace(workspaceName)
+                            ? "W"
+                            : workspaceName.Substring(0, 1).ToUpperInvariant();
+
+                        <article class="ws-dashboard-workspace-card">
+
+                            <div class="ws-dashboard-workspace-card-top">
+
+                                <div class="ws-dashboard-workspace-mark"
+                                     aria-hidden="true">
+                                    @workspaceInitial
+                                </div>
+
+                                <div class="ws-dashboard-workspace-heading">
+
+                                    <h3>
+                                        @workspace.WorkspaceName
+                                    </h3>
+
+                                    <span class="@GetRoleClass(workspace.Role)">
+                                        @workspace.Role
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            @if (!string.IsNullOrWhiteSpace(workspace.Description))
+                            {
+                                <p class="ws-dashboard-workspace-description">
+                                    @workspace.Description
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="ws-dashboard-workspace-description
+                                    ws-dashboard-workspace-description-muted">
+                                    No workspace description provided.
+                                </p>
+                            }
+
+
+                            <div class="ws-dashboard-workspace-meta">
+
+                                <span>
+                                    <strong>
+                                        @workspace.MemberCount
+                                    </strong>
+
+                                    @(workspace.MemberCount == 1
+                                        ? "member"
+                                        : "members")
+                                </span>
+
+                                <span class="ws-workspace-meta-divider">
+                                    ·
+                                </span>
+
+                                <span>
+                                    <strong>
+                                        @workspace.BoardCount
+                                    </strong>
+
+                                    @(workspace.BoardCount == 1
+                                        ? "board"
+                                        : "boards")
+                                </span>
+
+                            </div>
+
+
+                            <div class="ws-dashboard-workspace-action">
+
+                                <a asp-controller="Workspace"
+                                   asp-action="Details"
+                                   asp-route-id="@workspace.WorkspaceId">
+
+                                    Open workspace
+
+                                    <span aria-hidden="true">
+                                        →
+                                    </span>
+
+                                </a>
+
+                            </div>
+
+                        </article>
+                    }
 
                 </div>
             }
 
-        </div>
-    }
+        </section>
 
-</section>
+    </div>
+
+</div>

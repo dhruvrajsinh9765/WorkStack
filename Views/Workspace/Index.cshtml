@@ -5,80 +5,307 @@
     var search = ViewData["Search"] as string ?? string.Empty;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Workspaces</h1>
+<div class="ws-workspace-page">
 
-    <a asp-action="Create"
-       class="btn btn-primary">
-        Create workspace
-    </a>
-</div>
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
 
-<!-- WORKSPACE SEARCH -->
-<form asp-action="Index"
-      method="get"
-      class="mb-4">
+    <section class="ws-workspace-page-header">
 
-    <div class="input-group">
-        <input type="text"
-               name="search"
-               value="@search"
-               class="form-control"
-               placeholder="Search workspaces by name or description..."
-               aria-label="Search workspaces" />
+        <div class="ws-workspace-page-heading">
 
-        <button type="submit"
-                class="btn btn-outline-primary">
-            Search
-        </button>
+            <p class="ws-workspace-eyebrow">
+                YOUR WORK
+            </p>
 
-        @if (!string.IsNullOrWhiteSpace(search))
-        {
-            <a asp-action="Index"
-               class="btn btn-outline-secondary">
-                Clear
+            <h1>
+                Workspaces
+            </h1>
+
+            <p>
+                Organize teams, projects, and collaborative work
+                in dedicated spaces.
+            </p>
+
+        </div>
+
+        <div class="ws-workspace-page-actions">
+
+            <a asp-action="Create"
+               class="ws-workspace-primary-action">
+
+                <span class="ws-workspace-plus"
+                      aria-hidden="true">
+                    +
+                </span>
+
+                <span>
+                    Create workspace
+                </span>
+
             </a>
-        }
-    </div>
-</form>
 
-@if (!Model.Any())
-{
-    @if (string.IsNullOrWhiteSpace(search))
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         SEARCH
+         ========================================================= -->
+
+    <section class="ws-workspace-search">
+
+        <div class="ws-workspace-search-heading">
+
+            <div class="ws-workspace-search-icon"
+                 aria-hidden="true">
+
+                <svg viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="6.5"></circle>
+                    <path d="m16 16 4 4"></path>
+                </svg>
+
+            </div>
+
+            <div>
+
+                <strong>
+                    Find a workspace
+                </strong>
+
+                <span>
+                    Search by workspace name or description.
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <form asp-action="Index"
+              method="get"
+              class="ws-workspace-search-form">
+
+            <div class="ws-workspace-search-input-wrap">
+
+                <svg viewBox="0 0 24 24"
+                     aria-hidden="true">
+                    <circle cx="11" cy="11" r="6.5"></circle>
+                    <path d="m16 16 4 4"></path>
+                </svg>
+
+                <input type="text"
+                       name="search"
+                       value="@search"
+                       placeholder="Search workspaces..."
+                       aria-label="Search workspaces"
+                       autocomplete="off" />
+
+            </div>
+
+            <button type="submit"
+                    class="ws-workspace-search-button">
+                Search
+            </button>
+
+            @if (!string.IsNullOrWhiteSpace(search))
+            {
+                <a asp-action="Index"
+                   class="ws-workspace-clear-button">
+                    Clear
+                </a>
+            }
+
+        </form>
+
+    </section>
+
+
+    <!-- =========================================================
+         SEARCH RESULT SUMMARY
+         ========================================================= -->
+    @if (!string.IsNullOrWhiteSpace(search))
     {
-        <p>You are not a member of any workspaces yet.</p>
+        <div class="ws-workspace-result-summary">
+
+            <span>
+                Search results for
+                <strong>@search</strong>
+            </span>
+
+            <span>
+                @Model.Count()
+                @(Model.Count() == 1 ? "workspace" : "workspaces")
+            </span>
+
+        </div>
+    }
+
+
+    <!-- =========================================================
+         EMPTY STATE
+         ========================================================= -->
+    @if (!Model.Any())
+    {
+        <section class="ws-workspace-empty">
+
+            <div class="ws-workspace-empty-icon"
+                 aria-hidden="true">
+
+                @if (string.IsNullOrWhiteSpace(search))
+                {
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 7.5h6l2 2h8v9H4z"></path>
+                        <path d="M4 7.5v-2h6l2 2"></path>
+                    </svg>
+                }
+                else
+                {
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="10.5" cy="10.5" r="6"></circle>
+                        <path d="m15 15 4.5 4.5"></path>
+                        <path d="M8 10.5h5"></path>
+                    </svg>
+                }
+
+            </div>
+
+            @if (string.IsNullOrWhiteSpace(search))
+            {
+                <h2>
+                    No workspaces yet
+                </h2>
+
+                <p>
+                    Create your first workspace to start organizing
+                    projects and collaborating with your team.
+                </p>
+
+                <a asp-action="Create"
+                   class="ws-workspace-empty-action">
+                    Create your first workspace
+                </a>
+            }
+            else
+            {
+                <h2>
+                    No matching workspaces
+                </h2>
+
+                <p>
+                    We couldn't find a workspace matching
+                    <strong>@search</strong>.
+                    Try a different search term.
+                </p>
+
+                <a asp-action="Index"
+                   class="ws-workspace-empty-action">
+                    View all workspaces
+                </a>
+            }
+
+        </section>
     }
     else
     {
-        <div class="alert alert-secondary">
-            No workspaces found matching
-            <strong>@search</strong>.
-        </div>
+        <!-- =====================================================
+             WORKSPACE GRID
+             ===================================================== -->
+
+        <section class="ws-workspace-grid"
+                 aria-label="Your workspaces">
+
+            @foreach (var workspace in Model)
+            {
+                var workspaceName =
+                    workspace.Name?.Trim() ?? string.Empty;
+
+                var workspaceInitial =
+                    string.IsNullOrWhiteSpace(workspaceName)
+                        ? "W"
+                        : workspaceName
+                            .Substring(0, 1)
+                            .ToUpperInvariant();
+
+                <article class="ws-workspace-card">
+
+                    <div class="ws-workspace-card-top">
+
+                        <div class="ws-workspace-card-identity">
+
+                            <div class="ws-workspace-card-mark"
+                                 aria-hidden="true">
+                                @workspaceInitial
+                            </div>
+
+                            <div class="ws-workspace-card-title-wrap">
+
+                                <h2>
+                                    @workspace.Name
+                                </h2>
+
+                                <span>
+                                    Workspace
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="ws-workspace-card-body">
+
+                        @if (!string.IsNullOrWhiteSpace(workspace.Description))
+                        {
+                            <p>
+                                @workspace.Description
+                            </p>
+                        }
+                        else
+                        {
+                            <p class="ws-workspace-card-muted">
+                                No description has been added
+                                to this workspace.
+                            </p>
+                        }
+
+                    </div>
+
+
+                    <div class="ws-workspace-card-footer">
+
+                        <span class="ws-workspace-card-status">
+
+                            <span class="ws-workspace-status-dot"
+                                  aria-hidden="true">
+                            </span>
+
+                            Active workspace
+
+                        </span>
+
+                        <a asp-action="Details"
+                           asp-route-id="@workspace.Id"
+                           class="ws-workspace-open-action">
+
+                            Open
+
+                            <span aria-hidden="true">
+                                →
+                            </span>
+
+                        </a>
+
+                    </div>
+
+                </article>
+            }
+
+        </section>
     }
-}
-else
-{
-    <div class="list-group">
-        @foreach (var workspace in Model)
-        {
-            <div class="list-group-item">
-                <h2 class="h5 mb-1">
-                    @workspace.Name
-                </h2>
 
-                @if (!string.IsNullOrWhiteSpace(workspace.Description))
-                {
-                    <p class="mb-0">
-                        @workspace.Description
-                    </p>
-                }
-
-                <a asp-action="Details"
-                   asp-route-id="@workspace.Id"
-                   class="btn btn-outline-primary btn-sm mt-2">
-                    Open workspace
-                </a>
-            </div>
-        }
-    </div>
-}
+</div>

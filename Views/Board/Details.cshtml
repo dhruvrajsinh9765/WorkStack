@@ -3,54 +3,133 @@
 @{
     ViewData["Title"] = Model.Name;
 
-    var hasFilters =
-        !string.IsNullOrWhiteSpace(Model.Search) ||
-        !string.IsNullOrWhiteSpace(Model.Priority);
+    var search = Model.Search?.Trim() ?? string.Empty;
+    var priority = Model.Priority?.Trim() ?? string.Empty;
+
+    var hasSearch = !string.IsNullOrWhiteSpace(search);
+    var hasPriority = !string.IsNullOrWhiteSpace(priority);
+    var hasFilters = hasSearch || hasPriority;
+
+    var totalTasks = Model.Lists.Sum(list => list.TaskCount);
+    var visibleTasks = Model.Lists.Sum(list => list.Tasks.Count);
+
+    var boardName =
+        Model.Name?.Trim() ?? string.Empty;
+
+    var boardInitial =
+        string.IsNullOrWhiteSpace(boardName)
+            ? "B"
+            : boardName
+                .Substring(0, 1)
+                .ToUpperInvariant();
 }
 
-<div class="container-fluid py-4">
+<div class="ws-board-details-page">
 
-    <!-- BOARD HEADER -->
-    <div class="d-flex justify-content-between align-items-start mb-4">
+    <!-- =========================================================
+         BACK NAVIGATION
+         ========================================================= -->
 
-        <div>
+    <a asp-controller="Board"
+       asp-action="Index"
+       asp-route-workspaceId="@Model.WorkspaceId"
+       class="ws-board-details-back">
 
-            <div class="text-muted small mb-1">
-                @Model.WorkspaceName
+        <span aria-hidden="true">←</span>
+
+        <span>
+            @Model.WorkspaceName / Boards
+        </span>
+
+    </a>
+
+
+    <!-- =========================================================
+         BOARD HEADER
+         ========================================================= -->
+
+    <section class="ws-board-hero">
+
+        <div class="ws-board-hero-main">
+
+            <div class="ws-board-hero-icon"
+                 aria-hidden="true">
+
+                @boardInitial
+
             </div>
 
-            <h1 class="mb-2">
-                @Model.Name
-            </h1>
 
-            @if (!string.IsNullOrWhiteSpace(Model.Description))
-            {
-                <p class="text-muted mb-2">
-                    @Model.Description
+            <div class="ws-board-hero-copy">
+
+                <p class="ws-board-hero-eyebrow">
+                    BOARD
                 </p>
-            }
 
-            <div class="text-muted small">
-                Created @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy hh:mm tt")
-                ·
-                Updated @Model.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy hh:mm tt")
+                <h1>
+                    @Model.Name
+                </h1>
+
+                @if (!string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p class="ws-board-hero-description">
+                        @Model.Description
+                    </p>
+                }
+
+                <div class="ws-board-meta">
+
+                    <span>
+                        Created
+                        @Model.CreatedAt
+                        .ToLocalTime()
+                        .ToString("dd MMM yyyy")
+                    </span>
+
+                    <span class="ws-board-meta-divider"
+                          aria-hidden="true">
+                        /
+                    </span>
+
+                    <span>
+                        Updated
+                        @Model.UpdatedAt
+                        .ToLocalTime()
+                        .ToString("dd MMM yyyy")
+                    </span>
+
+                    <span class="ws-board-meta-divider"
+                          aria-hidden="true">
+                        /
+                    </span>
+
+                    <span>
+                        @totalTasks
+                        @(totalTasks == 1 ? "task" : "tasks")
+                    </span>
+
+                </div>
+
             </div>
 
         </div>
 
 
-        @if (Model.CanManageBoards)
-        {
-            <div class="d-flex gap-2">
+        <!-- ACTIONS -->
 
+        <div class="ws-board-hero-actions">
+
+            @if (Model.CanManageBoards)
+            {
                 <a asp-controller="Board"
                    asp-action="Edit"
                    asp-route-workspaceId="@Model.WorkspaceId"
                    asp-route-boardId="@Model.Id"
-                   class="btn btn-primary">
-                    Edit Board
-                </a>
+                   class="ws-board-secondary-action">
 
+                    Edit board
+
+                </a>
 
                 <form asp-controller="Board"
                       asp-action="Delete"
@@ -62,186 +141,50 @@
                     @Html.AntiForgeryToken()
 
                     <button type="submit"
-                            class="btn btn-outline-danger">
+                            class="ws-board-danger-action">
+
                         Delete
+
                     </button>
 
                 </form>
-
-
-                <a asp-controller="Board"
-                   asp-action="Index"
-                   asp-route-workspaceId="@Model.WorkspaceId"
-                   class="btn btn-secondary">
-                    Back
-                </a>
-
-            </div>
-        }
-        else
-        {
-            <a asp-controller="Board"
-               asp-action="Index"
-               asp-route-workspaceId="@Model.WorkspaceId"
-               class="btn btn-secondary">
-                Back
-            </a>
-        }
-
-    </div>
-
-
-    <!-- TASK SEARCH & FILTER -->
-    <div class="card mb-4">
-
-        <div class="card-body">
-
-            <div class="d-flex justify-content-between align-items-center mb-3">
-
-                <div>
-                    <h2 class="h5 mb-1">
-                        Find Tasks
-                    </h2>
-
-                    <p class="text-muted small mb-0">
-                        Search tasks by title or filter them by priority.
-                    </p>
-                </div>
-
-            </div>
-
-
-            <form asp-controller="Board"
-                  asp-action="Details"
-                  method="get">
-
-                <input type="hidden"
-                       name="workspaceId"
-                       value="@Model.WorkspaceId" />
-
-                <input type="hidden"
-                       name="boardId"
-                       value="@Model.Id" />
-
-
-                <div class="row g-2">
-
-                    <!-- SEARCH -->
-                    <div class="col-md-6">
-
-                        <label for="taskSearch"
-                               class="form-label">
-                            Search tasks
-                        </label>
-
-                        <input id="taskSearch"
-                               type="text"
-                               name="search"
-                               value="@Model.Search"
-                               class="form-control"
-                               placeholder="Search by task title..."
-                               aria-label="Search tasks by title" />
-
-                    </div>
-
-
-                    <!-- PRIORITY -->
-                    <div class="col-md-3">
-
-                        <label for="taskPriority"
-                               class="form-label">
-                            Priority
-                        </label>
-
-                        <select id="taskPriority"
-                                name="priority"
-                                class="form-select">
-
-                            <option value="">
-                                All priorities
-                            </option>
-
-                            @foreach (var priority in Enum.GetValues<WorkStack.Models.Enums.TaskPriority>())
-                            {
-                                if (Model.Priority.Equals(
-                                    priority.ToString(),
-                                    StringComparison.OrdinalIgnoreCase))
-                                {
-                                    <option value="@priority" selected>
-                                        @priority
-                                    </option>
-                                }
-                                else
-                                {
-                                    <option value="@priority">
-                                        @priority
-                                    </option>
-                                }
-                            }
-
-                        </select>
-
-                    </div>
-
-
-                    <!-- BUTTONS -->
-                    <div class="col-md-3 d-flex align-items-end gap-2">
-
-                        <button type="submit"
-                                class="btn btn-primary">
-                            Search
-                        </button>
-
-                        @if (hasFilters)
-                        {
-                            <a asp-controller="Board"
-                               asp-action="Details"
-                               asp-route-workspaceId="@Model.WorkspaceId"
-                               asp-route-boardId="@Model.Id"
-                               class="btn btn-outline-secondary">
-                                Clear
-                            </a>
-                        }
-
-                    </div>
-
-                </div>
-
-            </form>
+            }
 
         </div>
 
-    </div>
+    </section>
 
 
-    <!-- FILTER STATUS -->
-    @if (hasFilters)
+    <!-- =========================================================
+         DELETE ERROR
+         ========================================================= -->
+    @if (TempData["BoardDeleteError"] is string boardDeleteError)
     {
-        <div class="alert alert-light border mb-4">
+        <div class="ws-board-alert"
+             role="alert">
 
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="ws-board-alert-icon"
+                 aria-hidden="true">
 
-                <div>
+                <svg viewBox="0 0 24 24">
 
-                    <strong>Filters active</strong>
+                    <path d="M12 4 3.8 19h16.4z"></path>
+                    <path d="M12 9v4"></path>
+                    <path d="M12 16.5h.01"></path>
 
-                    @if (!string.IsNullOrWhiteSpace(Model.Search))
-                    {
-                        <span class="ms-2">
-                            Search:
-                            <strong>@Model.Search</strong>
-                        </span>
-                    }
+                </svg>
 
-                    @if (!string.IsNullOrWhiteSpace(Model.Priority))
-                    {
-                        <span class="ms-2">
-                            Priority:
-                            <strong>@Model.Priority</strong>
-                        </span>
-                    }
+            </div>
 
-                </div>
+            <div>
+
+                <strong>
+                    Board could not be deleted
+                </strong>
+
+                <p>
+                    @boardDeleteError
+                </p>
 
             </div>
 
@@ -249,17 +192,186 @@
     }
 
 
-    <!-- LIST HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-3">
+    <!-- =========================================================
+         FILTER BAR
+         ========================================================= -->
+
+    <section class="ws-board-filter-panel">
+
+        <div class="ws-board-filter-heading">
+
+            <div>
+
+                <span class="ws-board-filter-eyebrow">
+                    BOARD VIEW
+                </span>
+
+                <h2>
+                    Workflow
+                </h2>
+
+            </div>
+
+            <span class="ws-board-filter-task-count">
+
+                @if (hasFilters)
+                {
+                    @visibleTasks
+                    <span>visible</span>
+                }
+                else
+                {
+                    @totalTasks
+                    <span>tasks</span>
+                }
+
+            </span>
+
+        </div>
+
+
+        <form asp-controller="Board"
+              asp-action="Details"
+              asp-route-workspaceId="@Model.WorkspaceId"
+              asp-route-boardId="@Model.Id"
+              method="get"
+              class="ws-board-filter-form">
+
+            <!-- SEARCH -->
+
+            <div class="ws-board-filter-search">
+
+                <svg viewBox="0 0 24 24"
+                     aria-hidden="true">
+
+                    <circle cx="11" cy="11" r="6.5"></circle>
+                    <path d="m16 16 4.5 4.5"></path>
+
+                </svg>
+
+                <input type="text"
+                       name="search"
+                       value="@search"
+                       placeholder="Search tasks by title..."
+                       aria-label="Search tasks" />
+
+            </div>
+
+
+            <!-- PRIORITY -->
+
+            <div class="ws-board-filter-priority">
+
+                <select name="priority"
+                        aria-label="Filter by priority">
+
+                    <option value="">
+                        All priorities
+                    </option>
+
+                    @foreach (
+                        var taskPriority
+                        in Enum.GetValues<WorkStack.Models.Enums.TaskPriority>())
+                    {
+                        if (string.Equals(
+                            priority,
+                            taskPriority.ToString(),
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            <option value="@taskPriority"
+                                    selected>
+                                @taskPriority
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@taskPriority">
+                                @taskPriority
+                            </option>
+                        }
+                    }
+
+                </select>
+
+            </div>
+
+
+            <button type="submit"
+                    class="ws-board-filter-apply">
+
+                Apply filters
+
+            </button>
+
+
+            @if (hasFilters)
+            {
+                <a asp-controller="Board"
+                   asp-action="Details"
+                   asp-route-workspaceId="@Model.WorkspaceId"
+                   asp-route-boardId="@Model.Id"
+                   class="ws-board-filter-clear">
+
+                    Clear
+
+                </a>
+            }
+
+        </form>
+
+
+        @if (hasFilters)
+        {
+            <div class="ws-board-active-filters">
+
+                <span>
+                    Active filters:
+                </span>
+
+                @if (hasSearch)
+                {
+                    <span class="ws-board-filter-chip">
+
+                        Search:
+                        <strong>@search</strong>
+
+                    </span>
+                }
+
+                @if (hasPriority)
+                {
+                    <span class="ws-board-filter-chip">
+
+                        Priority:
+                        <strong>@priority</strong>
+
+                    </span>
+                }
+
+            </div>
+        }
+
+    </section>
+
+
+    <!-- =========================================================
+         LIST HEADER
+         ========================================================= -->
+
+    <section class="ws-board-workflow-header">
 
         <div>
 
-            <h2 class="h4 mb-1">
+            <span class="ws-board-section-eyebrow">
+                KANBAN WORKFLOW
+            </span>
+
+            <h2>
                 Lists
             </h2>
 
-            <p class="text-muted mb-0">
-                Organize tasks into workflow stages.
+            <p>
+                Move work through your team's workflow stages.
             </p>
 
         </div>
@@ -271,260 +383,339 @@
                asp-action="Create"
                asp-route-workspaceId="@Model.WorkspaceId"
                asp-route-boardId="@Model.Id"
-               class="btn btn-primary">
-                + Add List
+               class="ws-board-add-list">
+
+                <span aria-hidden="true">+</span>
+
+                Add list
+
             </a>
         }
 
-    </div>
+    </section>
 
 
-    <!-- KANBAN -->
+    <!-- =========================================================
+         NO LISTS
+         ========================================================= -->
     @if (Model.Lists.Count == 0)
     {
-        <div class="card">
+        <section class="ws-board-empty">
 
-            <div class="card-body text-center py-5">
+            <div class="ws-board-empty-icon"
+                 aria-hidden="true">
 
-                <h3 class="h5">
-                    No lists yet
-                </h3>
+                <svg viewBox="0 0 24 24">
 
-                <p class="text-muted mb-0">
-                    Create your first list to start adding tasks.
-                </p>
+                    <rect x="4" y="5" width="5" height="14" rx="1"></rect>
+                    <rect x="11" y="5" width="5" height="10" rx="1"></rect>
+                    <rect x="18" y="5" width="2" height="7" rx="1"></rect>
+
+                </svg>
 
             </div>
 
-        </div>
+            <h3>
+                No lists yet
+            </h3>
+
+            <p>
+                Create your first workflow stage to start
+                organizing tasks on this board.
+            </p>
+
+            @if (Model.CanManageLists)
+            {
+                <a asp-controller="List"
+                   asp-action="Create"
+                   asp-route-workspaceId="@Model.WorkspaceId"
+                   asp-route-boardId="@Model.Id"
+                   class="ws-board-empty-primary">
+
+                    Create first list
+
+                </a>
+            }
+
+        </section>
     }
     else
     {
-        <div class="d-flex gap-3 overflow-auto pb-3"
-             style="align-items: flex-start;">
+        <!-- =====================================================
+             KANBAN
+             ===================================================== -->
+
+        <section class="ws-kanban"
+                 aria-label="Board workflow">
 
             @foreach (var list in Model.Lists)
             {
-                <div class="card flex-shrink-0"
-                     style="width: 330px;">
+                <article class="ws-kanban-column">
 
-                    <!-- LIST HEADER -->
-                    <div class="card-body pb-2">
+                    <!-- COLUMN HEADER -->
 
-                        <div class="d-flex justify-content-between align-items-start">
+                    <header class="ws-kanban-column-header">
 
-                            <div>
+                        <div>
 
-                                <h3 class="h5 mb-1">
-                                    @list.Name
-                                </h3>
+                            <h3>
+                                @list.Name
+                            </h3>
 
-                                <div class="text-muted small">
-
-                                    @if (hasFilters)
-                                    {
-                                        @list.Tasks.Count
-                                        @(list.Tasks.Count == 1 ? "matching task" : "matching tasks")
-                                        <span class="mx-1">·</span>
-                                    }
-
-                                    @list.TaskCount
-                                    @(list.TaskCount == 1 ? "task" : "tasks")
-
-                                </div>
-
-                            </div>
-
-
-                            @if (Model.CanManageLists)
-                            {
-                                <div class="dropdown">
-
-                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown">
-                                        Actions
-                                    </button>
-
-                                    <ul class="dropdown-menu dropdown-menu-end">
-
-                                        <!-- MOVE LIST LEFT -->
-                                        <li>
-
-                                            <form asp-controller="List"
-                                                  asp-action="MoveUp"
-                                                  asp-route-workspaceId="@Model.WorkspaceId"
-                                                  asp-route-boardId="@Model.Id"
-                                                  asp-route-listId="@list.Id"
-                                                  method="post">
-
-                                                @Html.AntiForgeryToken()
-
-                                                <button type="submit"
-                                                        class="dropdown-item">
-                                                    Move Left
-                                                </button>
-
-                                            </form>
-
-                                        </li>
-
-
-                                        <!-- MOVE LIST RIGHT -->
-                                        <li>
-
-                                            <form asp-controller="List"
-                                                  asp-action="MoveDown"
-                                                  asp-route-workspaceId="@Model.WorkspaceId"
-                                                  asp-route-boardId="@Model.Id"
-                                                  asp-route-listId="@list.Id"
-                                                  method="post">
-
-                                                @Html.AntiForgeryToken()
-
-                                                <button type="submit"
-                                                        class="dropdown-item">
-                                                    Move Right
-                                                </button>
-
-                                            </form>
-
-                                        </li>
-
-
-                                        <!-- EDIT LIST -->
-                                        <li>
-
-                                            <a class="dropdown-item"
-                                               asp-controller="List"
-                                               asp-action="Edit"
-                                               asp-route-workspaceId="@Model.WorkspaceId"
-                                               asp-route-boardId="@Model.Id"
-                                               asp-route-listId="@list.Id">
-                                                Edit List
-                                            </a>
-
-                                        </li>
-
-
-                                        <li>
-                                            <hr class="dropdown-divider" />
-                                        </li>
-
-
-                                        <!-- DELETE LIST -->
-                                        <li>
-
-                                            <form asp-controller="List"
-                                                  asp-action="Delete"
-                                                  asp-route-workspaceId="@Model.WorkspaceId"
-                                                  asp-route-boardId="@Model.Id"
-                                                  asp-route-listId="@list.Id"
-                                                  method="post"
-                                                  onsubmit="return confirm('Delete this list?');">
-
-                                                @Html.AntiForgeryToken()
-
-                                                <button type="submit"
-                                                        class="dropdown-item text-danger">
-                                                    Delete List
-                                                </button>
-
-                                            </form>
-
-                                        </li>
-
-                                    </ul>
-
-                                </div>
-                            }
+                            <span>
+                                @list.TaskCount
+                                @(list.TaskCount == 1
+                                    ? "task"
+                                    : "tasks")
+                            </span>
 
                         </div>
 
-                    </div>
+
+                        @if (Model.CanManageLists)
+                        {
+                            <div class="dropdown">
+
+                                <button class="ws-kanban-menu-button"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                        aria-label="List actions">
+
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+
+                                </button>
 
 
-                    <!-- TASKS -->
-                    <div class="px-3 pb-3">
+                                <ul class="dropdown-menu dropdown-menu-end ws-kanban-dropdown">
+
+                                    <li>
+
+                                        <form asp-controller="List"
+                                              asp-action="MoveUp"
+                                              asp-route-workspaceId="@Model.WorkspaceId"
+                                              asp-route-boardId="@Model.Id"
+                                              asp-route-listId="@list.Id"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit"
+                                                    class="dropdown-item">
+
+                                                Move left
+
+                                            </button>
+
+                                        </form>
+
+                                    </li>
+
+
+                                    <li>
+
+                                        <form asp-controller="List"
+                                              asp-action="MoveDown"
+                                              asp-route-workspaceId="@Model.WorkspaceId"
+                                              asp-route-boardId="@Model.Id"
+                                              asp-route-listId="@list.Id"
+                                              method="post">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit"
+                                                    class="dropdown-item">
+
+                                                Move right
+
+                                            </button>
+
+                                        </form>
+
+                                    </li>
+
+
+                                    <li>
+
+                                        <a class="dropdown-item"
+                                           asp-controller="List"
+                                           asp-action="Edit"
+                                           asp-route-workspaceId="@Model.WorkspaceId"
+                                           asp-route-boardId="@Model.Id"
+                                           asp-route-listId="@list.Id">
+
+                                            Edit list
+
+                                        </a>
+
+                                    </li>
+
+
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
+
+
+                                    <li>
+
+                                        <form asp-controller="List"
+                                              asp-action="Delete"
+                                              asp-route-workspaceId="@Model.WorkspaceId"
+                                              asp-route-boardId="@Model.Id"
+                                              asp-route-listId="@list.Id"
+                                              method="post"
+                                              onsubmit="return confirm('Delete this list?');">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <button type="submit"
+                                                    class="dropdown-item text-danger">
+
+                                                Delete list
+
+                                            </button>
+
+                                        </form>
+
+                                    </li>
+
+                                </ul>
+
+                            </div>
+                        }
+
+                    </header>
+
+
+                    <!-- COLUMN BODY -->
+
+                    <div class="ws-kanban-column-body">
 
                         @if (list.Tasks.Count == 0)
                         {
-                            <div class="border rounded p-4 text-center text-muted mb-3">
+                            <div class="ws-kanban-empty">
 
-                                @if (hasFilters)
+                                @if (hasFilters && list.TaskCount > 0)
                                 {
-                                    <div>
+                                    <span>
                                         No matching tasks
-                                    </div>
-
-                                    <div class="small mt-1">
-                                        Try changing your search or priority filter.
-                                    </div>
+                                    </span>
                                 }
                                 else
                                 {
-                                    <div>
+                                    <span>
                                         No tasks yet
-                                    </div>
+                                    </span>
                                 }
 
                             </div>
                         }
                         else
                         {
-                            <div class="d-flex flex-column gap-2 mb-3">
+                            <div class="ws-kanban-tasks">
 
                                 @foreach (var task in list.Tasks)
                                 {
-                                    <div class="border rounded p-3">
+                                    var priorityClass =
+                                        task.Priority switch
+                                        {
+                                            WorkStack.Models.Enums.TaskPriority.Urgent
+                                                => "ws-task-priority-urgent",
 
-                                        <!-- TASK TITLE -->
+                                            WorkStack.Models.Enums.TaskPriority.High
+                                                => "ws-task-priority-high",
+
+                                            WorkStack.Models.Enums.TaskPriority.Medium
+                                                => "ws-task-priority-medium",
+
+                                            _
+                                                => "ws-task-priority-low"
+                                        };
+
+                                    <article class="ws-kanban-task">
+
                                         <a asp-controller="Task"
                                            asp-action="Details"
                                            asp-route-workspaceId="@Model.WorkspaceId"
                                            asp-route-boardId="@Model.Id"
                                            asp-route-listId="@list.Id"
                                            asp-route-taskId="@task.Id"
-                                           class="text-decoration-none">
+                                           class="ws-kanban-task-link">
 
-                                            <div class="d-flex justify-content-between align-items-start gap-2">
+                                            <div class="ws-kanban-task-top">
 
-                                                <div class="fw-semibold">
-                                                    @task.Title
-                                                </div>
-
-
-                                                <span class="badge
-                                                    @(task.Priority == WorkStack.Models.Enums.TaskPriority.Urgent
-                                                          ? "bg-danger"
-                                                          : task.Priority == WorkStack.Models.Enums.TaskPriority.High
-                                                              ? "bg-warning text-dark"
-                                                              : task.Priority == WorkStack.Models.Enums.TaskPriority.Medium
-                                                                  ? "bg-primary"
-                                                                  : "bg-secondary")">
-
+                                                <span class="ws-task-priority @priorityClass">
                                                     @task.Priority
-
                                                 </span>
 
                                             </div>
 
 
+                                            <h4>
+                                                @task.Title
+                                            </h4>
+
+
                                             @if (task.DueDate.HasValue)
                                             {
-                                                <div class="text-muted small mt-2">
-                                                    Due @task.DueDate.Value.ToString("dd MMM yyyy")
+                                                <div class="ws-kanban-task-due">
+
+                                                    <svg viewBox="0 0 24 24"
+                                                         aria-hidden="true">
+
+                                                        <rect x="4" y="5" width="16" height="15" rx="2"></rect>
+                                                        <path d="M8 3v4M16 3v4M4 10h16"></path>
+
+                                                    </svg>
+
+                                                    <span>
+                                                        Due
+                                                        @task.DueDate
+                                                        .Value
+                                                        .ToString("dd MMM yyyy")
+                                                    </span>
+
                                                 </div>
                                             }
 
 
                                             @if (task.AssigneeNames.Count > 0)
                                             {
-                                                <div class="text-muted small mt-2">
+                                                <div class="ws-kanban-task-assignees">
 
-                                                    <strong>Assigned:</strong>
+                                                    <div class="ws-kanban-assignee-stack">
 
-                                                    @string.Join(", ", task.AssigneeNames)
+                                                        @foreach (
+                                                            var assigneeName
+                                                            in task.AssigneeNames.Take(3))
+                                                        {
+                                                            var assigneeInitial =
+                                                                string.IsNullOrWhiteSpace(assigneeName)
+                                                                    ? "?"
+                                                                    : assigneeName
+                                                                        .Trim()
+                                                                        .Substring(0, 1)
+                                                                        .ToUpperInvariant();
+
+                                                            <span class="ws-kanban-assignee-avatar"
+                                                                  title="@assigneeName">
+
+                                                                @assigneeInitial
+
+                                                            </span>
+                                                        }
+
+                                                    </div>
+
+
+                                                    <span>
+                                                        @task.AssigneeNames.Count
+                                                        @(task.AssigneeNames.Count == 1
+                                                            ? "assignee"
+                                                            : "assignees")
+                                                    </span>
 
                                                 </div>
                                             }
@@ -533,9 +724,10 @@
 
 
                                         <!-- MOVE TASK -->
-                                        @if (Model.CanManageLists && Model.Lists.Count > 1)
+                                        @if (Model.CanManageLists &&
+                                                                                     Model.Lists.Count > 1)
                                         {
-                                            <div class="mt-3">
+                                            <div class="ws-kanban-move">
 
                                                 <form asp-controller="Task"
                                                       asp-action="Move"
@@ -547,41 +739,33 @@
 
                                                     @Html.AntiForgeryToken()
 
-                                                    <label class="form-label small text-muted mb-1">
-                                                        Move to
-                                                    </label>
+                                                    <select name="targetListId"
+                                                            aria-label="Move task to another list">
 
-                                                    <div class="input-group input-group-sm">
-
-                                                        <select name="targetListId"
-                                                                class="form-select">
-
-                                                            @foreach (var targetList in Model.Lists)
+                                                        @foreach (
+                                                            var targetList
+                                                            in Model.Lists)
+                                                        {
+                                                            if (targetList.Id != list.Id)
                                                             {
-                                                                if (targetList.Id != list.Id)
-                                                                {
-                                                                    <option value="@targetList.Id">
-                                                                        @targetList.Name
-                                                                    </option>
-                                                                }
+                                                                <option value="@targetList.Id">
+                                                                    Move to @targetList.Name
+                                                                </option>
                                                             }
+                                                        }
 
-                                                        </select>
+                                                    </select>
 
-
-                                                        <button type="submit"
-                                                                class="btn btn-outline-primary">
-                                                            Move
-                                                        </button>
-
-                                                    </div>
+                                                    <button type="submit">
+                                                        Move
+                                                    </button>
 
                                                 </form>
 
                                             </div>
                                         }
 
-                                    </div>
+                                    </article>
                                 }
 
                             </div>
@@ -596,17 +780,21 @@
                                asp-route-workspaceId="@Model.WorkspaceId"
                                asp-route-boardId="@Model.Id"
                                asp-route-listId="@list.Id"
-                               class="btn btn-sm btn-outline-primary w-100">
-                                + Add Task
+                               class="ws-kanban-add-task">
+
+                                <span aria-hidden="true">+</span>
+
+                                Add task
+
                             </a>
                         }
 
                     </div>
 
-                </div>
+                </article>
             }
 
-        </div>
+        </section>
     }
 
 </div>

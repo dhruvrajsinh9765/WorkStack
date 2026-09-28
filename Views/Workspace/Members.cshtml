@@ -5,141 +5,264 @@
 
     var workspaceId = (int)ViewData["WorkspaceId"]!;
 
+    var canManageMembers =
+        ViewData["CanManageMembers"] is true;
+
     var showActionsColumn =
         Model.Any(member =>
             member.CanBeRemovedByCurrentUser ||
             member.CanChangeRole);
+
+    var memberCount = Model.Count();
 }
 
-<div class="container-fluid py-4">
+<div class="ws-members-page">
+
+    <!-- =========================================================
+         BACK NAVIGATION
+         ========================================================= -->
+
+    <a asp-action="Details"
+       asp-route-id="@workspaceId"
+       class="ws-members-back-link">
+
+        <span aria-hidden="true">←</span>
+
+        <span>Back to workspace</span>
+
+    </a>
+
 
     <!-- =========================================================
          HEADER
          ========================================================= -->
 
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+    <section class="ws-members-header">
 
         <div>
-            <div class="text-muted small mb-1">
-                Workspace
-            </div>
 
-            <h1 class="mb-1">
+            <p class="ws-members-eyebrow">
+                WORKSPACE / PEOPLE
+            </p>
+
+            <h1>
                 Workspace members
             </h1>
 
-            <p class="text-muted mb-0">
-                Manage the people who have access to this workspace.
+            <p>
+                Manage the people who have access to this workspace
+                and control their workspace roles.
             </p>
+
         </div>
 
-
-        @if (ViewData["CanManageMembers"] is true)
+        @if (canManageMembers)
         {
             <a asp-action="AddMember"
                asp-route-id="@workspaceId"
-               class="btn btn-primary">
+               class="ws-members-primary-action">
+
+                <span aria-hidden="true">+</span>
 
                 Add member
 
             </a>
         }
 
-    </div>
+    </section>
 
 
     <!-- =========================================================
-         SUCCESS / ERROR MESSAGES
+         ALERTS
          ========================================================= -->
     @if (TempData["MemberRemoveError"] is string removeError)
     {
-        <div class="alert alert-warning alert-dismissible fade show"
+        <div class="ws-members-alert ws-members-alert-warning"
              role="alert">
 
-            @removeError
+            <div class="ws-members-alert-icon"
+                 aria-hidden="true">
 
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                    aria-label="Close">
-            </button>
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 4 3.8 19h16.4z"></path>
+                    <path d="M12 9v4"></path>
+                    <path d="M12 16.5h.01"></path>
+                </svg>
+
+            </div>
+
+            <div>
+
+                <strong>
+                    Member could not be removed
+                </strong>
+
+                <p>
+                    @removeError
+                </p>
+
+            </div>
 
         </div>
     }
 
-
     @if (TempData["MemberRemoveSuccess"] is string removeSuccess)
     {
-        <div class="alert alert-success alert-dismissible fade show"
+        <div class="ws-members-alert ws-members-alert-success"
              role="alert">
 
-            @removeSuccess
+            <div class="ws-members-alert-icon"
+                 aria-hidden="true">
 
-            <button type="button"
-                    class="btn-close"
-                    data-bs-dismiss="alert"
-                    aria-label="Close">
-            </button>
+                <svg viewBox="0 0 24 24">
+                    <path d="m5 12 4 4L19 6"></path>
+                </svg>
+
+            </div>
+
+            <div>
+
+                <strong>
+                    Member removed
+                </strong>
+
+                <p>
+                    @removeSuccess
+                </p>
+
+            </div>
 
         </div>
     }
 
 
     <!-- =========================================================
-         MEMBERS TABLE
+         MEMBERS SUMMARY
+         ========================================================= -->
+
+    <section class="ws-members-summary">
+
+        <div class="ws-members-summary-icon"
+             aria-hidden="true">
+
+            <svg viewBox="0 0 24 24">
+                <circle cx="9" cy="8" r="3"></circle>
+                <path d="M3.5 19c.7-3 2.5-4.5 5.5-4.5s4.8 1.5 5.5 4.5"></path>
+                <path d="M16 11a2.5 2.5 0 1 0 0-5"></path>
+                <path d="M17 14.5c2 .4 3.2 1.7 3.5 4"></path>
+            </svg>
+
+        </div>
+
+        <div class="ws-members-summary-copy">
+
+            <strong>
+                @memberCount
+                @(memberCount == 1 ? "member" : "members")
+            </strong>
+
+            <span>
+                People currently connected to this workspace.
+            </span>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         EMPTY STATE
          ========================================================= -->
     @if (!Model.Any())
     {
-        <div class="ws-empty-state">
+        <section class="ws-members-empty">
 
-            <h3 class="h4">
-                No members found
-            </h3>
+            <div class="ws-members-empty-icon"
+                 aria-hidden="true">
 
-            <p class="mb-3">
-                Add members to start collaborating in this workspace.
+                <svg viewBox="0 0 24 24">
+                    <circle cx="9" cy="8" r="3"></circle>
+                    <path d="M3.5 19c.7-3 2.5-4.5 5.5-4.5s4.8 1.5 5.5 4.5"></path>
+                    <path d="M16 12h5"></path>
+                    <path d="M18.5 9.5v5"></path>
+                </svg>
+
+            </div>
+
+            <h2>
+                No members yet
+            </h2>
+
+            <p>
+                Add people to this workspace to start collaborating
+                with your team.
             </p>
 
-            @if (ViewData["CanManageMembers"] is true)
+            @if (canManageMembers)
             {
                 <a asp-action="AddMember"
                    asp-route-id="@workspaceId"
-                   class="btn btn-primary">
+                   class="ws-members-empty-action">
 
                     Add the first member
 
                 </a>
             }
 
-        </div>
+        </section>
     }
     else
     {
-        <div class="ws-card overflow-hidden">
+        <!-- =====================================================
+             MEMBERS TABLE
+             ===================================================== -->
+
+        <section class="ws-members-table-card">
+
+            <div class="ws-members-table-header">
+
+                <div>
+
+                    <p class="ws-members-table-eyebrow">
+                        PEOPLE WITH ACCESS
+                    </p>
+
+                    <h2>
+                        Members
+                    </h2>
+
+                </div>
+
+                <span class="ws-members-table-count">
+                    @memberCount
+                </span>
+
+            </div>
+
 
             <div class="table-responsive">
 
-                <table class="table table-dark table-hover align-middle mb-0">
+                <table class="ws-members-table">
 
                     <thead>
 
                         <tr>
 
-                            <th class="px-4 py-3">
-                                Email
+                            <th>
+                                Member
                             </th>
 
-                            <th class="py-3">
+                            <th>
                                 Role
                             </th>
 
-                            <th class="py-3">
+                            <th>
                                 Joined
                             </th>
 
                             @if (showActionsColumn)
                             {
-                                <th class="px-4 py-3 text-end">
+                                <th class="ws-members-actions-heading">
                                     Actions
                                 </th>
                             }
@@ -153,49 +276,83 @@
 
                         @foreach (var member in Model)
                         {
+                            var email =
+                                member.Email
+                                ?? "Email unavailable";
+
+                            var memberInitial =
+                                string.IsNullOrWhiteSpace(email)
+                                    ? "?"
+                                    : email
+                                        .Trim()
+                                        .Substring(0, 1)
+                                        .ToUpperInvariant();
+
+                            var roleClass =
+                                member.Role switch
+                                {
+                                    WorkStack.Models.Enums.WorkspaceRole.Owner
+                                        => "ws-member-role-owner",
+
+                                    WorkStack.Models.Enums.WorkspaceRole.Manager
+                                        => "ws-member-role-manager",
+
+                                    _
+                                        => "ws-member-role-member"
+                                };
+
                             <tr>
 
-                                <!-- EMAIL -->
+                                <!-- MEMBER -->
 
-                                <td class="px-4 py-3">
+                                <td>
 
-                                    <span class="fw-semibold">
-                                        @(member.Email ?? "Email unavailable")
-                                    </span>
+                                    <div class="ws-member-identity">
+
+                                        <div class="ws-member-avatar"
+                                             aria-hidden="true">
+
+                                            @memberInitial
+
+                                        </div>
+
+                                        <div class="ws-member-identity-copy">
+
+                                            <strong>
+                                                @email
+                                            </strong>
+
+                                            <span>
+                                                WorkStack member
+                                            </span>
+
+                                        </div>
+
+                                    </div>
 
                                 </td>
 
 
                                 <!-- ROLE -->
 
-                                <td class="py-3">
+                                <td>
 
-                                    <span class="badge rounded-pill
-                                        @(member.Role switch
-                                          {
-                                              WorkStack.Models.Enums.WorkspaceRole.Owner
-                                                  => "bg-danger",
-
-                                              WorkStack.Models.Enums.WorkspaceRole.Manager
-                                                  => "bg-warning text-dark",
-
-                                              _ => "bg-secondary"
-                                          })">
-
+                                    <span class="ws-member-role @roleClass">
                                         @member.Role
-
                                     </span>
 
                                 </td>
 
 
-                                <!-- JOINED DATE -->
+                                <!-- JOINED -->
 
-                                <td class="py-3">
+                                <td>
 
-                                    @member.JoinedAt
-                                    .ToLocalTime()
-                                    .ToString("dd MMM yyyy")
+                                    <span class="ws-member-joined">
+                                        @member.JoinedAt
+                                        .ToLocalTime()
+                                        .ToString("dd MMM yyyy")
+                                    </span>
 
                                 </td>
 
@@ -203,22 +360,21 @@
                                 <!-- ACTIONS -->
                                 @if (showActionsColumn)
                                 {
-                                    <td class="px-4 py-3 text-end">
+                                    <td class="ws-members-actions-cell">
 
-                                        <div class="d-flex justify-content-end flex-wrap gap-2">
+                                        <div class="ws-member-actions">
 
                                             @if (member.CanChangeRole)
                                             {
                                                 <a asp-action="ChangeMemberRole"
                                                    asp-route-workspaceId="@workspaceId"
                                                    asp-route-userId="@member.UserId"
-                                                   class="btn btn-outline-primary btn-sm">
+                                                   class="ws-member-action-secondary">
 
                                                     Change role
 
                                                 </a>
                                             }
-
 
                                             @if (member.CanBeRemovedByCurrentUser)
                                             {
@@ -226,13 +382,13 @@
                                                       asp-route-workspaceId="@workspaceId"
                                                       asp-route-userId="@member.UserId"
                                                       method="post"
-                                                      class="d-inline">
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Are you sure you want to remove this member?');">
 
                                                     @Html.AntiForgeryToken()
 
                                                     <button type="submit"
-                                                            class="btn btn-outline-danger btn-sm"
-                                                            onclick="return confirm('Are you sure you want to remove this member?');">
+                                                            class="ws-member-action-danger">
 
                                                         Remove
 
@@ -255,21 +411,23 @@
 
             </div>
 
-        </div>
+        </section>
     }
 
 
     <!-- =========================================================
-         BACK
+         FOOTER NAVIGATION
          ========================================================= -->
 
-    <div class="mt-4">
+    <div class="ws-members-footer">
 
         <a asp-action="Details"
            asp-route-id="@workspaceId"
-           class="btn btn-outline-secondary">
+           class="ws-members-back-button">
 
-            ← Back to workspace
+            <span aria-hidden="true">←</span>
+
+            Back to workspace
 
         </a>
 

@@ -2,33 +2,227 @@
 
 @{
     ViewData["Title"] = "Change member role";
-    var workspaceId = (int)ViewData["WorkspaceId"]!;
-    var userId = (string)ViewContext.RouteData.Values["userId"]!;
+
+    var workspaceId =
+        (int)ViewData["WorkspaceId"]!;
+
+    var userId =
+        (string)ViewContext.RouteData.Values["userId"]!;
 }
 
-<h1>Change member role</h1>
+<div class="ws-member-form-page">
 
-<dl class="row">
-    <dt class="col-sm-3">Email</dt>
-    <dd class="col-sm-9">@(Model.Email ?? "Email unavailable")</dd>
-    <dt class="col-sm-3">Current role</dt>
-    <dd class="col-sm-9">@Model.CurrentRole</dd>
-</dl>
+    <!-- =========================================================
+         BACK NAVIGATION
+         ========================================================= -->
 
-<form asp-action="ChangeMemberRole" asp-route-workspaceId="@workspaceId" asp-route-userId="@userId" method="post">
-    @Html.AntiForgeryToken()
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="mb-3">
-        <label asp-for="NewRole" class="form-label">New role</label>
-        <select asp-for="NewRole" class="form-select">
-            <option value="3">Member</option>
-            <option value="2">Manager</option>
-        </select>
-        <span asp-validation-for="NewRole" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Save role</button>
-    <a asp-action="Members" asp-route-id="@workspaceId" class="btn btn-secondary">Cancel</a>
-</form>
+    <a asp-action="Members"
+       asp-route-id="@workspaceId"
+       class="ws-member-form-back-link">
+
+        <span aria-hidden="true">←</span>
+
+        Back to members
+
+    </a>
+
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <section class="ws-member-form-header">
+
+        <p class="ws-members-eyebrow">
+            WORKSPACE / PEOPLE
+        </p>
+
+        <h1>
+            Change member role
+        </h1>
+
+        <p>
+            Update the level of access this member has
+            within the workspace.
+        </p>
+
+    </section>
+
+
+    <!-- =========================================================
+         MEMBER INFORMATION
+         ========================================================= -->
+
+    <section class="ws-role-member-card">
+
+        <div class="ws-role-member-avatar"
+             aria-hidden="true">
+
+            @{
+                var memberEmail =
+                    Model.Email ?? "Email unavailable";
+
+                var memberInitial =
+                    string.IsNullOrWhiteSpace(memberEmail)
+                        ? "?"
+                        : memberEmail
+                            .Trim()
+                            .Substring(0, 1)
+                            .ToUpperInvariant();
+            }
+
+            @memberInitial
+
+        </div>
+
+
+        <div class="ws-role-member-copy">
+
+            <span>
+                MEMBER
+            </span>
+
+            <strong>
+                @memberEmail
+            </strong>
+
+            <p>
+                Current role:
+                <b>@Model.CurrentRole</b>
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         ROLE FORM
+         ========================================================= -->
+
+    <section class="ws-member-form-card">
+
+        <div class="ws-member-form-card-header">
+
+            <p class="ws-members-eyebrow">
+                ACCESS LEVEL
+            </p>
+
+            <h2>
+                Choose a new role
+            </h2>
+
+            <p>
+                Select the level of workspace access this member
+                should have.
+            </p>
+
+        </div>
+
+
+        <form asp-action="ChangeMemberRole"
+              asp-route-workspaceId="@workspaceId"
+              asp-route-userId="@userId"
+              method="post"
+              class="ws-member-form">
+
+            @Html.AntiForgeryToken()
+
+
+            <div asp-validation-summary="ModelOnly"
+                 class="ws-member-validation-summary">
+            </div>
+
+
+            <div class="ws-role-options">
+
+                <!-- MEMBER -->
+
+                <label class="ws-role-option">
+
+                    <input asp-for="NewRole"
+                           type="radio"
+                           value="3" />
+
+                    <span class="ws-role-option-indicator">
+                    </span>
+
+                    <span class="ws-role-option-content">
+
+                        <strong>
+                            Member
+                        </strong>
+
+                        <span>
+                            Standard workspace access for
+                            participating in team work.
+                        </span>
+
+                    </span>
+
+                </label>
+
+
+                <!-- MANAGER -->
+
+                <label class="ws-role-option">
+
+                    <input asp-for="NewRole"
+                           type="radio"
+                           value="2" />
+
+                    <span class="ws-role-option-indicator">
+                    </span>
+
+                    <span class="ws-role-option-content">
+
+                        <strong>
+                            Manager
+                        </strong>
+
+                        <span>
+                            Can manage workspace members and
+                            their access.
+                        </span>
+
+                    </span>
+
+                </label>
+
+            </div>
+
+
+            <span asp-validation-for="NewRole"
+                  class="ws-member-validation">
+            </span>
+
+
+            <!-- ACTIONS -->
+
+            <div class="ws-member-form-actions">
+
+                <button type="submit"
+                        class="ws-member-form-primary-action">
+
+                    Save role
+
+                </button>
+
+                <a asp-action="Members"
+                   asp-route-id="@workspaceId"
+                   class="ws-member-form-secondary-action">
+
+                    Cancel
+
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

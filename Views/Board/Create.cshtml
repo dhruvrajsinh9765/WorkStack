@@ -2,27 +2,183 @@
 
 @{
     ViewData["Title"] = "Create board";
+
     var workspaceId = (int)ViewData["WorkspaceId"]!;
 }
 
-<h1>Create board</h1>
+<div class="ws-board-form-page">
 
-<form asp-action="Create" asp-route-workspaceId="@workspaceId" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+    <a asp-controller="Board"
+       asp-action="Index"
+       asp-route-workspaceId="@workspaceId"
+       class="ws-board-form-back">
+
+        <span aria-hidden="true">←</span>
+
+        <span>Back to boards</span>
+
+    </a>
+
+
+    <div class="ws-board-form-layout">
+
+        <section class="ws-board-form-intro">
+
+            <div class="ws-board-form-icon"
+                 aria-hidden="true">
+
+                <svg viewBox="0 0 24 24">
+                    <rect x="4" y="4" width="7" height="7" rx="1"></rect>
+                    <rect x="13" y="4" width="7" height="4" rx="1"></rect>
+                    <rect x="13" y="10" width="7" height="10" rx="1"></rect>
+                    <rect x="4" y="13" width="7" height="7" rx="1"></rect>
+                </svg>
+
+            </div>
+
+            <p class="ws-board-form-eyebrow">
+                NEW BOARD
+            </p>
+
+            <h1>
+                Create a board
+            </h1>
+
+            <p>
+                Set up a focused space for your team to organize
+                work, track progress, and collaborate.
+            </p>
+
+            <div class="ws-board-form-context">
+
+                <span class="ws-board-form-context-label">
+                    WORKSPACE
+                </span>
+
+                <span>
+                    You're creating a board inside this workspace.
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <section class="ws-board-form-card">
+
+            <div class="ws-board-form-card-header">
+
+                <div>
+                    <span class="ws-board-form-card-label">
+                        BOARD DETAILS
+                    </span>
+
+                    <h2>
+                        Define your board
+                    </h2>
+
+                    <p>
+                        Give your board a clear name and description.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <form asp-controller="Board"
+                  asp-action="Create"
+                  asp-route-workspaceId="@workspaceId"
+                  method="post"
+                  class="ws-board-form">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="ws-board-validation-summary"
+                     role="alert">
+                </div>
+
+
+                <div class="ws-board-form-field">
+
+                    <label asp-for="Name"
+                           class="ws-board-form-label">
+                    </label>
+
+                    <input asp-for="Name"
+                           class="ws-board-form-input"
+                           placeholder="e.g. Product Development"
+                           maxlength="100"
+                           autocomplete="off"
+                           autofocus />
+
+                    <span asp-validation-for="Name"
+                          class="ws-board-form-error">
+                    </span>
+
+                    <span class="ws-board-form-hint">
+                        Choose a short, recognizable name for your board.
+                    </span>
+
+                </div>
+
+
+                <div class="ws-board-form-field">
+
+                    <label asp-for="Description"
+                           class="ws-board-form-label">
+                    </label>
+
+                    <textarea asp-for="Description"
+                              class="ws-board-form-input ws-board-form-textarea"
+                              rows="5"
+                              maxlength="500"
+                              placeholder="Describe what this board is used for."></textarea>
+
+                    <span asp-validation-for="Description"
+                          class="ws-board-form-error">
+                    </span>
+
+                    <span class="ws-board-form-hint">
+                        Add context so your team knows what belongs here.
+                    </span>
+
+                </div>
+
+
+                <div class="ws-board-form-actions">
+
+                    <a asp-controller="Board"
+                       asp-action="Index"
+                       asp-route-workspaceId="@workspaceId"
+                       class="ws-board-form-cancel">
+
+                        Cancel
+
+                    </a>
+
+                    <button type="submit"
+                            class="ws-board-form-submit">
+
+                        Create board
+
+                        <span aria-hidden="true">→</span>
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
+
     </div>
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" asp-route-workspaceId="@workspaceId" class="btn btn-secondary">Cancel</a>
-</form>
+
+</div>
+
 
 @section Scripts {
+
     <partial name="_ValidationScriptsPartial" />
+
 }

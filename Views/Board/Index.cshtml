@@ -2,124 +2,340 @@
 
 @{
     ViewData["Title"] = "Boards";
+
+    var search = Model.Search?.Trim() ?? string.Empty;
+    var hasSearch = !string.IsNullOrWhiteSpace(search);
+    var boardCount = Model.Boards.Count;
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-        <h1>Boards</h1>
-        <p class="text-muted mb-0">@Model.WorkspaceName</p>
-    </div>
+<div class="ws-boards-page">
 
-    @if (Model.CanManageBoards)
-    {
-        <a asp-action="Create"
-           asp-route-workspaceId="@Model.WorkspaceId"
-           class="btn btn-primary">
-            Create board
-        </a>
-    }
-</div>
+    <!-- =========================================================
+         BACK TO WORKSPACE
+         ========================================================= -->
 
-<!-- BOARD SEARCH -->
-<form asp-action="Index"
-      asp-route-workspaceId="@Model.WorkspaceId"
-      method="get"
-      class="mb-4">
+    <a asp-controller="Workspace"
+       asp-action="Details"
+       asp-route-id="@Model.WorkspaceId"
+       class="ws-boards-back-link">
 
-    <div class="input-group">
-        <input type="text"
-               name="search"
-               value="@Model.Search"
-               class="form-control"
-               placeholder="Search boards by name or description..."
-               aria-label="Search boards" />
+        <span aria-hidden="true">←</span>
 
-        <button type="submit"
-                class="btn btn-outline-primary">
-            Search
-        </button>
+        <span>Back to workspace</span>
 
-        @if (!string.IsNullOrWhiteSpace(Model.Search))
+    </a>
+
+
+    <!-- =========================================================
+         HEADER
+         ========================================================= -->
+
+    <section class="ws-boards-header">
+
+        <div class="ws-boards-header-copy">
+
+            <p class="ws-boards-eyebrow">
+                @Model.WorkspaceName / BOARDS
+            </p>
+
+            <h1>
+                Boards
+            </h1>
+
+            <p>
+                Organize your team's work into focused workflows
+                and keep progress visible.
+            </p>
+
+        </div>
+
+
+        @if (Model.CanManageBoards)
         {
-            <a asp-action="Index"
+            <a asp-controller="Board"
+               asp-action="Create"
                asp-route-workspaceId="@Model.WorkspaceId"
-               class="btn btn-outline-secondary">
-                Clear
+               class="ws-boards-primary-action">
+
+                <span aria-hidden="true">+</span>
+
+                Create board
+
             </a>
         }
-    </div>
-</form>
 
-@if (Model.Boards.Count == 0)
-{
-    @if (string.IsNullOrWhiteSpace(Model.Search))
+    </section>
+
+
+    <!-- =========================================================
+         SEARCH
+         ========================================================= -->
+
+    <section class="ws-boards-search-panel">
+
+        <div class="ws-boards-search-copy">
+
+            <span class="ws-boards-search-label">
+                FIND A BOARD
+            </span>
+
+            <span>
+                Search by board name or description.
+            </span>
+
+        </div>
+
+
+        <form asp-controller="Board"
+              asp-action="Index"
+              asp-route-workspaceId="@Model.WorkspaceId"
+              method="get"
+              class="ws-boards-search-form">
+
+            <div class="ws-boards-search-input-wrap">
+
+                <svg viewBox="0 0 24 24"
+                     aria-hidden="true">
+
+                    <circle cx="11" cy="11" r="6.5"></circle>
+                    <path d="m16 16 4.5 4.5"></path>
+
+                </svg>
+
+                <input type="text"
+                       name="search"
+                       value="@search"
+                       class="ws-boards-search-input"
+                       placeholder="Search boards..."
+                       aria-label="Search boards" />
+
+            </div>
+
+
+            <button type="submit"
+                    class="ws-boards-search-button">
+
+                Search
+
+            </button>
+
+
+            @if (hasSearch)
+            {
+                <a asp-controller="Board"
+                   asp-action="Index"
+                   asp-route-workspaceId="@Model.WorkspaceId"
+                   class="ws-boards-clear-button">
+
+                    Clear
+
+                </a>
+            }
+
+        </form>
+
+    </section>
+
+
+    <!-- =========================================================
+         RESULT SUMMARY
+         ========================================================= -->
+
+    <div class="ws-boards-result-row">
+
+        @if (hasSearch)
+        {
+            <p>
+                Showing
+                <strong>@boardCount</strong>
+                @(boardCount == 1 ? "board" : "boards")
+                matching
+                <strong>“@search”</strong>
+            </p>
+        }
+        else
+        {
+            <p>
+                <strong>@boardCount</strong>
+                @(boardCount == 1 ? "board" : "boards")
+                in this workspace
+            </p>
+        }
+
+    </div>
+
+
+    <!-- =========================================================
+         EMPTY STATE
+         ========================================================= -->
+    @if (boardCount == 0)
     {
-        <p>This workspace has no boards yet.</p>
+        <section class="ws-boards-empty">
+
+            <div class="ws-boards-empty-icon"
+                 aria-hidden="true">
+
+                <svg viewBox="0 0 24 24">
+
+                    <rect x="4" y="4" width="7" height="7" rx="1"></rect>
+                    <rect x="13" y="4" width="7" height="4" rx="1"></rect>
+                    <rect x="13" y="10" width="7" height="10" rx="1"></rect>
+                    <rect x="4" y="13" width="7" height="7" rx="1"></rect>
+
+                </svg>
+
+            </div>
+
+
+            @if (hasSearch)
+            {
+                <h2>
+                    No boards found
+                </h2>
+
+                <p>
+                    No boards match
+                    <strong>“@search”</strong>.
+                    Try another search term.
+                </p>
+
+                <a asp-controller="Board"
+                   asp-action="Index"
+                   asp-route-workspaceId="@Model.WorkspaceId"
+                   class="ws-boards-empty-secondary">
+
+                    Clear search
+
+                </a>
+            }
+            else
+            {
+                <h2>
+                    No boards yet
+                </h2>
+
+                <p>
+                    Create your first board to start organizing
+                    work in this workspace.
+                </p>
+
+                @if (Model.CanManageBoards)
+                {
+                    <a asp-controller="Board"
+                       asp-action="Create"
+                       asp-route-workspaceId="@Model.WorkspaceId"
+                       class="ws-boards-empty-primary">
+
+                        Create your first board
+
+                    </a>
+                }
+            }
+
+        </section>
     }
     else
     {
-        <div class="alert alert-secondary">
-            No boards found matching
-            <strong>@Model.Search</strong>.
-        </div>
-    }
-}
-else
-{
-    <div class="list-group">
-        @foreach (var board in Model.Boards)
-        {
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <h2 class="h5 mb-1">@board.Name</h2>
+        <!-- =====================================================
+             BOARD GRID
+             ===================================================== -->
 
-                    @if (!string.IsNullOrWhiteSpace(board.Description))
-                    {
-                        <p class="mb-0">@board.Description</p>
-                    }
-                </div>
+        <section class="ws-board-grid"
+                 aria-label="Workspace boards">
 
-                <div class="d-flex gap-2">
-                    <a asp-action="Details"
-                       asp-route-workspaceId="@Model.WorkspaceId"
-                       asp-route-boardId="@board.Id"
-                       class="btn btn-outline-primary">
-                        Open
-                    </a>
+            @foreach (var board in Model.Boards)
+            {
+                var boardName =
+                    board.Name?.Trim() ?? string.Empty;
 
-                    @if (Model.CanManageBoards)
-                    {
-                        <a asp-action="Edit"
+                var boardInitial =
+                    string.IsNullOrWhiteSpace(boardName)
+                        ? "B"
+                        : boardName
+                            .Substring(0, 1)
+                            .ToUpperInvariant();
+
+                <article class="ws-board-card">
+
+                    <!-- BOARD IDENTITY -->
+
+                    <div class="ws-board-card-top">
+
+                        <div class="ws-board-card-icon"
+                             aria-hidden="true">
+
+                            @boardInitial
+
+                        </div>
+
+
+                        <div class="ws-board-card-heading">
+
+                            <span class="ws-board-card-label">
+                                BOARD
+                            </span>
+
+                            <h2>
+                                @board.Name
+                            </h2>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DESCRIPTION -->
+
+                    <div class="ws-board-card-description">
+
+                        @if (!string.IsNullOrWhiteSpace(board.Description))
+                        {
+                            <p>
+                                @board.Description
+                            </p>
+                        }
+                        else
+                        {
+                            <p class="is-muted">
+                                No description has been added
+                                for this board.
+                            </p>
+                        }
+
+                    </div>
+
+
+                    <!-- FOOTER -->
+
+                    <div class="ws-board-card-footer">
+
+                        <span class="ws-board-card-status">
+
+                            <span aria-hidden="true"></span>
+
+                            Active board
+
+                        </span>
+
+
+                        <a asp-controller="Board"
+                           asp-action="Details"
                            asp-route-workspaceId="@Model.WorkspaceId"
                            asp-route-boardId="@board.Id"
-                           class="btn btn-outline-secondary">
-                            Edit
+                           class="ws-board-card-open">
+
+                            Open board
+
+                            <span aria-hidden="true">→</span>
+
                         </a>
 
-                        <form asp-action="Delete"
-                              asp-route-workspaceId="@Model.WorkspaceId"
-                              asp-route-boardId="@board.Id"
-                              method="post"
-                              class="d-inline">
+                    </div>
 
-                            @Html.AntiForgeryToken()
+                </article>
+            }
 
-                            <button type="submit"
-                                    class="btn btn-outline-danger"
-                                    onclick="return confirm('Are you sure you want to delete this board?');">
-                                Delete
-                            </button>
-                        </form>
-                    }
-                </div>
-            </div>
-        }
-    </div>
-}
+        </section>
+    }
 
-<a asp-controller="Workspace"
-   asp-action="Details"
-   asp-route-id="@Model.WorkspaceId"
-   class="btn btn-secondary mt-3">
-    Back to workspace
-</a>
+</div>
