@@ -1,10 +1,43 @@
 @page
 @model AccessDeniedModel
+
 @{
     ViewData["Title"] = "Access denied";
 }
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">You do not have access to this resource.</p>
-</header>
+<div class="ws-access-denied-page">
+    <div class="ws-access-denied-card">
+
+        <div class="ws-access-denied-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 3 4.5 6v5.5c0 4.7 3.1 8.2 7.5 9.5 4.4-1.3 7.5-4.8 7.5-9.5V6L12 3Z" />
+                <path d="M12 8v4" />
+                <path d="M12 15.5h.01" />
+            </svg>
+        </div>
+
+        <span class="ws-page-eyebrow">PERMISSION REQUIRED</span>
+
+        <h1>Access denied</h1>
+
+        <p class="ws-access-denied-message">
+            You don't have permission to access this page or perform this action.
+        </p>
+
+        <div class="ws-access-denied-actions">
+            <a asp-area=""
+               asp-controller="Dashboard"
+               asp-action="Index"
+               class="ws-btn ws-btn-primary">
+                Go to Dashboard
+            </a>
+
+            <button type="button"
+                    class="ws-btn ws-btn-secondary"
+                    onclick="history.back()">
+                Go Back
+            </button>
+        </div>
+
+    </div>
+</div>
