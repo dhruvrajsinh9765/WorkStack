@@ -6,99 +6,148 @@
     var workspaceId = (int)ViewData["WorkspaceId"]!;
 }
 
-<div class="container py-4">
+<div class="ws-workspace-form-page">
 
-    <div class="mb-4">
+    <a asp-action="Details"
+       asp-route-id="@workspaceId"
+       class="ws-workspace-back">
+        <span aria-hidden="true">←</span>
+        <span>Back to workspace</span>
+    </a>
 
-        <div class="text-muted small mb-1">
-            Workspace Settings
+    <header class="ws-workspace-form-header">
+
+        <div class="ws-workspace-form-heading">
+
+            <div class="ws-workspace-form-eyebrow">
+                <span class="ws-workspace-form-eyebrow-dot"></span>
+                WORKSPACE SETTINGS
+            </div>
+
+            <h1>Edit workspace</h1>
+
+            <p>
+                Update your workspace name and description.
+            </p>
+
         </div>
 
-        <h1 class="mb-1">
-            Edit Workspace
-        </h1>
+    </header>
 
-        <p class="text-muted mb-0">
-            Update your workspace name and description.
-        </p>
 
-    </div>
+    <section class="ws-workspace-form-card">
 
-    <div class="card">
+        <div class="ws-workspace-form-card-header">
 
-        <div class="card-body">
+            <div>
+                <span class="ws-workspace-form-card-kicker">
+                    WORKSPACE DETAILS
+                </span>
 
-            <form asp-controller="Workspace"
-                  asp-action="Edit"
-                  asp-route-id="@workspaceId"
-                  method="post">
+                <h2>Workspace information</h2>
 
-                @Html.AntiForgeryToken()
+                <p>
+                    Keep your workspace information clear and up to date
+                    for everyone on the team.
+                </p>
+            </div>
 
-                <div asp-validation-summary="ModelOnly"
-                     class="text-danger mb-3">
-                </div>
+            <div class="ws-workspace-form-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 20h9" />
+                    <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                </svg>
+            </div>
 
-                <div class="mb-3">
+        </div>
 
-                    <label asp-for="Name"
-                           class="form-label">
-                        Workspace Name
-                    </label>
 
-                    <input asp-for="Name"
-                           class="form-control"
-                           maxlength="100"
-                           autocomplete="off"
-                           autofocus />
+        <form asp-controller="Workspace"
+              asp-action="Edit"
+              asp-route-id="@workspaceId"
+              method="post"
+              class="ws-workspace-form">
 
-                    <span asp-validation-for="Name"
-                          class="text-danger">
-                    </span>
+            @Html.AntiForgeryToken()
 
-                </div>
+            <div asp-validation-summary="ModelOnly"
+                 class="ws-workspace-form-validation">
+            </div>
 
-                <div class="mb-4">
+
+            <div class="ws-workspace-form-field">
+
+                <label asp-for="Name"
+                       class="ws-workspace-form-label">
+                    Workspace Name
+                </label>
+
+                <input asp-for="Name"
+                       class="ws-workspace-form-input"
+                       maxlength="100"
+                       autocomplete="off"
+                       autofocus />
+
+                <span asp-validation-for="Name"
+                      class="ws-workspace-form-error">
+                </span>
+
+            </div>
+
+
+            <div class="ws-workspace-form-field">
+
+                <div class="ws-workspace-form-label-row">
 
                     <label asp-for="Description"
-                           class="form-label">
+                           class="ws-workspace-form-label">
                         Description
                     </label>
 
-                    <textarea asp-for="Description"
-                              class="form-control"
-                              rows="4"
-                              maxlength="500"
-                              placeholder="Describe what this workspace is for.">
-                    </textarea>
-
-                    <span asp-validation-for="Description"
-                          class="text-danger">
+                    <span class="ws-workspace-form-hint">
+                        Optional
                     </span>
 
                 </div>
 
-                <div class="d-flex gap-2">
+                <textarea asp-for="Description"
+                          class="ws-workspace-form-input ws-workspace-form-textarea"
+                          rows="5"
+                          maxlength="500"
+                          placeholder="Describe what this workspace is for.">
+                </textarea>
 
-                    <button type="submit"
-                            class="btn btn-primary">
-                        Save Changes
-                    </button>
+                <span asp-validation-for="Description"
+                      class="ws-workspace-form-error">
+                </span>
 
-                    <a asp-controller="Workspace"
-                       asp-action="Details"
-                       asp-route-id="@workspaceId"
-                       class="btn btn-secondary">
-                        Cancel
-                    </a>
+                <span class="ws-workspace-form-help">
+                    Keep it short and useful. You can change this whenever
+                    your workspace changes.
+                </span>
 
-                </div>
+            </div>
 
-            </form>
 
-        </div>
+            <div class="ws-workspace-form-actions">
 
-    </div>
+                <button type="submit"
+                        class="ws-workspace-form-primary-action">
+                    Save changes
+                </button>
+
+                <a asp-controller="Workspace"
+                   asp-action="Details"
+                   asp-route-id="@workspaceId"
+                   class="ws-workspace-form-secondary-action">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
 
 </div>
 

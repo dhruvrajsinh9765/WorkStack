@@ -5,7 +5,7 @@
 
     var displayName = string.IsNullOrWhiteSpace(Model.DisplayName)
         ? "there"
-        : Model.DisplayName;
+        : Model.DisplayName.Trim();
 
     var urgentCount = Model.UrgentTaskCount;
     var dueSoonCount = Model.DueSoonTaskCount;
@@ -63,7 +63,7 @@
 <div class="ws-dashboard">
 
     <!-- =========================================================
-         DASHBOARD HEADER
+         HEADER
          ========================================================= -->
 
     <section class="ws-dashboard-header">
@@ -86,21 +86,19 @@
         </div>
 
         <div class="ws-dashboard-header-actions">
-
             <a asp-controller="Workspace"
                asp-action="Index"
                class="ws-dashboard-primary-action">
                 <span>View workspaces</span>
                 <span class="ws-action-arrow" aria-hidden="true">→</span>
             </a>
-
         </div>
 
     </section>
 
 
     <!-- =========================================================
-         OVERVIEW
+         OVERVIEW STATS
          ========================================================= -->
 
     <section class="ws-dashboard-overview"
@@ -193,10 +191,7 @@
         </article>
 
 
-        <article class="ws-dashboard-stat-card
-            @(Model.DueSoonTaskCount > 0
-                     ? "ws-dashboard-stat-card-attention"
-                     : null)">
+        <article class="ws-dashboard-stat-card @(Model.DueSoonTaskCount > 0 ? "ws-dashboard-stat-card-attention" : null)">
 
             <div class="ws-dashboard-stat-top">
 
@@ -232,17 +227,16 @@
          ========================================================= -->
     @if (urgentCount > 0 || dueSoonCount > 0)
     {
-        <section class="ws-dashboard-attention">
+        <section class="ws-dashboard-attention"
+                 aria-label="Tasks needing attention">
 
             <div class="ws-dashboard-attention-icon"
                  aria-hidden="true">
-
                 <svg viewBox="0 0 24 24">
                     <path d="M12 4 3.8 19h16.4z" />
                     <path d="M12 9v4" />
                     <path d="M12 16.5h.01" />
                 </svg>
-
             </div>
 
             <div class="ws-dashboard-attention-content">
@@ -263,7 +257,9 @@
 
                     @if (urgentCount > 0 && dueSoonCount > 0)
                     {
-                        <span> · </span>
+                        <span class="ws-dashboard-attention-separator">
+                            ·
+                        </span>
                     }
 
                     @if (dueSoonCount > 0)
@@ -283,7 +279,7 @@
 
 
     <!-- =========================================================
-         MAIN CONTENT GRID
+         MAIN CONTENT
          ========================================================= -->
 
     <div class="ws-dashboard-content-grid">
@@ -297,7 +293,6 @@
             <div class="ws-dashboard-panel-header">
 
                 <div>
-
                     <p class="ws-dashboard-panel-eyebrow">
                         WORK QUEUE
                     </p>
@@ -309,7 +304,6 @@
                     <p>
                         Work currently assigned to you.
                     </p>
-
                 </div>
 
                 @if (Model.MyTaskCount > 0)
@@ -328,12 +322,10 @@
 
                     <div class="ws-dashboard-empty-icon"
                          aria-hidden="true">
-
                         <svg viewBox="0 0 24 24">
                             <rect x="5" y="4" width="14" height="16" rx="2" />
                             <path d="m8 12 2.5 2.5L16 9" />
                         </svg>
-
                     </div>
 
                     <h3>
@@ -372,7 +364,8 @@
                                         @task.WorkspaceName
                                     </span>
 
-                                    <span class="ws-context-separator">
+                                    <span class="ws-context-separator"
+                                          aria-hidden="true">
                                         /
                                     </span>
 
@@ -380,7 +373,8 @@
                                         @task.BoardName
                                     </span>
 
-                                    <span class="ws-context-separator">
+                                    <span class="ws-context-separator"
+                                          aria-hidden="true">
                                         /
                                     </span>
 
@@ -399,21 +393,17 @@
                                     @task.Priority
                                 </span>
 
-
-                                <span class="ws-dashboard-task-due
-                                    @(task.IsOverdue
-                                          ? "ws-task-due-overdue"
-                                          : null)">
+                                <span class="ws-dashboard-task-due @(task.IsOverdue ? "ws-task-due-overdue" : null)">
 
                                     @if (task.IsOverdue)
                                     {
-                                        <span class="ws-dashboard-due-dot"></span>
+                                        <span class="ws-dashboard-due-dot"
+                                              aria-hidden="true"></span>
                                     }
 
                                     @GetDueLabel(task)
 
                                 </span>
-
 
                                 <span class="ws-dashboard-task-arrow"
                                       aria-hidden="true">
@@ -431,13 +421,11 @@
                 @if (Model.MyTaskCount > Model.MyTasks.Count)
                 {
                     <div class="ws-dashboard-panel-footer">
-
                         <span>
                             Showing the most relevant
                             @Model.MyTasks.Count
                             of @Model.MyTaskCount tasks.
                         </span>
-
                     </div>
                 }
             }
@@ -454,7 +442,6 @@
             <div class="ws-dashboard-panel-header">
 
                 <div>
-
                     <p class="ws-dashboard-panel-eyebrow">
                         COLLABORATION
                     </p>
@@ -466,16 +453,13 @@
                     <p>
                         Teams and projects you're working with.
                     </p>
-
                 </div>
 
                 <a asp-controller="Workspace"
                    asp-action="Index"
                    class="ws-dashboard-panel-link">
-
                     View all
                     <span aria-hidden="true">→</span>
-
                 </a>
 
             </div>
@@ -487,12 +471,10 @@
 
                     <div class="ws-dashboard-empty-icon"
                          aria-hidden="true">
-
                         <svg viewBox="0 0 24 24">
                             <path d="M4 7.5h6l2 2h8v9H4z" />
                             <path d="M4 7.5v-2h6l2 2" />
                         </svg>
-
                     </div>
 
                     <h3>
@@ -518,11 +500,15 @@
 
                     @foreach (var workspace in Model.Workspaces)
                     {
-                        var workspaceName = workspace.WorkspaceName?.Trim() ?? string.Empty;
+                        var workspaceName =
+                            workspace.WorkspaceName?.Trim() ?? string.Empty;
 
-                        var workspaceInitial = string.IsNullOrWhiteSpace(workspaceName)
-                            ? "W"
-                            : workspaceName.Substring(0, 1).ToUpperInvariant();
+                        var workspaceInitial =
+                            string.IsNullOrWhiteSpace(workspaceName)
+                                ? "W"
+                                : workspaceName
+                                    .Substring(0, 1)
+                                    .ToUpperInvariant();
 
                         <article class="ws-dashboard-workspace-card">
 
@@ -556,8 +542,7 @@
                             }
                             else
                             {
-                                <p class="ws-dashboard-workspace-description
-                                    ws-dashboard-workspace-description-muted">
+                                <p class="ws-dashboard-workspace-description ws-dashboard-workspace-description-muted">
                                     No workspace description provided.
                                 </p>
                             }
@@ -569,13 +554,13 @@
                                     <strong>
                                         @workspace.MemberCount
                                     </strong>
-
                                     @(workspace.MemberCount == 1
                                         ? "member"
                                         : "members")
                                 </span>
 
-                                <span class="ws-workspace-meta-divider">
+                                <span class="ws-workspace-meta-divider"
+                                      aria-hidden="true">
                                     ·
                                 </span>
 
@@ -583,7 +568,6 @@
                                     <strong>
                                         @workspace.BoardCount
                                     </strong>
-
                                     @(workspace.BoardCount == 1
                                         ? "board"
                                         : "boards")
@@ -597,13 +581,8 @@
                                 <a asp-controller="Workspace"
                                    asp-action="Details"
                                    asp-route-id="@workspace.WorkspaceId">
-
                                     Open workspace
-
-                                    <span aria-hidden="true">
-                                        →
-                                    </span>
-
+                                    <span aria-hidden="true">→</span>
                                 </a>
 
                             </div>

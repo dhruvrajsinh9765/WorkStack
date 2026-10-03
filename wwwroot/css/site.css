@@ -8285,3 +8285,1190 @@ button:focus-visible {
         width: 100%;
     }
 }
+
+/* ============================================================
+   WORKSTACK - DASHBOARD FINAL POLISH
+   ============================================================ */
+
+.ws-dashboard {
+    width: 100%;
+}
+
+/* ------------------------------------------------------------
+   Dashboard header
+   ------------------------------------------------------------ */
+
+.ws-dashboard-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.ws-dashboard-heading {
+    min-width: 0;
+}
+
+.ws-dashboard-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.75rem;
+    color: #A5B4FC;
+    font-size: 0.68rem;
+    font-weight: 750;
+    letter-spacing: 0.12em;
+    line-height: 1.3;
+    text-transform: uppercase;
+}
+
+.ws-dashboard-eyebrow-dot {
+    width: 0.42rem;
+    height: 0.42rem;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--ws-primary-hover);
+    box-shadow: 0 0 12px rgb(129 140 248 / 0.5);
+}
+
+.ws-dashboard-heading h1 {
+    max-width: 800px;
+    margin: 0;
+    font-size: clamp(2rem, 3.4vw, 3rem);
+    font-weight: 720;
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+}
+
+.ws-dashboard-heading > p {
+    max-width: 650px;
+    margin: 0.85rem 0 0;
+    color: var(--ws-muted);
+    font-size: 0.98rem;
+    line-height: 1.65;
+}
+
+.ws-dashboard-header-actions {
+    flex: 0 0 auto;
+}
+
+.ws-dashboard-primary-action,
+.ws-dashboard-secondary-action {
+    display: inline-flex;
+    min-height: 2.7rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.65rem;
+    padding: 0.58rem 0.9rem;
+    border: 1px solid transparent;
+    border-radius: 0.58rem;
+    font-size: 0.84rem;
+    font-weight: 650;
+    text-decoration: none;
+    transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.ws-dashboard-primary-action {
+    border-color: var(--ws-primary);
+    background: var(--ws-primary);
+    color: #FFFFFF;
+}
+
+    .ws-dashboard-primary-action:hover {
+        border-color: var(--ws-primary-hover);
+        background: var(--ws-primary-hover);
+        color: #0B1120;
+        text-decoration: none;
+        transform: translateY(-1px);
+        box-shadow: 0 8px 22px rgb(99 102 241 / 0.18);
+    }
+
+.ws-action-arrow {
+    font-size: 1rem;
+    line-height: 1;
+    transition: transform 160ms ease;
+}
+
+.ws-dashboard-primary-action:hover .ws-action-arrow {
+    transform: translateX(2px);
+}
+
+
+/* ------------------------------------------------------------
+   Overview cards
+   ------------------------------------------------------------ */
+
+.ws-dashboard-overview {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.ws-dashboard-stat-card {
+    min-width: 0;
+    padding: 1.15rem 1.2rem 1.2rem;
+    border: 1px solid var(--ws-border);
+    border-radius: 0.8rem;
+    background: var(--ws-surface);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.1);
+    transition: border-color 160ms ease, background-color 160ms ease, transform 160ms ease;
+}
+
+    .ws-dashboard-stat-card:hover {
+        border-color: #34425B;
+        background: var(--ws-surface-hover);
+        transform: translateY(-1px);
+    }
+
+.ws-dashboard-stat-card-attention {
+    border-color: rgb(245 158 11 / 0.28);
+}
+
+.ws-dashboard-stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.ws-dashboard-stat-icon {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgb(255 255 255 / 0.06);
+    border-radius: 0.62rem;
+}
+
+    .ws-dashboard-stat-icon svg {
+        width: 1.08rem;
+        height: 1.08rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.7;
+    }
+
+.ws-stat-icon-indigo {
+    background: rgb(99 102 241 / 0.13);
+    color: #A5B4FC;
+}
+
+.ws-stat-icon-blue {
+    background: rgb(56 189 248 / 0.11);
+    color: #7DD3FC;
+}
+
+.ws-stat-icon-violet {
+    background: rgb(167 139 250 / 0.12);
+    color: #C4B5FD;
+}
+
+.ws-stat-icon-amber {
+    background: rgb(245 158 11 / 0.12);
+    color: #FCD34D;
+}
+
+.ws-dashboard-stat-label {
+    color: var(--ws-muted);
+    font-size: 0.73rem;
+    font-weight: 650;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+}
+
+.ws-dashboard-stat-value {
+    margin-top: 1rem;
+    color: var(--ws-text);
+    font-size: 2rem;
+    font-weight: 720;
+    letter-spacing: -0.04em;
+    line-height: 1;
+}
+
+.ws-dashboard-stat-description {
+    min-height: 2.4em;
+    margin: 0.6rem 0 0;
+    color: #8290A4;
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+
+/* ------------------------------------------------------------
+   Attention strip
+   ------------------------------------------------------------ */
+
+.ws-dashboard-attention {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid rgb(245 158 11 / 0.2);
+    border-radius: 0.72rem;
+    background: rgb(245 158 11 / 0.055);
+}
+
+.ws-dashboard-attention-icon {
+    display: grid;
+    width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 0.55rem;
+    background: rgb(245 158 11 / 0.1);
+    color: #FCD34D;
+}
+
+    .ws-dashboard-attention-icon svg {
+        width: 1rem;
+        height: 1rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.7;
+    }
+
+.ws-dashboard-attention-content {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.6rem;
+    color: var(--ws-text-secondary);
+    font-size: 0.82rem;
+}
+
+    .ws-dashboard-attention-content strong {
+        color: var(--ws-text);
+        font-weight: 650;
+    }
+
+.ws-dashboard-attention-separator {
+    margin: 0 0.15rem;
+    color: #64748B;
+}
+
+
+/* ------------------------------------------------------------
+   Main dashboard panels
+   ------------------------------------------------------------ */
+
+.ws-dashboard-content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(340px, 0.82fr);
+    align-items: start;
+    gap: 1rem;
+}
+
+.ws-dashboard-panel {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--ws-border);
+    border-radius: 0.85rem;
+    background: var(--ws-surface);
+    box-shadow: 0 10px 28px rgb(0 0 0 / 0.11);
+}
+
+.ws-dashboard-panel-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.2rem 1.25rem;
+    border-bottom: 1px solid var(--ws-border);
+}
+
+    .ws-dashboard-panel-header > div {
+        min-width: 0;
+    }
+
+.ws-dashboard-panel-eyebrow {
+    margin: 0 0 0.3rem;
+    color: #718096;
+    font-size: 0.64rem;
+    font-weight: 720;
+    letter-spacing: 0.1em;
+    line-height: 1.3;
+    text-transform: uppercase;
+}
+
+.ws-dashboard-panel-header h2 {
+    margin: 0;
+    color: var(--ws-text);
+    font-size: 1.08rem;
+    font-weight: 680;
+    letter-spacing: -0.02em;
+}
+
+.ws-dashboard-panel-header > div > p:last-child {
+    margin: 0.35rem 0 0;
+    color: var(--ws-muted);
+    font-size: 0.78rem;
+}
+
+.ws-dashboard-panel-count {
+    display: grid;
+    min-width: 2rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    place-items: center;
+    padding: 0 0.5rem;
+    border: 1px solid #34425B;
+    border-radius: 0.52rem;
+    background: #111A29;
+    color: var(--ws-text-secondary);
+    font-size: 0.78rem;
+    font-weight: 680;
+}
+
+.ws-dashboard-panel-link {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.35rem;
+    color: #A5B4FC;
+    font-size: 0.78rem;
+    font-weight: 620;
+    text-decoration: none;
+}
+
+    .ws-dashboard-panel-link:hover {
+        color: #C7D2FE;
+        text-decoration: none;
+    }
+
+    .ws-dashboard-panel-link span {
+        transition: transform 150ms ease;
+    }
+
+    .ws-dashboard-panel-link:hover span {
+        transform: translateX(2px);
+    }
+
+
+/* ------------------------------------------------------------
+   Dashboard task list
+   ------------------------------------------------------------ */
+
+.ws-dashboard-task-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.ws-dashboard-task-row {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.95rem 1.25rem;
+    border-bottom: 1px solid rgb(36 48 68 / 0.8);
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 150ms ease, padding-left 150ms ease;
+}
+
+    .ws-dashboard-task-row:last-child {
+        border-bottom: 0;
+    }
+
+    .ws-dashboard-task-row:hover {
+        padding-left: 1.35rem;
+        background: #182335;
+        color: inherit;
+        text-decoration: none;
+    }
+
+.ws-dashboard-task-main {
+    min-width: 0;
+}
+
+.ws-dashboard-task-title {
+    overflow: hidden;
+    color: var(--ws-text);
+    font-size: 0.86rem;
+    font-weight: 620;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ws-dashboard-task-context {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.28rem;
+    color: #738196;
+    font-size: 0.7rem;
+}
+
+    .ws-dashboard-task-context span:not(.ws-context-separator) {
+        overflow: hidden;
+        max-width: 12rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+.ws-context-separator {
+    flex: 0 0 auto;
+    color: #475569;
+}
+
+.ws-dashboard-task-meta {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.ws-dashboard-task-due {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: #8996A8;
+    font-size: 0.7rem;
+    white-space: nowrap;
+}
+
+.ws-task-due-overdue {
+    color: #FCA5A5;
+    font-weight: 620;
+}
+
+.ws-dashboard-due-dot {
+    width: 0.35rem;
+    height: 0.35rem;
+    border-radius: 50%;
+    background: var(--ws-danger);
+    box-shadow: 0 0 7px rgb(239 68 68 / 0.35);
+}
+
+.ws-dashboard-task-arrow {
+    color: #64748B;
+    font-size: 0.95rem;
+    line-height: 1;
+    transition: color 150ms ease, transform 150ms ease;
+}
+
+.ws-dashboard-task-row:hover .ws-dashboard-task-arrow {
+    color: #A5B4FC;
+    transform: translateX(2px);
+}
+
+.ws-dashboard-panel-footer {
+    padding: 0.7rem 1.25rem;
+    border-top: 1px solid var(--ws-border);
+    background: #111A29;
+    color: #718096;
+    font-size: 0.7rem;
+}
+
+
+/* ------------------------------------------------------------
+   Empty states
+   ------------------------------------------------------------ */
+
+.ws-dashboard-empty {
+    display: flex;
+    min-height: 220px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+.ws-dashboard-empty-icon {
+    display: grid;
+    width: 2.8rem;
+    height: 2.8rem;
+    margin-bottom: 0.85rem;
+    place-items: center;
+    border: 1px solid #2D3A50;
+    border-radius: 0.72rem;
+    background: #111A29;
+    color: #7F8CA1;
+}
+
+    .ws-dashboard-empty-icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.6;
+    }
+
+.ws-dashboard-empty h3 {
+    margin: 0;
+    color: var(--ws-text);
+    font-size: 0.92rem;
+    font-weight: 650;
+}
+
+.ws-dashboard-empty p {
+    max-width: 330px;
+    margin: 0.45rem auto 0;
+    color: var(--ws-muted);
+    font-size: 0.76rem;
+    line-height: 1.55;
+}
+
+.ws-dashboard-secondary-action {
+    margin-top: 1rem;
+    border-color: #344258;
+    background: #172233;
+    color: var(--ws-text-secondary);
+}
+
+    .ws-dashboard-secondary-action:hover {
+        border-color: #4A5A74;
+        background: #202D41;
+        color: var(--ws-text);
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+
+/* ------------------------------------------------------------
+   Workspace cards
+   ------------------------------------------------------------ */
+
+.ws-dashboard-workspace-list {
+    display: grid;
+    grid-template-columns: 1fr;
+}
+
+.ws-dashboard-workspace-card {
+    min-width: 0;
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid rgb(36 48 68 / 0.8);
+    transition: background-color 150ms ease;
+}
+
+    .ws-dashboard-workspace-card:last-child {
+        border-bottom: 0;
+    }
+
+    .ws-dashboard-workspace-card:hover {
+        background: #182335;
+    }
+
+.ws-dashboard-workspace-card-top {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.ws-dashboard-workspace-mark {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgb(129 140 248 / 0.2);
+    border-radius: 0.62rem;
+    background: #252A5C;
+    color: #C7D2FE;
+    font-size: 0.82rem;
+    font-weight: 720;
+    text-transform: uppercase;
+}
+
+.ws-dashboard-workspace-heading {
+    min-width: 0;
+}
+
+    .ws-dashboard-workspace-heading h3 {
+        overflow: hidden;
+        margin: 0;
+        color: var(--ws-text);
+        font-size: 0.88rem;
+        font-weight: 650;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .ws-dashboard-workspace-heading .ws-role-badge {
+        margin-top: 0.35rem;
+    }
+
+.ws-dashboard-workspace-description {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0.8rem 0 0;
+    color: #8996A8;
+    font-size: 0.75rem;
+    line-height: 1.55;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.ws-dashboard-workspace-description-muted {
+    color: #64748B;
+    font-style: italic;
+}
+
+.ws-dashboard-workspace-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-top: 0.8rem;
+    color: #718096;
+    font-size: 0.7rem;
+}
+
+    .ws-dashboard-workspace-meta strong {
+        color: var(--ws-text-secondary);
+        font-weight: 650;
+    }
+
+.ws-workspace-meta-divider {
+    color: #475569;
+}
+
+.ws-dashboard-workspace-action {
+    margin-top: 0.85rem;
+}
+
+    .ws-dashboard-workspace-action a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: #A5B4FC;
+        font-size: 0.74rem;
+        font-weight: 620;
+        text-decoration: none;
+    }
+
+        .ws-dashboard-workspace-action a:hover {
+            color: #C7D2FE;
+            text-decoration: none;
+        }
+
+        .ws-dashboard-workspace-action a span {
+            transition: transform 150ms ease;
+        }
+
+        .ws-dashboard-workspace-action a:hover span {
+            transform: translateX(2px);
+        }
+
+
+/* ------------------------------------------------------------
+   Dashboard responsive refinement
+   ------------------------------------------------------------ */
+
+@media (max-width: 1100px) {
+    .ws-dashboard-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .ws-dashboard-content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .ws-dashboard-header {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 1.15rem;
+        margin-bottom: 1.4rem;
+    }
+
+    .ws-dashboard-heading h1 {
+        font-size: clamp(1.75rem, 8vw, 2.3rem);
+    }
+
+    .ws-dashboard-heading > p {
+        font-size: 0.86rem;
+    }
+
+    .ws-dashboard-header-actions,
+    .ws-dashboard-primary-action {
+        width: 100%;
+    }
+
+    .ws-dashboard-primary-action {
+        min-height: 2.8rem;
+    }
+
+    .ws-dashboard-overview {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.65rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .ws-dashboard-stat-card {
+        padding: 0.9rem;
+    }
+
+    .ws-dashboard-stat-label {
+        font-size: 0.62rem;
+    }
+
+    .ws-dashboard-stat-value {
+        margin-top: 0.8rem;
+        font-size: 1.65rem;
+    }
+
+    .ws-dashboard-stat-description {
+        min-height: auto;
+        margin-top: 0.5rem;
+        font-size: 0.68rem;
+    }
+
+    .ws-dashboard-stat-icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+        .ws-dashboard-stat-icon svg {
+            width: 0.95rem;
+            height: 0.95rem;
+        }
+
+    .ws-dashboard-attention {
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        padding: 0.8rem;
+    }
+
+    .ws-dashboard-attention-content {
+        flex-direction: column;
+        gap: 0.15rem;
+        font-size: 0.76rem;
+    }
+
+    .ws-dashboard-content-grid {
+        gap: 0.75rem;
+    }
+
+    .ws-dashboard-panel-header {
+        padding: 1rem;
+    }
+
+    .ws-dashboard-task-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.65rem;
+        padding: 0.9rem 1rem;
+    }
+
+        .ws-dashboard-task-row:hover {
+            padding-left: 1rem;
+        }
+
+    .ws-dashboard-task-meta {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .ws-dashboard-task-context span:not(.ws-context-separator) {
+        max-width: 7rem;
+    }
+
+    .ws-dashboard-panel-footer {
+        padding: 0.65rem 1rem;
+    }
+
+    .ws-dashboard-workspace-card {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .ws-dashboard-overview {
+        grid-template-columns: 1fr;
+    }
+
+    .ws-dashboard-stat-card {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        column-gap: 0.8rem;
+        align-items: center;
+    }
+
+    .ws-dashboard-stat-top {
+        display: contents;
+    }
+
+    .ws-dashboard-stat-icon {
+        grid-row: span 2;
+    }
+
+    .ws-dashboard-stat-label {
+        align-self: end;
+    }
+
+    .ws-dashboard-stat-value {
+        grid-column: 2;
+        grid-row: 2;
+        margin-top: 0.2rem;
+        font-size: 1.5rem;
+    }
+
+    .ws-dashboard-stat-description {
+        display: none;
+    }
+
+    .ws-dashboard-task-meta {
+        flex-wrap: wrap;
+    }
+
+    .ws-dashboard-task-context {
+        max-width: 100%;
+    }
+
+        .ws-dashboard-task-context span:not(.ws-context-separator) {
+            max-width: 5.5rem;
+        }
+
+    .ws-dashboard-panel-link {
+        font-size: 0.7rem;
+    }
+}
+
+/* ============================================================
+   WORKSTACK WORKSPACE FORMS
+   Create + Edit Workspace
+   ============================================================ */
+
+.ws-workspace-form-page {
+    width: min(100%, 900px);
+    margin: 0 auto;
+}
+
+.ws-workspace-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 1.5rem;
+    color: var(--ws-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 160ms ease, transform 160ms ease;
+}
+
+    .ws-workspace-back:hover {
+        color: var(--ws-text);
+        text-decoration: none;
+        transform: translateX(-2px);
+    }
+
+    .ws-workspace-back span:first-child {
+        font-size: 1rem;
+        line-height: 1;
+    }
+
+.ws-workspace-form-header {
+    margin-bottom: 1.5rem;
+}
+
+.ws-workspace-form-heading {
+    min-width: 0;
+}
+
+.ws-workspace-form-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin-bottom: 0.7rem;
+    color: #A5B4FC;
+    font-size: 0.67rem;
+    font-weight: 750;
+    letter-spacing: 0.12em;
+    line-height: 1.2;
+}
+
+.ws-workspace-form-eyebrow-dot {
+    width: 0.42rem;
+    height: 0.42rem;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--ws-primary-hover);
+    box-shadow: 0 0 12px rgb(129 140 248 / 0.5);
+}
+
+.ws-workspace-form-heading h1 {
+    margin: 0;
+    color: var(--ws-text);
+    font-size: clamp(2rem, 4vw, 2.8rem);
+    font-weight: 720;
+    letter-spacing: -0.045em;
+    line-height: 1.08;
+}
+
+.ws-workspace-form-heading p {
+    max-width: 650px;
+    margin: 0.7rem 0 0;
+    color: var(--ws-muted);
+    font-size: 0.92rem;
+    line-height: 1.65;
+}
+
+.ws-workspace-form-card {
+    overflow: hidden;
+    border: 1px solid var(--ws-border);
+    border-radius: var(--ws-radius);
+    background: var(--ws-surface);
+    box-shadow: var(--ws-shadow);
+}
+
+.ws-workspace-form-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.4rem 1.5rem;
+    border-bottom: 1px solid var(--ws-border);
+    background: #111A29;
+}
+
+.ws-workspace-form-card-kicker {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #818CF8;
+    font-size: 0.64rem;
+    font-weight: 750;
+    letter-spacing: 0.1em;
+}
+
+.ws-workspace-form-card-header h2 {
+    margin: 0;
+    color: var(--ws-text);
+    font-size: 1.05rem;
+    font-weight: 680;
+    letter-spacing: -0.025em;
+}
+
+.ws-workspace-form-card-header p {
+    max-width: 620px;
+    margin: 0.4rem 0 0;
+    color: var(--ws-muted);
+    font-size: 0.78rem;
+    line-height: 1.55;
+}
+
+.ws-workspace-form-icon {
+    display: grid;
+    width: 2.8rem;
+    height: 2.8rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgb(129 140 248 / 0.2);
+    border-radius: 0.7rem;
+    background: rgb(99 102 241 / 0.1);
+    color: #A5B4FC;
+}
+
+    .ws-workspace-form-icon svg {
+        width: 1.25rem;
+        height: 1.25rem;
+        fill: none;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.7;
+    }
+
+.ws-workspace-form {
+    padding: 1.5rem;
+}
+
+.ws-workspace-form-validation {
+    margin-bottom: 1.25rem;
+    color: #FCA5A5;
+    font-size: 0.8rem;
+}
+
+    .ws-workspace-form-validation:empty {
+        display: none;
+    }
+
+.ws-workspace-form-field {
+    margin-bottom: 1.35rem;
+}
+
+.ws-workspace-form-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.ws-workspace-form-label {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--ws-text-secondary);
+    font-size: 0.8rem;
+    font-weight: 650;
+}
+
+.ws-workspace-form-label-row .ws-workspace-form-label {
+    margin-bottom: 0.45rem;
+}
+
+.ws-workspace-form-hint {
+    margin-bottom: 0.45rem;
+    color: var(--ws-muted);
+    font-size: 0.68rem;
+}
+
+.ws-workspace-form-input {
+    display: block;
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.62rem 0.75rem;
+    border: 1px solid var(--ws-border);
+    border-radius: 0.55rem;
+    outline: none;
+    background: #101827;
+    color: var(--ws-text);
+    font: inherit;
+    font-size: 0.88rem;
+    transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+}
+
+    .ws-workspace-form-input::placeholder {
+        color: var(--ws-placeholder);
+    }
+
+    .ws-workspace-form-input:hover {
+        border-color: #344258;
+    }
+
+    .ws-workspace-form-input:focus {
+        border-color: var(--ws-primary-hover);
+        background: #101827;
+        color: var(--ws-text);
+        box-shadow: 0 0 0 0.2rem rgb(99 102 241 / 0.2);
+    }
+
+.ws-workspace-form-textarea {
+    min-height: 8.5rem;
+    resize: vertical;
+    line-height: 1.55;
+}
+
+.ws-workspace-form-error {
+    display: block;
+    margin-top: 0.4rem;
+    color: #FCA5A5;
+    font-size: 0.74rem;
+}
+
+.ws-workspace-form-help {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--ws-muted);
+    font-size: 0.7rem;
+    line-height: 1.5;
+}
+
+.ws-workspace-form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: 1.6rem;
+    padding-top: 1.35rem;
+    border-top: 1px solid var(--ws-border);
+}
+
+.ws-workspace-form-primary-action,
+.ws-workspace-form-secondary-action {
+    display: inline-flex;
+    min-height: 2.55rem;
+    align-items: center;
+    justify-content: center;
+    padding: 0.55rem 0.95rem;
+    border-radius: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 650;
+    text-decoration: none;
+    transition: color 160ms ease, background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.ws-workspace-form-primary-action {
+    border: 1px solid var(--ws-primary);
+    background: var(--ws-primary);
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+    .ws-workspace-form-primary-action:hover {
+        border-color: var(--ws-primary-hover);
+        background: var(--ws-primary-hover);
+        color: #0B1120;
+        transform: translateY(-1px);
+    }
+
+.ws-workspace-form-secondary-action {
+    border: 1px solid #344258;
+    background: #172233;
+    color: var(--ws-text-secondary);
+}
+
+    .ws-workspace-form-secondary-action:hover {
+        border-color: #4A5A74;
+        background: #202D41;
+        color: var(--ws-text);
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+@media (max-width: 700px) {
+    .ws-workspace-form-card-header {
+        padding: 1.2rem;
+    }
+
+    .ws-workspace-form {
+        padding: 1.2rem;
+    }
+
+    .ws-workspace-form-heading h1 {
+        font-size: 2.15rem;
+    }
+}
+
+@media (max-width: 520px) {
+    .ws-workspace-form-page {
+        width: 100%;
+    }
+
+    .ws-workspace-form-card-header {
+        gap: 1rem;
+    }
+
+    .ws-workspace-form-icon {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    .ws-workspace-form {
+        padding: 1rem;
+    }
+
+    .ws-workspace-form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .ws-workspace-form-primary-action,
+    .ws-workspace-form-secondary-action {
+        width: 100%;
+    }
+}

@@ -4,23 +4,144 @@
     ViewData["Title"] = "Create workspace";
 }
 
-<h1>Create workspace</h1>
+<div class="ws-workspace-form-page">
 
-<form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
-    <div class="mb-3">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-    <button type="submit" class="btn btn-primary">Create</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+    <a asp-action="Index" class="ws-workspace-back">
+        <span aria-hidden="true">←</span>
+        <span>Back to workspaces</span>
+    </a>
+
+    <header class="ws-workspace-form-header">
+
+        <div class="ws-workspace-form-heading">
+
+            <div class="ws-workspace-form-eyebrow">
+                <span class="ws-workspace-form-eyebrow-dot"></span>
+                NEW WORKSPACE
+            </div>
+
+            <h1>Create workspace</h1>
+
+            <p>
+                Create a shared space for your projects, boards, tasks,
+                and team members.
+            </p>
+
+        </div>
+
+    </header>
+
+
+    <section class="ws-workspace-form-card">
+
+        <div class="ws-workspace-form-card-header">
+
+            <div>
+                <span class="ws-workspace-form-card-kicker">
+                    WORKSPACE DETAILS
+                </span>
+
+                <h2>Set up your workspace</h2>
+
+                <p>
+                    Give your workspace a clear name and an optional
+                    description so your team knows what it is for.
+                </p>
+            </div>
+
+            <div class="ws-workspace-form-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                    <path d="M4 5.5h7v6H4zM13 5.5h7v3h-7zM13 10.5h7v8h-7zM4 13.5h7v5H4z" />
+                </svg>
+            </div>
+
+        </div>
+
+
+        <form asp-action="Create"
+              method="post"
+              class="ws-workspace-form">
+
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly"
+                 class="ws-workspace-form-validation">
+            </div>
+
+
+            <div class="ws-workspace-form-field">
+
+                <label asp-for="Name"
+                       class="ws-workspace-form-label">
+                    Workspace Name
+                </label>
+
+                <input asp-for="Name"
+                       class="ws-workspace-form-input"
+                       maxlength="100"
+                       autocomplete="off"
+                       autofocus
+                       placeholder="e.g. Product Development" />
+
+                <span asp-validation-for="Name"
+                      class="ws-workspace-form-error">
+                </span>
+
+            </div>
+
+
+            <div class="ws-workspace-form-field">
+
+                <div class="ws-workspace-form-label-row">
+
+                    <label asp-for="Description"
+                           class="ws-workspace-form-label">
+                        Description
+                    </label>
+
+                    <span class="ws-workspace-form-hint">
+                        Optional
+                    </span>
+
+                </div>
+
+                <textarea asp-for="Description"
+                          class="ws-workspace-form-input ws-workspace-form-textarea"
+                          rows="5"
+                          maxlength="500"
+                          placeholder="Describe what this workspace is for.">
+                </textarea>
+
+                <span asp-validation-for="Description"
+                      class="ws-workspace-form-error">
+                </span>
+
+                <span class="ws-workspace-form-help">
+                    Keep it short and useful. You can change this later.
+                </span>
+
+            </div>
+
+
+            <div class="ws-workspace-form-actions">
+
+                <button type="submit"
+                        class="ws-workspace-form-primary-action">
+                    Create workspace
+                </button>
+
+                <a asp-action="Index"
+                   class="ws-workspace-form-secondary-action">
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
