@@ -71,4 +71,25 @@ app.MapControllerRoute(
 app.MapRazorPages()
    .WithStaticAssets();
 
+
+// ============================================================
+// DEMO DATA
+// ============================================================
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context =
+        services.GetRequiredService<ApplicationDbContext>();
+
+    var userManager =
+        services.GetRequiredService<UserManager<IdentityUser>>();
+
+    await DemoDataSeeder.SeedAsync(
+        context,
+        userManager);
+}
+
+
 app.Run();

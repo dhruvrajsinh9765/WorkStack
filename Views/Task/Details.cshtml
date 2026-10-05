@@ -297,9 +297,7 @@
                                             </strong>
 
                                             <time>
-                                                @comment.CreatedAt
-                                                .ToLocalTime()
-                                                .ToString("dd MMM yyyy, hh:mm tt")
+                                                @comment.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
                                             </time>
 
                                         </div>
@@ -394,9 +392,7 @@
                         </span>
 
                         <strong>
-                            @Model.CreatedAt
-                            .ToLocalTime()
-                            .ToString("dd MMM yyyy, hh:mm tt")
+                            @Model.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
                         </strong>
 
                     </div>
@@ -409,9 +405,7 @@
                         </span>
 
                         <strong>
-                            @Model.UpdatedAt
-                            .ToLocalTime()
-                            .ToString("dd MMM yyyy, hh:mm tt")
+                            @Model.UpdatedAt.ToLocalTime().ToString("dd MMM yyyy, hh:mm tt")
                         </strong>
 
                     </div>
